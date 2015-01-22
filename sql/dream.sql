@@ -164,7 +164,7 @@ DROP TABLE IF EXISTS `t_token`;
 CREATE TABLE IF NOT EXISTS `t_token` (
   `F_user_name` varchar(50) NOT NULL COMMENT '用户名',
   `F_pkg` varchar(250) NOT NULL COMMENT '包名',
-  `F_token` char(40) NOT NULL COMMENT 'token',
+  `F_token` char(32) NOT NULL COMMENT 'token',
   `F_expire_datetime` datetime NOT NULL COMMENT 'token到期时间',
   UNIQUE KEY `F_user_name` (`F_user_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='token表';
@@ -172,6 +172,8 @@ CREATE TABLE IF NOT EXISTS `t_token` (
 -- 正在导出表  dream_api_sms_v2.t_token 的数据：0 rows
 DELETE FROM `t_token`;
 /*!40000 ALTER TABLE `t_token` DISABLE KEYS */;
+INSERT INTO `t_token` (`F_user_name`, `F_pkg`, `F_token`, `F_expire_datetime`) VALUES
+	('13417747867', 'abc', '84fa43a3d8092bbda8d69ce49df5959f', '0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `t_token` ENABLE KEYS */;
 
 
@@ -195,6 +197,8 @@ CREATE TABLE IF NOT EXISTS `t_user` (
 -- 正在导出表  dream_api_sms_v2.t_user 的数据：0 rows
 DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
+INSERT INTO `t_user` (`F_user_name`, `F_user_password`, `F_gender`, `F_grade_id`, `F_birthday`, `F_school_id`, `F_province_id`, `F_city_id`, `F_county_id`, `F_area_id`, `F_user_realname`) VALUES
+	('13417747867', '123456', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
