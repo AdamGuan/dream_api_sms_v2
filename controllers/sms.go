@@ -9,7 +9,7 @@ import (
 	//"strings"
 )
 
-//短信
+//短信(每个用户短信发送限制为1分钟的一次)
 type SmsController struct {
 	beego.Controller
 }
@@ -30,13 +30,13 @@ func (u0 *SmsController) checkSign(u *SmsController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
-	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
+//	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
 	}else{
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, mobilePhoneNumber, pkg,helper.Md5(pkg)); re == true {
+		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
 			result = 0
 		}
 	}
@@ -49,7 +49,6 @@ func (u0 *SmsController) checkSign(u *SmsController)int {
 // @Param	num					form	string	true	验证码
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /smsvalid/:mobilePhoneNumber [post]
@@ -88,7 +87,6 @@ func (u *SmsController) Smsvalid() {
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /register/:mobilePhoneNumber [get]
@@ -137,7 +135,6 @@ func (u *SmsController) RegisterGetSms() {
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /resetpwd/:mobilePhoneNumber [get]
@@ -186,7 +183,6 @@ func (u *SmsController) ResetPwdGetSms() {
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /pwd/:mobilePhoneNumber [get]

@@ -48,13 +48,12 @@ func (u0 *UserController) checkSign2(u *UserController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
-	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
 	}else{
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, mobilePhoneNumber, pkg,helper.Md5(pkg)); re == true {
+		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
 			result = 0
 		}
 	}
@@ -67,7 +66,6 @@ func (u0 *UserController) checkSign2(u *UserController)int {
 // @Param	pwd			form	string	true	密码
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /register [post]
@@ -100,7 +98,6 @@ func (u *UserController) Register() {
 // @Param	pwd			form	string	true	密码
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /resetpwd [put]
@@ -133,7 +130,6 @@ func (u *UserController) ResetPwd() {
 // @Param	pwd			query	string	true	密码
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
 // @Success	200 {object} models.MUserLoginResp
 // @Failure 401 无权访问
 // @router /login/:mobilePhoneNumber [get]
@@ -157,10 +153,18 @@ func (u *UserController) CheckUserAndPwd() {
 		}else{
 			res := userObj.CheckUserAndPwd(mobilePhoneNumber,pwd)
 			if res{
-				token := userObj.GetToken(mobilePhoneNumber,pkg)
+				token,tokenExpireDatetime := userObj.GetToken(mobilePhoneNumber,pkg)
 				if len(token) > 0{
 					datas["responseNo"] = 0
 					datas["token"] = token
+					datas["tokenExpireDatetime"] = tokenExpireDatetime
+					//获取用户信息
+					info := userObj.GetUserInfo(mobilePhoneNumber)
+					if len(info) > 0{
+						for k,v := range info{
+							datas[k] = v
+						}
+					}
 				}
 			}else{
 				datas["responseNo"] = -9
@@ -178,7 +182,6 @@ func (u *UserController) CheckUserAndPwd() {
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
 // @Success	200 {object} models.MFindPwdResp
 // @Failure 401 无权访问
 // @router /pwd/:mobilePhoneNumber [get]
@@ -256,7 +259,6 @@ func (u *UserController) ModifyPwd() {
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /exists/:mobilePhoneNumber [get]
@@ -312,6 +314,83 @@ func (u *UserController) GetUserInfo() {
 			for k,v := range info{
 				datas[k] = v
 			}
+		}
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -1
+	}
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 修改用户信息
+// @Description 修改用户信息(token: 登录时获取)
+// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	gender				form	string	false	性别(男或女)
+// @Param	grade				form	string	false	年级
+// @Param	birthday			form	string	false	生日(格式:1999-09-10)
+// @Param	school				form	string	false	学校
+// @Param	province			form	string	false	省
+// @Param	city				form	string	false	市
+// @Param	county				form	string	false	县
+// @Param	area				form	string	false	区
+// @Param	realname			form	string	false	真实姓名
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	pnum				header	string	true	手机号码
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /:mobilePhoneNumber [put]
+func (u *UserController) ModifyUserInfo() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MUser
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	//check sign
+	datas["responseNo"] = u.checkSign(u)
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+		datas["responseNo"] = -1
+		parames := make(map[string]string)
+		for k,v := range u.Ctx.Request.PostForm{
+			parames[k] = v[0]
+		}
+		parames["mobilePhoneNumber"] = mobilePhoneNumber
+		datas["responseNo"] = userObj.ModifyUserInfo(parames)
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -1
+	}
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 用户登出
+// @Description 用户登出(token: 登录时获取)
+// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	pnum				header	string	true	手机号码
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /logout/:mobilePhoneNumber [delete]
+func (u *UserController) UserLogout() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MUser
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	pkg := u.Ctx.Request.Header.Get("pkg")
+	//check sign
+	datas["responseNo"] = u.checkSign(u)
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+		datas["responseNo"] = -1
+		if userObj.UserLoginout(mobilePhoneNumber,pkg) == true{
+			datas["responseNo"] = 0
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1

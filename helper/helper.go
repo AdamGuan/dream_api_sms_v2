@@ -143,3 +143,16 @@ func Md5(str string)string{
 	md5Str := fmt.Sprintf("%x", md5.Sum([]byte(str)))
 	return md5Str
 }
+
+//get now datatime
+func GetNowDateTime()string{
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func GetDateTimeBeforeMinute(num int)string{
+	return time.Now().Add(-time.Minute * time.Duration(num)).Format("2006-01-02 15:04:05")
+}
+
+func GetDateTimeAfterMinute(num int)string{
+	return time.Now().Add(time.Minute * time.Duration(num)).Format("2006-01-02 15:04:05")
+}
