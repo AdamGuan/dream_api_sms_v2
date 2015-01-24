@@ -73,6 +73,7 @@ func (u *SmsController) Smsvalid() {
 			res := smsObj.ValidMsm(num,mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"])
 			if len(res) == 0{
 				datas["responseNo"] = 0
+				smsObj.AddMsmActionvalid(mobilePhoneNumber,pkg,num)
 			}
 		}
 	}else if datas["responseNo"] == 0{

@@ -6,20 +6,6 @@ import (
 
 func init() {
 	
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"],
-		beego.ControllerComments{
-			"DeleteAllUser",
-			`/alluser`,
-			[]string{"delete"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"],
-		beego.ControllerComments{
-			"DeleteUser",
-			`/user`,
-			[]string{"delete"},
-			nil})
-
 	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"],
 		beego.ControllerComments{
 			"Register",
@@ -83,6 +69,41 @@ func init() {
 			[]string{"delete"},
 			nil})
 
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetAllProvinces",
+			`/provinces`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetCitys",
+			`/citys`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetCountys",
+			`/countys`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetTowns",
+			`/towns`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
+		beego.ControllerComments{
+			"QuerySchools",
+			`/`,
+			[]string{"get"},
+			nil})
+
 	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
 		beego.ControllerComments{
 			"Smsvalid",
@@ -109,6 +130,20 @@ func init() {
 			"FindPwdGetSms",
 			`/pwd/:mobilePhoneNumber`,
 			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"],
+		beego.ControllerComments{
+			"DeleteAllUser",
+			`/alluser`,
+			[]string{"delete"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"],
+		beego.ControllerComments{
+			"DeleteUser",
+			`/user`,
+			[]string{"delete"},
 			nil})
 
 }

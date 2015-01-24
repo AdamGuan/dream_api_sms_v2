@@ -11,30 +11,29 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- 导出 dream_api_sms_v2 的数据库结构
-DROP DATABASE IF EXISTS `dream_api_sms_v2`;
 CREATE DATABASE IF NOT EXISTS `dream_api_sms_v2` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `dream_api_sms_v2`;
 
 
--- 导出  表 dream_api_sms_v2.t_city 结构
-DROP TABLE IF EXISTS `t_city`;
-CREATE TABLE IF NOT EXISTS `t_city` (
-  `F_city_id` tinyint(3) unsigned NOT NULL COMMENT '城市ID',
-  `F_city` varchar(50) NOT NULL COMMENT '城市',
-  UNIQUE KEY `F_city_id` (`F_city_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='城市表';
+-- 导出  表 dream_api_sms_v2.t_area 结构
+CREATE TABLE IF NOT EXISTS `t_area` (
+  `F_area_id` int(10) unsigned NOT NULL COMMENT 'ID',
+  `F_area_name` varchar(100) NOT NULL COMMENT '名称',
+  `F_area_parent` int(10) unsigned NOT NULL COMMENT '父ID',
+  `F_area_level` tinyint(1) unsigned NOT NULL COMMENT '等级(1省,2市,3县,4镇)',
+  UNIQUE KEY `t_area_id` (`F_area_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='地域表（包含了4个等级，省，市，县，镇）';
 
--- 正在导出表  dream_api_sms_v2.t_city 的数据：2 rows
-DELETE FROM `t_city`;
-/*!40000 ALTER TABLE `t_city` DISABLE KEYS */;
-INSERT INTO `t_city` (`F_city_id`, `F_city`) VALUES
-	(1, '珠海'),
-	(2, '中山');
-/*!40000 ALTER TABLE `t_city` ENABLE KEYS */;
+-- 正在导出表  dream_api_sms_v2.t_area 的数据：2 rows
+DELETE FROM `t_area`;
+/*!40000 ALTER TABLE `t_area` DISABLE KEYS */;
+INSERT INTO `t_area` (`F_area_id`, `F_area_name`, `F_area_parent`, `F_area_level`) VALUES
+	(1, '北京', 0, 1),
+	(2, '湖南', 0, 1);
+/*!40000 ALTER TABLE `t_area` ENABLE KEYS */;
 
 
 -- 导出  表 dream_api_sms_v2.t_config_pkg 结构
-DROP TABLE IF EXISTS `t_config_pkg`;
 CREATE TABLE IF NOT EXISTS `t_config_pkg` (
   `F_pkg` varchar(250) NOT NULL COMMENT '包名',
   `F_app_name` varchar(250) NOT NULL COMMENT '包对应的应用名字',
@@ -56,7 +55,6 @@ INSERT INTO `t_config_pkg` (`F_pkg`, `F_app_name`, `F_app_id`, `F_app_key`, `F_a
 
 
 -- 导出  表 dream_api_sms_v2.t_config_response 结构
-DROP TABLE IF EXISTS `t_config_response`;
 CREATE TABLE IF NOT EXISTS `t_config_response` (
   `F_response_no` smallint(5) NOT NULL COMMENT '响应code',
   `F_response_msg` varchar(50) NOT NULL COMMENT '响应信息'
@@ -80,24 +78,7 @@ INSERT INTO `t_config_response` (`F_response_no`, `F_response_msg`) VALUES
 /*!40000 ALTER TABLE `t_config_response` ENABLE KEYS */;
 
 
--- 导出  表 dream_api_sms_v2.t_county 结构
-DROP TABLE IF EXISTS `t_county`;
-CREATE TABLE IF NOT EXISTS `t_county` (
-  `F_county_id` tinyint(3) unsigned NOT NULL COMMENT '县ID',
-  `F_county` varchar(50) NOT NULL COMMENT '县',
-  UNIQUE KEY `F_county_id` (`F_county_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='县表';
-
--- 正在导出表  dream_api_sms_v2.t_county 的数据：1 rows
-DELETE FROM `t_county`;
-/*!40000 ALTER TABLE `t_county` DISABLE KEYS */;
-INSERT INTO `t_county` (`F_county_id`, `F_county`) VALUES
-	(1, '太原县');
-/*!40000 ALTER TABLE `t_county` ENABLE KEYS */;
-
-
 -- 导出  表 dream_api_sms_v2.t_grade 结构
-DROP TABLE IF EXISTS `t_grade`;
 CREATE TABLE IF NOT EXISTS `t_grade` (
   `F_grade_id` tinyint(3) unsigned NOT NULL COMMENT '年级ID',
   `F_grade` varchar(50) NOT NULL COMMENT '年级',
@@ -123,24 +104,7 @@ INSERT INTO `t_grade` (`F_grade_id`, `F_grade`) VALUES
 /*!40000 ALTER TABLE `t_grade` ENABLE KEYS */;
 
 
--- 导出  表 dream_api_sms_v2.t_province 结构
-DROP TABLE IF EXISTS `t_province`;
-CREATE TABLE IF NOT EXISTS `t_province` (
-  `F_province_id` tinyint(3) unsigned NOT NULL COMMENT '省份ID',
-  `F_province` varchar(50) NOT NULL COMMENT '省份',
-  UNIQUE KEY `F_province_id` (`F_province_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='省份表';
-
--- 正在导出表  dream_api_sms_v2.t_province 的数据：1 rows
-DELETE FROM `t_province`;
-/*!40000 ALTER TABLE `t_province` DISABLE KEYS */;
-INSERT INTO `t_province` (`F_province_id`, `F_province`) VALUES
-	(1, '广东省');
-/*!40000 ALTER TABLE `t_province` ENABLE KEYS */;
-
-
 -- 导出  表 dream_api_sms_v2.t_school 结构
-DROP TABLE IF EXISTS `t_school`;
 CREATE TABLE IF NOT EXISTS `t_school` (
   `F_school_id` mediumint(8) unsigned NOT NULL COMMENT '学校ID',
   `F_school` varchar(50) NOT NULL COMMENT '学校',
@@ -42860,10 +42824,21 @@ INSERT INTO `t_school` (`F_school_id`, `F_school`) VALUES
 /*!40000 ALTER TABLE `t_school` ENABLE KEYS */;
 
 
+-- 导出  表 dream_api_sms_v2.t_sms_action_valid 结构
+CREATE TABLE IF NOT EXISTS `t_sms_action_valid` (
+  `F_action` char(32) NOT NULL COMMENT '动作，(md5(pthone+pkg+sms))',
+  UNIQUE KEY `F_action` (`F_action`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='记录每个动作对应的短信验证码，用于安全验证。暂时的，会改为redis';
+
+-- 正在导出表  dream_api_sms_v2.t_sms_action_valid 的数据：0 rows
+DELETE FROM `t_sms_action_valid`;
+/*!40000 ALTER TABLE `t_sms_action_valid` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_sms_action_valid` ENABLE KEYS */;
+
+
 -- 导出  表 dream_api_sms_v2.t_sms_rate 结构
-DROP TABLE IF EXISTS `t_sms_rate`;
 CREATE TABLE IF NOT EXISTS `t_sms_rate` (
-  `F_action` char(32) NOT NULL COMMENT '动作，由(手机号码，包名，一起md5构成)',
+  `F_action` char(32) NOT NULL COMMENT '动作，(md5(pthone+pkg))',
   `F_last_timestamp` datetime NOT NULL COMMENT '时间',
   UNIQUE KEY `F_action` (`F_action`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='记录短信发送的频率，用于限制短信的频繁发送，暂时的，会改为redis';
@@ -42875,7 +42850,6 @@ DELETE FROM `t_sms_rate`;
 
 
 -- 导出  表 dream_api_sms_v2.t_token 结构
-DROP TABLE IF EXISTS `t_token`;
 CREATE TABLE IF NOT EXISTS `t_token` (
   `F_user_name` varchar(50) NOT NULL COMMENT '用户名',
   `F_pkg` varchar(250) NOT NULL COMMENT '包名',
@@ -42884,33 +42858,13 @@ CREATE TABLE IF NOT EXISTS `t_token` (
   UNIQUE KEY `F_user_name` (`F_user_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='token表';
 
--- 正在导出表  dream_api_sms_v2.t_token 的数据：1 rows
+-- 正在导出表  dream_api_sms_v2.t_token 的数据：0 rows
 DELETE FROM `t_token`;
 /*!40000 ALTER TABLE `t_token` DISABLE KEYS */;
-INSERT INTO `t_token` (`F_user_name`, `F_pkg`, `F_token`, `F_expire_datetime`) VALUES
-	('13417747867', 'abc', 'd04d6bcd8952675513640bdc2816e041', '2015-02-22 14:35:22');
 /*!40000 ALTER TABLE `t_token` ENABLE KEYS */;
 
 
--- 导出  表 dream_api_sms_v2.t_town 结构
-DROP TABLE IF EXISTS `t_town`;
-CREATE TABLE IF NOT EXISTS `t_town` (
-  `F_town_id` tinyint(3) unsigned NOT NULL COMMENT '镇ID',
-  `F_town` varchar(50) NOT NULL COMMENT '镇',
-  UNIQUE KEY `F_area_id` (`F_town_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='镇表';
-
--- 正在导出表  dream_api_sms_v2.t_town 的数据：2 rows
-DELETE FROM `t_town`;
-/*!40000 ALTER TABLE `t_town` DISABLE KEYS */;
-INSERT INTO `t_town` (`F_town_id`, `F_town`) VALUES
-	(1, '芙蓉区'),
-	(2, '东区');
-/*!40000 ALTER TABLE `t_town` ENABLE KEYS */;
-
-
 -- 导出  表 dream_api_sms_v2.t_user 结构
-DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE IF NOT EXISTS `t_user` (
   `F_user_name` varchar(50) NOT NULL COMMENT '用户名',
   `F_user_password` char(40) NOT NULL COMMENT '用户密码',
@@ -42928,11 +42882,9 @@ CREATE TABLE IF NOT EXISTS `t_user` (
   UNIQUE KEY `F_user_name` (`F_user_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户表';
 
--- 正在导出表  dream_api_sms_v2.t_user 的数据：1 rows
+-- 正在导出表  dream_api_sms_v2.t_user 的数据：0 rows
 DELETE FROM `t_user`;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
-INSERT INTO `t_user` (`F_user_name`, `F_user_password`, `F_gender`, `F_grade_id`, `F_birthday`, `F_school_id`, `F_province_id`, `F_city_id`, `F_county_id`, `F_town_id`, `F_user_realname`, `F_crate_datetime`, `F_modify_datetime`) VALUES
-	('13417747867', '111111', 1, NULL, '1986-02-18', 255, NULL, NULL, NULL, NULL, '管韩强', '2015-01-23 14:32:49', '2015-01-23 16:09:08');
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

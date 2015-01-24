@@ -52,3 +52,15 @@ type MUserInfoResp struct {
 	F_crate_datetime string
 	F_modify_datetime string
 }
+
+type MAreaResp struct {
+	responseNo  int
+	responseMsg string
+	areaList []string
+}
+
+type MSchoolResp struct {
+	responseNo  int
+	responseMsg string
+	schoolList []string
+}

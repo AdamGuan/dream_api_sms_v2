@@ -64,6 +64,7 @@ func (u0 *UserController) checkSign2(u *UserController)int {
 // @Description 注册(token: md5(pkg))
 // @Param	mobilePhoneNumber	form	string	true	手机号码
 // @Param	pwd			form	string	true	密码
+// @Param	num			form	string	true	验证码(经过验证成功后的)
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
 // @Success	200 {object} models.MResp
@@ -74,17 +75,22 @@ func (u *UserController) Register() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MUser
+	var smsObj *models.MSms
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
 	pwd := u.Ctx.Request.FormValue("pwd")
+	num := u.Ctx.Request.FormValue("num")
+	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
-		res2 := userObj.AddUser(mobilePhoneNumber,pwd)
-		datas["responseNo"] = res2
+		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
+			res2 := userObj.AddUser(mobilePhoneNumber,pwd)
+			datas["responseNo"] = res2
+		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
 	}
@@ -96,6 +102,7 @@ func (u *UserController) Register() {
 // @Description 重置密码(token: md5(pkg))
 // @Param	mobilePhoneNumber	form	string	true	手机号码
 // @Param	pwd			form	string	true	密码
+// @Param	num			form	string	true	验证码(经过验证成功后的)
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
 // @Success	200 {object} models.MResp
@@ -106,17 +113,22 @@ func (u *UserController) ResetPwd() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MUser
+	var smsObj *models.MSms
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
 	pwd := u.Ctx.Request.FormValue("pwd")
+	num := u.Ctx.Request.FormValue("num")
+	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
-		res2 := userObj.ModifyUserPwd(mobilePhoneNumber,pwd)
-		datas["responseNo"] = res2
+		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
+			res2 := userObj.ModifyUserPwd(mobilePhoneNumber,pwd)
+			datas["responseNo"] = res2
+		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
 	}
@@ -180,6 +192,7 @@ func (u *UserController) CheckUserAndPwd() {
 // @Title 找回密码
 // @Description 找回密码(token: md5(pkg))
 // @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	num			query	string	true	验证码(经过验证成功后的)
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
 // @Success	200 {object} models.MFindPwdResp
@@ -190,19 +203,24 @@ func (u *UserController) FindPwd() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MUser
+	var smsObj *models.MSms
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	num := u.Ctx.Request.FormValue("num")
+	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
 		if userObj.CheckUserNameExists(mobilePhoneNumber){
-			res := userObj.GetUserPwd(mobilePhoneNumber)
-			if len(res) > 0{
-				datas["responseNo"] = 0
-				datas["password"] = res
+			if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
+				res := userObj.GetUserPwd(mobilePhoneNumber)
+				if len(res) > 0{
+					datas["responseNo"] = 0
+					datas["password"] = res
+				}
 			}
 		}else{
 			datas["responseNo"] = -4

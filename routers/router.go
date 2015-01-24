@@ -20,6 +20,16 @@ func init() {
 				&controllers.UserController{},
 			),
 		),
+		beego.NSNamespace("/area",
+			beego.NSInclude(
+				&controllers.AreaController{},
+			),
+		),
+		beego.NSNamespace("/school",
+			beego.NSInclude(
+				&controllers.SchoolController{},
+			),
+		),
 		beego.NSNamespace("/tmp",
 			beego.NSInclude(
 				&controllers.TmpController{},

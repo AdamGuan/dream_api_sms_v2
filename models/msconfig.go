@@ -64,11 +64,11 @@ func getResponseConfig() {
 func getTown() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_town").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 4").Values(&maps)
 	if err == nil && num > 0 {
 		Town = make(map[string]string)
 		for _, item := range maps {
-			Town[item["F_town_id"].(string)] = item["F_town"].(string)
+			Town[item["t_area_id"].(string)] = item["t_area_name"].(string)
 		}
 	}
 }
@@ -77,11 +77,11 @@ func getTown() {
 func getCity() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_city").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 2").Values(&maps)
 	if err == nil && num > 0 {
 		City = make(map[string]string)
 		for _, item := range maps {
-			City[item["F_city_id"].(string)] = item["F_city"].(string)
+			City[item["t_area_id"].(string)] = item["t_area_name"].(string)
 		}
 	}
 }
@@ -90,11 +90,11 @@ func getCity() {
 func getCounty() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_county").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 3").Values(&maps)
 	if err == nil && num > 0 {
 		County = make(map[string]string)
 		for _, item := range maps {
-			County[item["F_county_id"].(string)] = item["F_county"].(string)
+			County[item["t_area_id"].(string)] = item["t_area_name"].(string)
 		}
 	}
 }
@@ -116,11 +116,11 @@ func getGrade() {
 func getProvince() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_province").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 1").Values(&maps)
 	if err == nil && num > 0 {
 		Province = make(map[string]string)
 		for _, item := range maps {
-			Province[item["F_province_id"].(string)] = item["F_province"].(string)
+			Province[item["t_area_id"].(string)] = item["t_area_name"].(string)
 		}
 	}
 }
