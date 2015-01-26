@@ -46,7 +46,7 @@ func (u *MArea) GetCitys(provinceValue string)[]string{
 		if err == nil && num > 0 {
 			citys2 := make([]string,num)
 			for key,item := range maps{
-				citys[key] = item["F_area_name"].(string)
+				citys2[key] = item["F_area_name"].(string)
 			}
 			return citys2
 		}
@@ -72,7 +72,7 @@ func (u *MArea) GetCountys(cityValue string)[]string{
 		if err == nil && num > 0 {
 			countys2 := make([]string,num)
 			for key,item := range maps{
-				countys[key] = item["F_area_name"].(string)
+				countys2[key] = item["F_area_name"].(string)
 			}
 			return countys2
 		}
@@ -94,11 +94,11 @@ func (u *MArea) GetTowns(countyValue string)[]string{
 	if len(countyId) > 0{
 		o := orm.NewOrm()
 		var maps []orm.Params
-		num, err := o.Raw("SELECT F_area_name FROM t_area WHERE F_area_level=3 AND F_area_parent=?",helper.StrToInt(countyId)).Values(&maps)
+		num, err := o.Raw("SELECT F_area_name FROM t_area WHERE F_area_level=4 AND F_area_parent=?",helper.StrToInt(countyId)).Values(&maps)
 		if err == nil && num > 0 {
 			towns2 := make([]string,num)
 			for key,item := range maps{
-				towns[key] = item["F_area_name"].(string)
+				towns2[key] = item["F_area_name"].(string)
 			}
 			return towns2
 		}

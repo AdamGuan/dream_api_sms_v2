@@ -64,11 +64,11 @@ func getResponseConfig() {
 func getTown() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 4").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE F_area_level = 4").Values(&maps)
 	if err == nil && num > 0 {
 		Town = make(map[string]string)
 		for _, item := range maps {
-			Town[item["t_area_id"].(string)] = item["t_area_name"].(string)
+			Town[item["F_area_id"].(string)] = item["F_area_name"].(string)
 		}
 	}
 }
@@ -77,11 +77,11 @@ func getTown() {
 func getCity() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 2").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE F_area_level = 2").Values(&maps)
 	if err == nil && num > 0 {
 		City = make(map[string]string)
 		for _, item := range maps {
-			City[item["t_area_id"].(string)] = item["t_area_name"].(string)
+			City[item["F_area_id"].(string)] = item["F_area_name"].(string)
 		}
 	}
 }
@@ -90,11 +90,11 @@ func getCity() {
 func getCounty() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 3").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE F_area_level = 3").Values(&maps)
 	if err == nil && num > 0 {
 		County = make(map[string]string)
 		for _, item := range maps {
-			County[item["t_area_id"].(string)] = item["t_area_name"].(string)
+			County[item["F_area_id"].(string)] = item["F_area_name"].(string)
 		}
 	}
 }
@@ -116,11 +116,11 @@ func getGrade() {
 func getProvince() {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_area WHERE t_area_level = 1").Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_area WHERE F_area_level = 1").Values(&maps)
 	if err == nil && num > 0 {
 		Province = make(map[string]string)
 		for _, item := range maps {
-			Province[item["t_area_id"].(string)] = item["t_area_name"].(string)
+			Province[item["F_area_id"].(string)] = item["F_area_name"].(string)
 		}
 	}
 }

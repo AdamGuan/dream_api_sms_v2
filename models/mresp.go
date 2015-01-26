@@ -64,3 +64,9 @@ type MSchoolResp struct {
 	responseMsg string
 	schoolList []string
 }
+
+type MGradeResp struct {
+	responseNo  int
+	responseMsg string
+	gradeList []string
+}

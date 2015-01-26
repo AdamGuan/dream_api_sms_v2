@@ -29,3 +29,19 @@ func (u *MSchool) QuerySchools(name string)[]string{
 	}
 	return schools
 }
+
+//获取所有年级
+func (u *MSchool) GetAllGrade()[]string{
+	grades := make([]string,0)
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_grade FROM t_grade WHERE 1").Values(&maps)
+	if err == nil && num > 0 {
+		grades := make([]string,num)
+		for key,item := range maps{
+			grades[key] = item["F_grade"].(string)
+		}
+		return grades
+	}
+	return grades
+}

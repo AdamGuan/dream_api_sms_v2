@@ -42,3 +42,19 @@ func (u *SchoolController) QuerySchools() {
 	//return
 	u.jsonEcho(datas,u)
 }
+
+// @Title 获取所有年级
+// @Description 获取所有年级
+// @Success	200 {object} models.MGradeResp
+// @Failure 401 无权访问
+// @router /grades [get]
+func (u *SchoolController) GetAllGrade() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": 0}
+	//model ini
+	var schoolObj *models.MSchool
+	grades := schoolObj.GetAllGrade()
+	datas["gradeList"] = grades
+	//return
+	u.jsonEcho(datas,u)
+}
