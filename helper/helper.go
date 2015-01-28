@@ -121,7 +121,7 @@ func CheckSign(sign string, token string) bool {
 
 //手机号码有效性验证
 func CheckMPhoneValid(phone string)bool{
-	matched, err := regexp.MatchString("^1[3|4|5|8][0-9]{9}$", phone)
+	matched, err := regexp.MatchString("^1[3|4|5|6|7|8][0-9]{9}$", phone)
 	if err == nil && matched{
 		return true
 	}
