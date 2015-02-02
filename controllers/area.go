@@ -41,7 +41,7 @@ func (u *AreaController) GetAllProvinces() {
 
 // @Title 获取市
 // @Description 获取市
-// @Param	province	query	string	true	省份
+// @Param	provinceId	query	int	true	省份ID
 // @Success	200 {object} models.MAreaResp
 // @Failure 401 无权访问
 // @router /citys [get]
@@ -50,10 +50,10 @@ func (u *AreaController) GetCitys() {
 	datas := map[string]interface{}{"responseNo": 0}
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	province := u.Ctx.Request.FormValue("province")
+	provinceId := u.Ctx.Request.FormValue("provinceId")
 	//model ini
 	var areaObj *models.MArea
-	citys := areaObj.GetCitys(province)
+	citys := areaObj.GetCitys(helper.StrToInt(provinceId))
 	datas["areaList"] = citys
 	//return
 	u.jsonEcho(datas,u)
@@ -61,7 +61,7 @@ func (u *AreaController) GetCitys() {
 
 // @Title 获取县
 // @Description 获取县
-// @Param	city	query	string	true	市
+// @Param	cityId	query	int	true	市ID
 // @Success	200 {object} models.MAreaResp
 // @Failure 401 无权访问
 // @router /countys [get]
@@ -70,10 +70,10 @@ func (u *AreaController) GetCountys() {
 	datas := map[string]interface{}{"responseNo": 0}
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	city := u.Ctx.Request.FormValue("city")
+	cityId := u.Ctx.Request.FormValue("cityId")
 	//model ini
 	var areaObj *models.MArea
-	countys := areaObj.GetCountys(city)
+	countys := areaObj.GetCountys(helper.StrToInt(cityId))
 	datas["areaList"] = countys
 	//return
 	u.jsonEcho(datas,u)
@@ -81,7 +81,7 @@ func (u *AreaController) GetCountys() {
 
 // @Title 获取镇
 // @Description 获取镇
-// @Param	county	query	string	true	县
+// @Param	countyId	query	int	true	县ID
 // @Success	200 {object} models.MAreaResp
 // @Failure 401 无权访问
 // @router /towns [get]
@@ -90,10 +90,10 @@ func (u *AreaController) GetTowns() {
 	datas := map[string]interface{}{"responseNo": 0}
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	county := u.Ctx.Request.FormValue("county")
+	countyId := u.Ctx.Request.FormValue("countyId")
 	//model ini
 	var areaObj *models.MArea
-	towns := areaObj.GetTowns(county)
+	towns := areaObj.GetTowns(helper.StrToInt(countyId))
 	datas["areaList"] = towns
 	//return
 	u.jsonEcho(datas,u)

@@ -15,12 +15,14 @@ import (
 var ConfigMyResponse map[string]string
 
 //key:id，value:名称
-var Town map[string]string
 var City map[string]string
 var County map[string]string
 var Grade map[string]string
 var Province map[string]string
 var School map[string]string
+
+//学校类型(小学,初中,高中)
+var SchoolType map[int]string
 
 func init() {
 	
@@ -39,12 +41,16 @@ func init() {
 	orm.DebugLog = orm.NewLog(logFile)
 
 	getResponseConfig()
-	getTown()
 	getCity()
 	getCounty()
 	getGrade()
 	getProvince()
 	getSchool()
+	
+	SchoolType = make(map[int]string)
+	SchoolType[1] = "小学"
+	SchoolType[2] = "初中"
+	SchoolType[3] = "高中"
 }
 
 //获取config  im
@@ -56,19 +62,6 @@ func getResponseConfig() {
 		ConfigMyResponse = make(map[string]string)
 		for _, item := range maps {
 			ConfigMyResponse[item["F_response_no"].(string)] = item["F_response_msg"].(string)
-		}
-	}
-}
-
-//获取town
-func getTown() {
-	o := orm.NewOrm()
-	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_area WHERE F_area_level = 4").Values(&maps)
-	if err == nil && num > 0 {
-		Town = make(map[string]string)
-		for _, item := range maps {
-			Town[item["F_area_id"].(string)] = item["F_area_name"].(string)
 		}
 	}
 }

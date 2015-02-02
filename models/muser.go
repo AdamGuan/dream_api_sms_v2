@@ -15,6 +15,24 @@ func init() {
 type MUser struct {
 }
 
+type userInfo struct {
+	F_phone_number string
+	F_gender string
+	F_grade string
+	F_birthday string
+	F_school string
+	F_school_id int
+	F_province string
+	F_province_id int
+	F_city string
+	F_city_id int
+	F_county string
+	F_county_id int
+	F_user_realname string
+	F_crate_datetime string
+	F_modify_datetime string
+}
+
 //检查用户名是否可用
 func (u *MUser) CheckUserNameValid(userName string)int{
 	o := orm.NewOrm()
@@ -140,88 +158,60 @@ func (u *MUser) GetToken(userName string,pkg string)(token string,tokenExpireDat
 }
 
 //获取用户的信息
-func (u *MUser) GetUserInfo(userName string)map[string]string{
-	info := make(map[string]string)
+func (u *MUser) GetUserInfo(userName string)userInfo{
+	info := userInfo{}
 	if len(userName) > 0 {
 		o := orm.NewOrm()
 		var maps []orm.Params
 		num, err := o.Raw("SELECT * FROM t_user WHERE F_user_name=? LIMIT 1", userName).Values(&maps)
 		if err == nil && num > 0 {
-			info["F_phone_number"] = maps[0]["F_user_name"].(string)
+			info.F_phone_number = maps[0]["F_user_name"].(string)
 			//性别
 			gender := maps[0]["F_gender"].(string)
 			genderint := helper.StrToInt(gender)
-			info["F_gender"] = "男"
+			info.F_gender = "男"
 			if genderint != 1{
-				info["F_gender"] = "女"
+				info.F_gender = "女"
 			}
 			//年级
-			info["F_grade"] = ""
+			info.F_grade = ""
 			if maps[0]["F_grade_id"] != nil{
 			tmp,ok := Grade[maps[0]["F_grade_id"].(string)]
 			if ok{
-				info["F_grade"] = tmp
+				info.F_grade = tmp
 			}
 			}
 			//生日
-			info["F_birthday"] = ""
+			info.F_birthday = ""
 			if maps[0]["F_birthday"] != nil{
-				info["F_birthday"] = maps[0]["F_birthday"].(string)
+				info.F_birthday = maps[0]["F_birthday"].(string)
 			}
 			//学校
-			info["F_school"] = ""
-			if maps[0]["F_school_id"] != nil{
-				tmp,ok := School[maps[0]["F_school_id"].(string)]
-				if ok{
-					info["F_school"] = tmp
-				}
-			}
+			info.F_school,_ = School[maps[0]["F_school_id"].(string)]
+			info.F_school_id = helper.StrToInt(maps[0]["F_school_id"].(string))
 			//省份
-			info["F_province"] = ""
-			if maps[0]["F_province_id"] != nil{
-			tmp,ok := Province[maps[0]["F_province_id"].(string)]
-			if ok{
-				info["F_province"] = tmp
-			}
-			}
+			info.F_province,_ = Province[maps[0]["F_province_id"].(string)]
+			info.F_province_id = helper.StrToInt(maps[0]["F_province_id"].(string))
 			//城市
-			info["F_city"] = ""
-			if maps[0]["F_city_id"] != nil{
-			tmp,ok := City[maps[0]["F_city_id"].(string)]
-			if ok{
-				info["F_city"] = tmp
-			}
-			}
-			//镇
-			info["F_county"] = ""
-			if maps[0]["F_county_id"] != nil{
-			tmp,ok := County[maps[0]["F_county_id"].(string)]
-			if ok{
-				info["F_county"] = tmp
-			}
-			}
-			//区
-			info["F_town"] = ""
-			if maps[0]["F_town_id"] != nil{
-			tmp,ok := Town[maps[0]["F_town_id"].(string)]
-			if ok{
-				info["F_town"] = tmp
-			}
-			}
+			info.F_city,_ = City[maps[0]["F_city_id"].(string)]
+			info.F_city_id = helper.StrToInt(maps[0]["F_city_id"].(string))
+			//县
+			info.F_county,_ = County[maps[0]["F_county_id"].(string)]
+			info.F_county_id = helper.StrToInt(maps[0]["F_county_id"].(string))
 			//真实名
-			info["F_user_realname"] = ""
+			info.F_user_realname = ""
 			if maps[0]["F_user_realname"] != nil{
-				info["F_user_realname"] = maps[0]["F_user_realname"].(string)
+				info.F_user_realname = maps[0]["F_user_realname"].(string)
 			}
 			//创建时间
-			info["F_crate_datetime"] = ""
+			info.F_crate_datetime = ""
 			if maps[0]["F_crate_datetime"] != nil{
-				info["F_crate_datetime"] = maps[0]["F_crate_datetime"].(string)
+				info.F_crate_datetime = maps[0]["F_crate_datetime"].(string)
 			}
 			//修改时间
-			info["F_modify_datetime"] = ""
+			info.F_modify_datetime = ""
 			if maps[0]["F_modify_datetime"] != nil{
-				info["F_modify_datetime"] = maps[0]["F_modify_datetime"].(string)
+				info.F_modify_datetime = maps[0]["F_modify_datetime"].(string)
 			}
 		}
 	}
@@ -269,62 +259,34 @@ func (u *MUser) ModifyUserInfo(parames map[string]string)int{
 						result = -10
 					}
 				case "school":
-					tmp := 0
-					for id,v := range School{
-						if value == v{
-							set += "F_school_id="+id+","
-							tmp = 1
-						}
-					}
-					if tmp == 0 {
+					_,ok := School[value]
+					if ok{
+						set += "F_school_id="+value+","
+					}else{
 						breakd = 1
 						result = -10
 					}
 				case "province":
-					tmp := 0
-					for id,v := range Province{
-						if value == v{
-							set += "F_province_id="+id+","
-							tmp = 1
-						}
-					}
-					if tmp == 0 {
+					_,ok := Province[value]
+					if ok{
+						set += "F_province_id="+value+","
+					}else{
 						breakd = 1
 						result = -10
 					}
 				case "city":
-					tmp := 0
-					for id,v := range City{
-						if value == v{
-							set += "F_city_id="+id+","
-							tmp = 1
-						}
-					}
-					if tmp == 0 {
+					_,ok := City[value]
+					if ok{
+						set += "F_city_id="+value+","
+					}else{
 						breakd = 1
 						result = -10
 					}
 				case "county":
-					tmp := 0
-					for id,v := range County{
-						if value == v{
-							set += "F_county_id="+id+","
-							tmp = 1
-						}
-					}
-					if tmp == 0 {
-						breakd = 1
-						result = -10
-					}
-				case "town":
-					tmp := 0
-					for id,v := range Town{
-						if value == v{
-							set += "F_town_id="+id+","
-							tmp = 1
-						}
-					}
-					if tmp == 0 {
+					_,ok := County[value]
+					if ok{
+						set += "F_county_id="+value+","
+					}else{
 						breakd = 1
 						result = -10
 					}

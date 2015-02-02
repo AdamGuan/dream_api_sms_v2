@@ -172,10 +172,22 @@ func (u *UserController) CheckUserAndPwd() {
 					datas["tokenExpireDatetime"] = tokenExpireDatetime
 					//获取用户信息
 					info := userObj.GetUserInfo(mobilePhoneNumber)
-					if len(info) > 0{
-						for k,v := range info{
-							datas[k] = v
-						}
+					if len(info.F_phone_number) > 0{
+						datas["F_phone_number"] = info.F_phone_number
+						datas["F_gender"] = info.F_gender
+						datas["F_grade"] = info.F_grade
+						datas["F_birthday"] = info.F_birthday
+						datas["F_school"] = info.F_school
+						datas["F_school_id"] = info.F_school_id
+						datas["F_province"] = info.F_province
+						datas["F_province_id"] = info.F_province_id
+						datas["F_city"] = info.F_city
+						datas["F_city_id"] = info.F_city_id
+						datas["F_county"] = info.F_county
+						datas["F_county_id"] = info.F_county_id
+						datas["F_user_realname"] = info.F_user_realname
+						datas["F_crate_datetime"] = info.F_crate_datetime
+						datas["F_modify_datetime"] = info.F_modify_datetime
 					}
 				}
 			}else{
@@ -327,11 +339,23 @@ func (u *UserController) GetUserInfo() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
 		info := userObj.GetUserInfo(mobilePhoneNumber)
-		if len(info) > 0{
+		if len(info.F_phone_number) > 0{
 			datas["responseNo"] = 0
-			for k,v := range info{
-				datas[k] = v
-			}
+			datas["F_phone_number"] = info.F_phone_number
+			datas["F_gender"] = info.F_gender
+			datas["F_grade"] = info.F_grade
+			datas["F_birthday"] = info.F_birthday
+			datas["F_school"] = info.F_school
+			datas["F_school_id"] = info.F_school_id
+			datas["F_province"] = info.F_province
+			datas["F_province_id"] = info.F_province_id
+			datas["F_city"] = info.F_city
+			datas["F_city_id"] = info.F_city_id
+			datas["F_county"] = info.F_county
+			datas["F_county_id"] = info.F_county_id
+			datas["F_user_realname"] = info.F_user_realname
+			datas["F_crate_datetime"] = info.F_crate_datetime
+			datas["F_modify_datetime"] = info.F_modify_datetime
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -343,14 +367,13 @@ func (u *UserController) GetUserInfo() {
 // @Title 修改用户信息
 // @Description 修改用户信息(token: 登录时获取)
 // @Param	mobilePhoneNumber	path	string	true	手机号码
-// @Param	gender				form	string	false	性别(男或女)
-// @Param	grade				form	string	false	年级
+// @Param	gender				form	string	false	性别(值: [男|女])
+// @Param	grade				form	string	false	年级(小学一年级 -> 高中三年级)
 // @Param	birthday			form	string	false	生日(格式:1999-09-10)
-// @Param	school				form	string	false	学校
-// @Param	province			form	string	false	省
-// @Param	city				form	string	false	市
-// @Param	county				form	string	false	县
-// @Param	area				form	string	false	区
+// @Param	school				form	int		false	学校ID
+// @Param	province			form	int		false	省ID
+// @Param	city				form	int		false	市ID
+// @Param	county				form	int		false	县ID
 // @Param	realname			form	string	false	真实姓名
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名

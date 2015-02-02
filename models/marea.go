@@ -12,16 +12,27 @@ func init() {
 type MArea struct {
 }
 
+type listItem struct{
+	F_area_id	int
+	F_area_name	string
+}
+
+type list []struct{
+	F_area_id	int
+	F_area_name	string
+}
+
+
 //获取省份
-func (u *MArea) GetAllProvinces()[]string{
-	provinces := make([]string,0)
+func (u *MArea) GetAllProvinces()list{
+	provinces := make(list,0)
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_area_name FROM t_area WHERE F_area_level=1").Values(&maps)
+	num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level=1").Values(&maps)
 	if err == nil && num > 0 {
-		provinces2 := make([]string,num)
+		provinces2 := make(list,num)
 		for key,item := range maps{
-			provinces2[key] = item["F_area_name"].(string)
+			provinces2[key] = listItem{F_area_id:helper.StrToInt(item["F_area_id"].(string)),F_area_name:item["F_area_name"].(string)}
 		}
 		return provinces2
 	}
@@ -29,79 +40,55 @@ func (u *MArea) GetAllProvinces()[]string{
 }
 
 //获取市
-func (u *MArea) GetCitys(provinceValue string)[]string{
-	citys := make([]string,0)
+func (u *MArea) GetCitys(provinceId int)list{
+	citys := make(list,0)
 
-	//获取province id
-	provinceId := ""
-	for k,v := range Province{
-		if v == provinceValue{
-			provinceId = k
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level=2 AND F_area_parent=?",provinceId).Values(&maps)
+	if err == nil && num > 0 {
+		citys2 := make(list,num)
+		for key,item := range maps{
+			citys2[key] = listItem{F_area_id:helper.StrToInt(item["F_area_id"].(string)),F_area_name:item["F_area_name"].(string)}
 		}
+		return citys2
 	}
-	if len(provinceId) > 0{
-		o := orm.NewOrm()
-		var maps []orm.Params
-		num, err := o.Raw("SELECT F_area_name FROM t_area WHERE F_area_level=2 AND F_area_parent=?",helper.StrToInt(provinceId)).Values(&maps)
-		if err == nil && num > 0 {
-			citys2 := make([]string,num)
-			for key,item := range maps{
-				citys2[key] = item["F_area_name"].(string)
-			}
-			return citys2
-		}
-	}
+
 	return citys
 }
 
 //获取县
-func (u *MArea) GetCountys(cityValue string)[]string{
-	countys := make([]string,0)
+func (u *MArea) GetCountys(cityId int)list{
+	countys := make(list,0)
 
-	//获取city id
-	cityId := ""
-	for k,v := range City{
-		if v == cityValue{
-			cityId = k
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level=3 AND F_area_parent=?",cityId).Values(&maps)
+	if err == nil && num > 0 {
+		countys2 := make(list,num)
+		for key,item := range maps{
+			countys2[key] = listItem{F_area_id:helper.StrToInt(item["F_area_id"].(string)),F_area_name:item["F_area_name"].(string)}
 		}
+		return countys2
 	}
-	if len(cityId) > 0{
-		o := orm.NewOrm()
-		var maps []orm.Params
-		num, err := o.Raw("SELECT F_area_name FROM t_area WHERE F_area_level=3 AND F_area_parent=?",helper.StrToInt(cityId)).Values(&maps)
-		if err == nil && num > 0 {
-			countys2 := make([]string,num)
-			for key,item := range maps{
-				countys2[key] = item["F_area_name"].(string)
-			}
-			return countys2
-		}
-	}
+
 	return countys
 }
 
 //获取镇
-func (u *MArea) GetTowns(countyValue string)[]string{
-	towns := make([]string,0)
+func (u *MArea) GetTowns(countyId int)list{
+	towns := make(list,0)
 
-	//获取county id
-	countyId := ""
-	for k,v := range County{
-		if v == countyValue{
-			countyId = k
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level=4 AND F_area_parent=?",countyId).Values(&maps)
+	if err == nil && num > 0 {
+		towns2 := make(list,num)
+		for key,item := range maps{
+			towns2[key] = listItem{F_area_id:helper.StrToInt(item["F_area_id"].(string)),F_area_name:item["F_area_name"].(string)}
 		}
+		return towns2
 	}
-	if len(countyId) > 0{
-		o := orm.NewOrm()
-		var maps []orm.Params
-		num, err := o.Raw("SELECT F_area_name FROM t_area WHERE F_area_level=4 AND F_area_parent=?",helper.StrToInt(countyId)).Values(&maps)
-		if err == nil && num > 0 {
-			towns2 := make([]string,num)
-			for key,item := range maps{
-				towns2[key] = item["F_area_name"].(string)
-			}
-			return towns2
-		}
-	}
+
 	return towns
 }

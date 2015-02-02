@@ -26,6 +26,8 @@ func (u0 *SchoolController) jsonEcho(datas map[string]interface{},u *SchoolContr
 // @Title 根据关键字查询学校
 // @Description 根据关键字查询学校
 // @Param	name	query	string	true	学校名
+// @Param	type	query	string	false	学校类型(值：[小学|初中|高中], 如果不传递则查询所有的学校类型)
+// @Param	areaId	query	int		false	地域ID(只支持第三级的地域ID,如果不传递则查询全部地域的)
 // @Success	200 {object} models.MSchoolResp
 // @Failure 401 无权访问
 // @router / [get]
@@ -35,9 +37,21 @@ func (u *SchoolController) QuerySchools() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	name := u.Ctx.Request.FormValue("name")
+	stype := u.Ctx.Request.FormValue("type")
+	areaId := u.Ctx.Request.FormValue("areaId")
 	//model ini
+	stype2 := 0
+	for k,v := range models.SchoolType{
+		if stype == v{
+			stype2 = k
+		}
+	}
+	areaId2 := 0
+	if len(areaId) > 0{
+		areaId2 = helper.StrToInt(areaId)
+	}
 	var schoolObj *models.MSchool
-	schools := schoolObj.QuerySchools(name)
+	schools := schoolObj.QuerySchools(name,stype2,areaId2)
 	datas["schoolList"] = schools
 	//return
 	u.jsonEcho(datas,u)
