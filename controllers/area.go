@@ -78,23 +78,3 @@ func (u *AreaController) GetCountys() {
 	//return
 	u.jsonEcho(datas,u)
 }
-
-// @Title 获取镇
-// @Description 获取镇
-// @Param	countyId	query	int	true	县ID
-// @Success	200 {object} models.MAreaResp
-// @Failure 401 无权访问
-// @router /towns [get]
-func (u *AreaController) GetTowns() {
-	//ini return
-	datas := map[string]interface{}{"responseNo": 0}
-	//parse request parames
-	u.Ctx.Request.ParseForm()
-	countyId := u.Ctx.Request.FormValue("countyId")
-	//model ini
-	var areaObj *models.MArea
-	towns := areaObj.GetTowns(helper.StrToInt(countyId))
-	datas["areaList"] = towns
-	//return
-	u.jsonEcho(datas,u)
-}

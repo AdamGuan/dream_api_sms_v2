@@ -34,7 +34,9 @@ func init() {
 	dbName := dbconf.String("dbName")
 	orm.RegisterDataBase("default", "mysql", userName+":"+password+"@/"+dbName+"?charset=utf8&loc=Asia%2FShanghai",maxIdle, maxConn)
 	orm.DefaultTimeLoc = time.UTC
-	if beego.RunMode == "dev"{
+	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if debug{
 		orm.Debug = true
 	}
 	logFile, _ := os.OpenFile("./db.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)

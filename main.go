@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"runtime"
+	"github.com/astaxie/beego/config" 
 )
 
 func page_not_found(rw http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,10 @@ func page_not_found(rw http.ResponseWriter, r *http.Request) {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	if beego.RunMode == "dev"{
+	
+	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if debug{
 		beego.StaticDir["/swagger"] = "swagger"
 	}
 	beego.Errorhandler("404", page_not_found)

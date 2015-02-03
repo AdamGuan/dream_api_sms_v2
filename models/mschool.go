@@ -28,27 +28,29 @@ type schoolItem struct {
 //查询学校
 func (u *MSchool) QuerySchools(name string,stype int,areaId int)schoolList{
 	schools := make(schoolList,0)
-	if len(name) > 0 {
-		where := " WHERE 1"
-		if stype != 0{
-			where += " AND F_school_type = "+helper.IntToString(stype);
-		}
-		if areaId != 0{
-			where += " AND F_belong_area_id = "+helper.IntToString(areaId);
-		}
-		where += " AND F_school LIKE '%"+name+"%'"
+	where := " WHERE 1"
 
-		o := orm.NewOrm()
-		var maps []orm.Params
-		num, err := o.Raw("SELECT * FROM t_school"+where).Values(&maps)
-		if err == nil && num > 0 {
-			schools := make(schoolList,num)
-			for key,item := range maps{
-				schools[key] = schoolItem{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:SchoolType[helper.StrToInt(item["F_school_type"].(string))]}
-			}
-			return schools
-		}
+	if stype != 0{
+		where += " AND F_school_type = "+helper.IntToString(stype);
 	}
+	if areaId != 0{
+		where += " AND F_belong_area_id = "+helper.IntToString(areaId);
+	}
+	if len(name) > 0{
+		where += " AND F_school LIKE '%"+name+"%'"
+	}
+
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_school"+where).Values(&maps)
+	if err == nil && num > 0 {
+		schools := make(schoolList,num)
+		for key,item := range maps{
+			schools[key] = schoolItem{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:SchoolType[helper.StrToInt(item["F_school_type"].(string))]}
+		}
+		return schools
+	}
+
 	return schools
 }
 

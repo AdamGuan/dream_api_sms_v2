@@ -15,13 +15,16 @@ import (
 	//"net/url"
 	"time"
 	"regexp"
+	"github.com/astaxie/beego/config" 
 )
 
 var MyLog *logs.BeeLogger
 
 func init() {
 	//初始化log
-	if beego.RunMode == "dev" {
+	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if debug {
 		MyLog = logs.NewLogger(10000)
 		MyLog.SetLogger("file", `{"filename":"log.log"}`)
 		MyLog.EnableFuncCallDepth(true)
