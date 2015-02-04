@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"net/http"
 	"dream_api_sms_v2/helper"
+	"github.com/astaxie/beego/config" 
 	//"fmt"
 	//"strings"
 )
@@ -20,7 +21,14 @@ func (u0 *UserController) jsonEcho(datas map[string]interface{},u *UserControlle
 		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
 	} 
-	datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
+	
+	datas["responseMsg"] = ""
+	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if debug{
+		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
+	}
+
 	u.Data["json"] = datas
 	u.ServeJson()
 }
@@ -188,6 +196,8 @@ func (u *UserController) CheckUserAndPwd() {
 						datas["F_user_realname"] = info.F_user_realname
 						datas["F_crate_datetime"] = info.F_crate_datetime
 						datas["F_modify_datetime"] = info.F_modify_datetime
+						datas["F_class_id"] = info.F_class_id
+						datas["F_class_name"] = info.F_class_name
 					}
 				}
 			}else{
@@ -356,6 +366,8 @@ func (u *UserController) GetUserInfo() {
 			datas["F_user_realname"] = info.F_user_realname
 			datas["F_crate_datetime"] = info.F_crate_datetime
 			datas["F_modify_datetime"] = info.F_modify_datetime
+			datas["F_class_id"] = info.F_class_id
+			datas["F_class_name"] = info.F_class_name
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -435,6 +447,35 @@ func (u *UserController) UserLogout() {
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
+	}
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 修改用户的年级
+// @Description 修改用户的年级
+// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	classId				query	int		true	年级ID
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	pnum				header	string	true	手机号码
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /class/:mobilePhoneNumber [put]
+func (u *UserController) ModifyUserClass() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MUser
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	classId := u.Ctx.Request.FormValue("classId")
+	//check sign
+	datas["responseNo"] = u.checkSign(u)
+	//检查参数
+	if datas["responseNo"] == 0 {
+		datas["responseNo"] = userObj.UserChangeClass(mobilePhoneNumber,helper.StrToInt(classId))
 	}
 	//return
 	u.jsonEcho(datas,u)

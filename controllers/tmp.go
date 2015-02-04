@@ -4,6 +4,7 @@ import (
 	"dream_api_sms_v2/models"
 	"github.com/astaxie/beego"
 	"dream_api_sms_v2/helper"
+	"github.com/astaxie/beego/config" 
 )
 
 //临时工具
@@ -13,7 +14,13 @@ type TmpController struct {
 
 //json echo
 func (u0 *TmpController) jsonEcho(datas map[string]interface{},u *TmpController) {
-	datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
+	datas["responseMsg"] = ""
+	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if debug{
+		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
+	}
+
 	u.Data["json"] = datas
 	u.ServeJson()
 }

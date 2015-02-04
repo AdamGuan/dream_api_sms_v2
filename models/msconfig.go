@@ -31,7 +31,7 @@ func init() {
 	maxConn,_ := dbconf.Int("maxConn")
 	userName := dbconf.String(beego.RunMode+"::userName")
 	password := dbconf.String(beego.RunMode+"::password")
-	dbName := dbconf.String("dbName")
+	dbName := dbconf.String(beego.RunMode+"::dbName")
 	orm.RegisterDataBase("default", "mysql", userName+":"+password+"@/"+dbName+"?charset=utf8&loc=Asia%2FShanghai",maxIdle, maxConn)
 	orm.DefaultTimeLoc = time.UTC
 	appConf, _ := config.NewConfig("ini", "conf/app.conf")

@@ -22,7 +22,6 @@ type list []struct{
 	F_area_name	string
 }
 
-
 //获取省份
 func (u *MArea) GetAllProvinces()list{
 	provinces := make(list,0)

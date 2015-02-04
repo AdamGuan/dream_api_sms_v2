@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"net/http"
 	"dream_api_sms_v2/helper"
+	"github.com/astaxie/beego/config" 
 )
 
 //地域
@@ -18,7 +19,14 @@ func (u0 *AreaController) jsonEcho(datas map[string]interface{},u *AreaControlle
 		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
 	} 
-	datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
+
+	datas["responseMsg"] = ""
+	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if debug{
+		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
+	}
+
 	u.Data["json"] = datas
 	u.ServeJson()
 }

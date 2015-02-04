@@ -30,6 +30,11 @@ func init() {
 				&controllers.SchoolController{},
 			),
 		),
+		beego.NSNamespace("/class",
+			beego.NSInclude(
+				&controllers.ClassController{},
+			),
+		),
 		beego.NSNamespace("/tmp",
 			beego.NSInclude(
 				&controllers.TmpController{},

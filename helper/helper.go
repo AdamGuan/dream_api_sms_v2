@@ -102,7 +102,10 @@ func CheckSign(sign string, token string) bool {
 	if len(sign) == 46 && len(token) == 32 {
 		timestamp := sign[0:14]
 		//检测是否超时
-		if beego.RunMode != "dev"{
+//		appConf, _ := config.NewConfig("ini", "conf/app.conf")
+//		debug,_ := appConf.Bool(beego.RunMode+"::debug")
+//		if !debug{
+		if 1 != 1{
 			nowTime, _ := strconv.Atoi(time.Now().Format("20060102150405"))
 			requestTime, _ := strconv.Atoi(timestamp)
 			timedistince := nowTime - requestTime
@@ -158,4 +161,8 @@ func GetDateTimeBeforeMinute(num int)string{
 
 func GetDateTimeAfterMinute(num int)string{
 	return time.Now().Add(time.Minute * time.Duration(num)).Format("2006-01-02 15:04:05")
+}
+
+func Split(str string,flag string)[]string{
+	return strings.Split(str, ",")
 }

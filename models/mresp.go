@@ -37,6 +37,8 @@ type MUserLoginResp struct {
 	F_user_realname string
 	F_crate_datetime string
 	F_modify_datetime string
+	F_class_id int
+	F_class_name string
 }
 
 type MUserInfoResp struct {
@@ -57,6 +59,8 @@ type MUserInfoResp struct {
 	F_user_realname string
 	F_crate_datetime string
 	F_modify_datetime string
+	F_class_id int
+	F_class_name string
 }
 
 type MAreaResp struct {
@@ -82,4 +86,38 @@ type MGradeResp struct {
 	responseNo  int
 	responseMsg string
 	gradeList []string
+}
+
+type MClassListInfoResp struct {
+	responseNo  int
+	responseMsg string
+	classList []struct{
+		F_class_id int
+		F_class_name string
+		F_class_person_total int
+	}
+}
+
+type MSchoolAreaInfoResp struct {
+	responseNo  int
+	responseMsg string
+	areaInfoList map[string]struct{
+		F_school_id int
+		F_area_province_id int
+		F_area_province_name string
+		F_area_city_id int
+		F_area_city_name string
+		F_area_county_id int
+		F_area_county_name string
+	}
+}
+
+type MSchoolAreaInfoItemResp map[string]struct{
+		F_school_id int
+		F_area_province_id int
+		F_area_province_name string
+		F_area_city_id int
+		F_area_city_name string
+		F_area_county_id int
+		F_area_county_name string
 }

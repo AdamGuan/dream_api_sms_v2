@@ -31,6 +31,8 @@ type userInfo struct {
 	F_user_realname string
 	F_crate_datetime string
 	F_modify_datetime string
+	F_class_id int
+	F_class_name string
 }
 
 //检查用户名是否可用
@@ -213,6 +215,14 @@ func (u *MUser) GetUserInfo(userName string)userInfo{
 			if maps[0]["F_modify_datetime"] != nil{
 				info.F_modify_datetime = maps[0]["F_modify_datetime"].(string)
 			}
+			//年级
+			info.F_class_id = helper.StrToInt(maps[0]["F_class_id"].(string))
+			info.F_class_name = ""
+			var maps2 []orm.Params
+			num, err := o.Raw("SELECT F_class_name FROM t_class WHERE F_class_id = ? LIMIT 1",maps[0]["F_class_id"].(string)).Values(&maps2)
+			if err == nil && num > 0 {
+				info.F_class_name = maps2[0]["F_class_name"].(string)
+			}
 		}
 	}
 	return info
@@ -335,5 +345,28 @@ func (u *MUser) UserLoginout(userName string,pkg string)bool{
 			result = true
 		}
 	}
+	return result
+}
+
+//用户修改班级
+func (u *MUser) UserChangeClass(userName string,classId int)int{
+	result := -14
+	//查询班级是否存在
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_class_id FROM t_class WHERE F_class_id = ? LIMIT 1",classId).Values(&maps)
+	if err == nil && num > 0 {
+		result = -1
+		//修改用户的班级
+		now := helper.GetNowDateTime()
+		res, err := o.Raw("UPDATE t_user SET F_class_id = ?,F_modify_datetime= ? WHERE F_user_name = ?",classId,now,userName).Exec()
+		if err == nil {
+			num, _ := res.RowsAffected()
+			if num >0 {
+				result = 0
+			}
+		}
+	}
+
 	return result
 }
