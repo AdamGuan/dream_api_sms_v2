@@ -78,7 +78,7 @@ func (u *MUser) CheckUserAndPwd(userName string,userPwd string)bool{
 
 //检查用户密码
 func (u *MUser) CheckUserPwdValid(userPwd string)int{
-	if len(userPwd) > 0{
+	if helper.CheckPwdValid(userPwd){
 		return 0
 	}
 	return -3
