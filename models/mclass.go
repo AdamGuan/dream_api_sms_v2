@@ -25,7 +25,7 @@ type classInfo struct{
 }
 
 //创建一个班级
-func (u *MClass) CreateAClass(userName string,className string,schoolId int)int{
+func (u *MClass) CreateAClass(userName string,className string,schoolId int,gradeId int)int{
 	o := orm.NewOrm()
 	//查询学校是否存在
 	result := -11
@@ -40,16 +40,24 @@ func (u *MClass) CreateAClass(userName string,className string,schoolId int)int{
 		if len(className) > 0 && len(className) <= 40{
 			result = -13
 			var maps []orm.Params
-			num, err := o.Raw("SELECT F_class_id FROM t_class WHERE F_school_id = ? AND F_class_name = ? LIMIT 1",schoolId,className).Values(&maps)
+			num, err := o.Raw("SELECT F_class_id FROM t_class WHERE F_school_id = ? AND F_grade_id = ? AND F_class_name = ? LIMIT 1",schoolId,gradeId,className).Values(&maps)
 			if err == nil && num <= 0 {
 				result = 0
 			}
 		}
 	}
+	//判断年级是否有效
+	if result == 0{
+		_,ok := Grade[helper.IntToString(gradeId)]
+		if !ok{
+			result = -19
+		}
+	}
+
 	//写入数据库
 	if result == 0{
 		result = -1
-		res, err := o.Raw("INSERT INTO t_class SET F_class_name = ?,F_school_id=?", className,schoolId).Exec()
+		res, err := o.Raw("INSERT INTO t_class SET F_class_name = ?,F_school_id=?,F_grade_id=?", className,schoolId,gradeId).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
 			classId, _ := res.LastInsertId()
@@ -68,13 +76,13 @@ func (u *MClass) CreateAClass(userName string,className string,schoolId int)int{
 	return result
 }
 
-//获取某个学校下的所有班级信息
-func (u *MClass) GetSchoolClassInfo(schoolId int)allClassInfo{
+//根据学校以及年级获取所有班级信息
+func (u *MClass) GetSchoolClassInfo(schoolId int,gradeId int)allClassInfo{
 	schools := make(allClassInfo,0)
 
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT t_class.F_class_id,t_class.F_class_name,count(t_user.F_user_name) as total_person FROM t_class,t_user where t_class.F_school_id = ? AND t_class.F_class_id = t_user.F_class_id GROUP BY t_class.F_class_id",schoolId).Values(&maps)
+	num, err := o.Raw("SELECT t_class.F_class_id,t_class.F_class_name,count(t_user.F_user_name) as total_person FROM t_class,t_user where t_class.F_school_id = ? AND t_class.F_grade_id = ? AND t_class.F_class_id = t_user.F_class_id GROUP BY t_class.F_class_id",schoolId,gradeId).Values(&maps)
 	if err == nil && num > 0 {
 		schools = make(allClassInfo,num)
 		for key,item := range maps{

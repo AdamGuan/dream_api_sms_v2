@@ -166,3 +166,14 @@ func GetDateTimeAfterMinute(num int)string{
 func Split(str string,flag string)[]string{
 	return strings.Split(str, ",")
 }
+
+func JoinString(list []string,flag string)string{
+	result := ""
+	if len(list) > 0{
+		for _,v := range list{
+			result += v+","
+		}
+		result = strings.Trim(result,",")
+	}
+	return result
+}

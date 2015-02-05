@@ -13,6 +13,16 @@ type AreaController struct {
 	beego.Controller
 }
 
+type areaInfoList map[string]struct{
+		F_area_id int
+		F_area_name string
+}
+
+type areaInfoItem struct{
+		F_area_id int
+		F_area_name string
+}
+
 //json echo
 func (u0 *AreaController) jsonEcho(datas map[string]interface{},u *AreaController) {
 	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
@@ -83,6 +93,99 @@ func (u *AreaController) GetCountys() {
 	var areaObj *models.MArea
 	countys := areaObj.GetCountys(helper.StrToInt(cityId))
 	datas["areaList"] = countys
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 根据省份ID获取名称
+// @Description 根据省份ID获取名称
+// @Param	ids	path	string		true	省份ID(多个ID用","分隔)
+// @Success	200 {object} models.MAreaInfoResp
+// @Failure 401 无权访问
+// @router /province/:ids [get]
+func (u *AreaController) GetProvinceName() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": 0}
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	ids := u.Ctx.Input.Param(":ids")
+	if len(ids) > 0{
+		idList := helper.Split(ids,",")
+		tmp := make(areaInfoList,len(idList))
+		for _,id := range idList{
+			name,ok := models.Province[id]
+			if ok{
+				tmp[id] = areaInfoItem{F_area_id:helper.StrToInt(id),F_area_name:name}
+			}
+		}
+		if len(tmp) > 0{
+			datas["areaInfoList"] = tmp
+		}else{
+			datas["responseNo"] = -17
+		}
+	}
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 根据市ID获取名称
+// @Description 根据市ID获取名称
+// @Param	ids	path	string		true	市ID(多个ID用","分隔)
+// @Success	200 {object} models.MAreaInfoResp
+// @Failure 401 无权访问
+// @router /city/:ids [get]
+func (u *AreaController) GetCityName() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": 0}
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	ids := u.Ctx.Input.Param(":ids")
+	if len(ids) > 0{
+		idList := helper.Split(ids,",")
+		tmp := make(areaInfoList,len(idList))
+		for _,id := range idList{
+			name,ok := models.City[id]
+			if ok{
+				tmp[id] = areaInfoItem{F_area_id:helper.StrToInt(id),F_area_name:name}
+			}
+		}
+		if len(tmp) > 0{
+			datas["areaInfoList"] = tmp
+		}else{
+			datas["responseNo"] = -17
+		}
+	}
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 根据县ID获取名称
+// @Description 根据县ID获取名称
+// @Param	ids	path	string		true	县ID(多个ID用","分隔)
+// @Success	200 {object} models.MAreaInfoResp
+// @Failure 401 无权访问
+// @router /county/:ids [get]
+func (u *AreaController) GetCountyName() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": 0}
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	ids := u.Ctx.Input.Param(":ids")
+	if len(ids) > 0{
+		idList := helper.Split(ids,",")
+		tmp := make(areaInfoList,len(idList))
+		for _,id := range idList{
+			name,ok := models.County[id]
+			if ok{
+				tmp[id] = areaInfoItem{F_area_id:helper.StrToInt(id),F_area_name:name}
+			}
+		}
+		if len(tmp) > 0{
+			datas["areaInfoList"] = tmp
+		}else{
+			datas["responseNo"] = -17
+		}
+	}
 	//return
 	u.jsonEcho(datas,u)
 }

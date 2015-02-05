@@ -9,6 +9,7 @@ import (
 	//"dream_api_sms/helper"
 	"time"
 	"github.com/astaxie/beego/config" 
+	"dream_api_sms_v2/helper"
 )
 
 //key:响应代码，value:响应信息
@@ -23,6 +24,23 @@ var School map[string]string
 
 //学校类型(小学,初中,高中)
 var SchoolType map[int]string
+
+//缺省学校列表
+type DefaultSchoolItemType struct{
+	F_school_id			int
+	F_school			string
+	F_school_type		int
+	F_belong_area_id	int
+}
+
+type DefaultSchoolListType map[string]struct{
+	F_school_id			int
+	F_school			string
+	F_school_type		int
+	F_belong_area_id	int
+}
+
+var DefaultSchoolList DefaultSchoolListType
 
 func init() {
 	
@@ -48,6 +66,7 @@ func init() {
 	getGrade()
 	getProvince()
 	getSchool()
+	getDefaultSchool()
 	
 	SchoolType = make(map[int]string)
 	SchoolType[1] = "小学"
@@ -129,6 +148,19 @@ func getSchool() {
 		School = make(map[string]string)
 		for _, item := range maps {
 			School[item["F_school_id"].(string)] = item["F_school"].(string)
+		}
+	}
+}
+
+//获取缺省的school列表
+func getDefaultSchool() {
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_school WHERE F_school_id < 0").Values(&maps)
+	if err == nil && num > 0 {
+		DefaultSchoolList = make(DefaultSchoolListType,num)
+		for _, item := range maps {
+			DefaultSchoolList[item["F_school_id"].(string)] = DefaultSchoolItemType{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:helper.StrToInt(item["F_school_type"].(string)),F_belong_area_id:helper.StrToInt(item["F_belong_area_id"].(string))}
 		}
 	}
 }

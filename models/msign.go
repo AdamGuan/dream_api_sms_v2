@@ -34,3 +34,19 @@ func (u *MSign) CheckSign(signOri string,userName string,pkg string,token string
 	}
 	return false
 }
+
+//检查token是否正确
+func (u *MSign) CheckToken(userName string,pkg string,token string) bool{
+	//get token
+	o := orm.NewOrm()
+	if len(token) > 0 && len(userName) > 0 && len(pkg) > 0{
+		if len(userName) > 0 && len(pkg) > 0{
+			var maps []orm.Params
+			num, err := o.Raw("SELECT F_token FROM t_token WHERE F_user_name=? AND F_pkg=? AND F_expire_datetime > ? LIMIT 1", userName,pkg,helper.GetNowDateTime()).Values(&maps)
+			if err == nil && num > 0 {
+				return true
+			}
+		}
+	}
+	return false
+}

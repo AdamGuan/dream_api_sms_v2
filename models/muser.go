@@ -85,21 +85,112 @@ func (u *MUser) CheckUserPwdValid(userPwd string)int{
 }
 
 //添加用户
-func (u *MUser) AddUser(userName string,userPwd string)int{
-	result := u.CheckUserNameValid(userName)
-	if result == 0{
+func (u *MUser) AddUser(parames map[string]string)int{
+	result := -16
+	userName,ok := parames["mobilePhoneNumber"]
+	if ok{
+		result = u.CheckUserNameValid(userName)
+	}
+	userPwd,ok := parames["pwd"]
+	if result == 0 && ok{
 		result = u.CheckUserPwdValid(userPwd)
 	}
 	if result == 0{
-		result = -1
-		//写入数据库
-		o := orm.NewOrm()
+		/**/
+		breakd := 0
 		now := helper.GetNowDateTime()
-		res, err := o.Raw("INSERT INTO t_user SET F_user_name = ?,F_user_password=?,F_crate_datetime=?,F_modify_datetime=?", userName,userPwd,now,now).Exec()
-		if err == nil {
-			num, _ := res.RowsAffected()
-			if num >0{
-				result = 0
+		set := "F_user_name = '"+userName+"',F_user_password='"+userPwd+"',F_crate_datetime='"+now+"',F_modify_datetime='"+now+"',"
+		for filed,value := range parames{
+			switch filed {
+				case "gender":
+					if value == "男" || value == "女"{
+						g := "2"
+						if value == "男" {
+							g = "1"
+						}
+						set += "F_gender="+g+","
+					}else{
+						breakd = 1
+						result = -10
+					}
+				case "grade":
+					tmp := 0
+					for id,v := range Grade{
+						if value == v{
+							set += "F_grade_id="+id+","
+							tmp = 1
+						}
+					}
+					if tmp == 0 {
+						breakd = 1
+						result = -10
+					}
+				case "birthday":
+					if len(value) > 0{
+						set += "F_birthday='"+value+"',"
+					}else{
+						breakd = 1
+						result = -10
+					}
+				case "school":
+					_,ok := School[value]
+					if ok{
+						set += "F_school_id="+value+","
+					}else{
+						breakd = 1
+						result = -10
+					}
+				case "province":
+					_,ok := Province[value]
+					if ok{
+						set += "F_province_id="+value+","
+					}else{
+						breakd = 1
+						result = -10
+					}
+				case "city":
+					_,ok := City[value]
+					if ok{
+						set += "F_city_id="+value+","
+					}else{
+						breakd = 1
+						result = -10
+					}
+				case "county":
+					_,ok := County[value]
+					if ok{
+						set += "F_county_id="+value+","
+					}else{
+						breakd = 1
+						result = -10
+					}
+				case "realname":
+					if len(value) > 0{
+						set += "F_user_realname='"+value+"',"
+					}else{
+						breakd = 1
+						result = -10
+					}
+				default:
+			}
+			if breakd == 1{
+				break
+			}
+		}
+		/**/
+		//写入数据库
+		if result == 0 {
+			result = -1
+			set = strings.Trim(set, ",")
+			if len(set) > 0{
+				o := orm.NewOrm()
+				res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+				if err == nil {
+					num, _ := res.RowsAffected()
+					if num >0{
+						result = 0
+					}
+				}
 			}
 		}
 	}
@@ -178,10 +269,10 @@ func (u *MUser) GetUserInfo(userName string)userInfo{
 			//年级
 			info.F_grade = ""
 			if maps[0]["F_grade_id"] != nil{
-			tmp,ok := Grade[maps[0]["F_grade_id"].(string)]
-			if ok{
-				info.F_grade = tmp
-			}
+				tmp,ok := Grade[maps[0]["F_grade_id"].(string)]
+				if ok{
+					info.F_grade = tmp
+				}
 			}
 			//生日
 			info.F_birthday = ""
@@ -215,7 +306,7 @@ func (u *MUser) GetUserInfo(userName string)userInfo{
 			if maps[0]["F_modify_datetime"] != nil{
 				info.F_modify_datetime = maps[0]["F_modify_datetime"].(string)
 			}
-			//年级
+			//班级
 			info.F_class_id = helper.StrToInt(maps[0]["F_class_id"].(string))
 			info.F_class_name = ""
 			var maps2 []orm.Params

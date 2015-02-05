@@ -35,6 +35,11 @@ func init() {
 				&controllers.ClassController{},
 			),
 		),
+		beego.NSNamespace("/token",
+			beego.NSInclude(
+				&controllers.TokenController{},
+			),
+		),
 		beego.NSNamespace("/tmp",
 			beego.NSInclude(
 				&controllers.TmpController{},

@@ -121,3 +121,12 @@ type MSchoolAreaInfoItemResp map[string]struct{
 		F_area_county_id int
 		F_area_county_name string
 }
+
+type MAreaInfoResp struct {
+	responseNo  int
+	responseMsg string
+	areaInfoList map[string]struct{
+		F_area_id int
+		F_area_name string
+	}
+}

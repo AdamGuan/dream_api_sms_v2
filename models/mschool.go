@@ -35,7 +35,7 @@ type schoolArea struct{
 }
 
 //查询学校
-func (u *MSchool) QuerySchools(name string,stype int,areaId int,areaName string)schoolList{
+func (u *MSchool) QuerySchools(name string,stype int,areaId int,areaName string,needDefault bool)schoolList{
 	schools := make(schoolList,0)
 	
 	//查询地域ID
@@ -48,7 +48,7 @@ func (u *MSchool) QuerySchools(name string,stype int,areaId int,areaName string)
 		}
 	}
 
-	where := " WHERE 1"
+	where := " WHERE 1 AND F_school_id > 0 "
 
 	if stype != 0{
 		where += " AND F_school_type = "+helper.IntToString(stype)
@@ -66,6 +66,19 @@ func (u *MSchool) QuerySchools(name string,stype int,areaId int,areaName string)
 		schools := make(schoolList,num)
 		for key,item := range maps{
 			schools[key] = schoolItem{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:SchoolType[helper.StrToInt(item["F_school_type"].(string))]}
+		}
+		return schools
+	}
+	if needDefault && num <= 0{
+		schools := make(schoolList,0)
+		for _,item := range DefaultSchoolList{
+			if stype != 0{
+				if item.F_school_type == stype{
+					schools = append(schools, schoolItem{F_school_id:item.F_school_id,F_school:item.F_school,F_school_type:SchoolType[item.F_school_type]})
+				}
+			}else{
+				schools = append(schools, schoolItem{F_school_id:item.F_school_id,F_school:item.F_school,F_school_type:SchoolType[item.F_school_type]})
+			}
 		}
 		return schools
 	}
@@ -134,4 +147,22 @@ func (u *MSchool) GetSchoolArea(schoolId int)schoolArea{
 		areaInfo = areaInfoTmp
 	}
 	return areaInfo
+}
+
+//根据学校ID查询学校名
+func (u *MSchool) GetSchoolNameById(ids []string)schoolList{
+	schools := make(schoolList,0)
+	if len(ids) > 0{
+		o := orm.NewOrm()
+		var maps []orm.Params
+		idStr := helper.JoinString(ids,",")
+		num, err := o.Raw("SELECT F_school_id,F_school,F_school_type FROM t_school WHERE F_school_id IN("+idStr+")").Values(&maps)
+		if err == nil && num > 0 {
+			schools = make(schoolList,num)
+			for key,item := range maps{
+				schools[key] = schoolItem{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:SchoolType[helper.StrToInt(item["F_school_type"].(string))]}
+			}
+		}
+	}
+	return schools
 }

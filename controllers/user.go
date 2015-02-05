@@ -71,10 +71,18 @@ func (u0 *UserController) checkSign2(u *UserController)int {
 // @Title 注册
 // @Description 注册(token: md5(pkg))
 // @Param	mobilePhoneNumber	form	string	true	手机号码
-// @Param	pwd			form	string	true	密码
-// @Param	num			form	string	true	验证码(经过验证成功后的)
-// @Param	sign		header	string	true	签名
-// @Param	pkg			header	string	true	包名
+// @Param	pwd					form	string	true	密码
+// @Param	gender				form	string	false	性别(值: [男|女])
+// @Param	grade				form	string	false	年级(小学一年级 -> 高中三年级)
+// @Param	birthday			form	string	false	生日(格式:1999-09-10)
+// @Param	school				form	int		false	学校ID
+// @Param	province			form	int		false	省ID
+// @Param	city				form	int		false	市ID
+// @Param	county				form	int		false	县ID
+// @Param	realname			form	string	false	真实姓名
+// @Param	num					form	string	true	验证码(经过验证成功后的)
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /register [post]
@@ -96,7 +104,13 @@ func (u *UserController) Register() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
 		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
-			res2 := userObj.AddUser(mobilePhoneNumber,pwd)
+			parames := make(map[string]string)
+			for k,v := range u.Ctx.Request.PostForm{
+				parames[k] = v[0]
+			}
+			parames["mobilePhoneNumber"] = mobilePhoneNumber
+
+			res2 := userObj.AddUser(parames)
 			datas["responseNo"] = res2
 		}
 	}else if datas["responseNo"] == 0{
