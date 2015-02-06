@@ -109,6 +109,7 @@ func (u *UserController) Register() {
 				parames[k] = v[0]
 			}
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
+			parames["pwd"] = pwd
 
 			res2 := userObj.AddUser(parames)
 			datas["responseNo"] = res2

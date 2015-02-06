@@ -6,62 +6,6 @@ import (
 
 func init() {
 	
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
-		beego.ControllerComments{
-			"GetAllProvinces",
-			`/provinces`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
-		beego.ControllerComments{
-			"GetCitys",
-			`/citys`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
-		beego.ControllerComments{
-			"GetCountys",
-			`/countys`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
-		beego.ControllerComments{
-			"GetProvinceName",
-			`/province/:ids`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
-		beego.ControllerComments{
-			"GetCityName",
-			`/city/:ids`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
-		beego.ControllerComments{
-			"GetCountyName",
-			`/county/:ids`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"],
-		beego.ControllerComments{
-			"AddAClass",
-			`/`,
-			[]string{"post"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"],
-		beego.ControllerComments{
-			"GetAllClasses",
-			`/:schoolId`,
-			[]string{"get"},
-			nil})
-
 	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
 		beego.ControllerComments{
 			"QuerySchools",
@@ -207,6 +151,62 @@ func init() {
 			"ModifyUserClass",
 			`/class/:mobilePhoneNumber`,
 			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetAllProvinces",
+			`/provinces`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetCitys",
+			`/citys`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetCountys",
+			`/countys`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetProvinceName",
+			`/province/:ids`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetCityName",
+			`/city/:ids`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
+		beego.ControllerComments{
+			"GetCountyName",
+			`/county/:ids`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"],
+		beego.ControllerComments{
+			"AddAClass",
+			`/`,
+			[]string{"post"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ClassController"],
+		beego.ControllerComments{
+			"GetAllClasses",
+			`/:schoolId`,
+			[]string{"get"},
 			nil})
 
 }

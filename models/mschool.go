@@ -112,40 +112,54 @@ func (u *MSchool) GetSchoolArea(schoolId int)schoolArea{
 	num, err := o.Raw("SELECT F_belong_area_id FROM t_school WHERE F_school_id = ? LIMIT 1",schoolId).Values(&maps)
 	if err == nil && num > 0 {
 		areaId := helper.StrToInt(maps[0]["F_belong_area_id"].(string))
-		if areaId > 0{
-			//查学校所属县的ID,name
+		if schoolId < 0{
+			//查学校所属省的ID,name
 			var maps []orm.Params
-			num, err := o.Raw("SELECT F_area_id,F_area_name,F_area_parent FROM t_area WHERE F_area_level = 3 AND F_area_id = ? LIMIT 1",areaId).Values(&maps)
+			num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level = 1 AND F_area_id = ? LIMIT 1",areaId).Values(&maps)
 			if err == nil && num > 0 {
-				areaInfoTmp.F_area_county_id = helper.StrToInt(maps[0]["F_area_id"].(string))
-				areaInfoTmp.F_area_county_name = maps[0]["F_area_name"].(string)
-				parentId := helper.StrToInt(maps[0]["F_area_parent"].(string))
-				if areaInfoTmp.F_area_county_id > 0{
-					//查学校所属市的ID,name
-					var maps []orm.Params
-					num, err := o.Raw("SELECT F_area_id,F_area_name,F_area_parent FROM t_area WHERE F_area_level = 2 AND F_area_id = ? LIMIT 1",parentId).Values(&maps)
-					if err == nil && num > 0 {
-						areaInfoTmp.F_area_city_id = helper.StrToInt(maps[0]["F_area_id"].(string))
-						areaInfoTmp.F_area_city_name = maps[0]["F_area_name"].(string)
-						parentId := helper.StrToInt(maps[0]["F_area_parent"].(string))
-						if areaInfoTmp.F_area_city_id > 0{
-							//查学校所属省的ID,name
-							var maps []orm.Params
-							num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level = 1 AND F_area_id = ? LIMIT 1",parentId).Values(&maps)
-							if err == nil && num > 0 {
-								areaInfoTmp.F_area_province_id = helper.StrToInt(maps[0]["F_area_id"].(string))
-								areaInfoTmp.F_area_province_name = maps[0]["F_area_name"].(string)
-								areaInfoTmp.F_school_id = schoolId
+				areaInfoTmp.F_area_province_id = helper.StrToInt(maps[0]["F_area_id"].(string))
+				areaInfoTmp.F_area_province_name = maps[0]["F_area_name"].(string)
+				areaInfoTmp.F_school_id = schoolId
+
+				areaInfo = areaInfoTmp
+			}
+		}else{
+			if areaId > 0{
+				//查学校所属县的ID,name
+				var maps []orm.Params
+				num, err := o.Raw("SELECT F_area_id,F_area_name,F_area_parent FROM t_area WHERE F_area_level = 3 AND F_area_id = ? LIMIT 1",areaId).Values(&maps)
+				if err == nil && num > 0 {
+					areaInfoTmp.F_area_county_id = helper.StrToInt(maps[0]["F_area_id"].(string))
+					areaInfoTmp.F_area_county_name = maps[0]["F_area_name"].(string)
+					parentId := helper.StrToInt(maps[0]["F_area_parent"].(string))
+					if areaInfoTmp.F_area_county_id > 0{
+						//查学校所属市的ID,name
+						var maps []orm.Params
+						num, err := o.Raw("SELECT F_area_id,F_area_name,F_area_parent FROM t_area WHERE F_area_level = 2 AND F_area_id = ? LIMIT 1",parentId).Values(&maps)
+						if err == nil && num > 0 {
+							areaInfoTmp.F_area_city_id = helper.StrToInt(maps[0]["F_area_id"].(string))
+							areaInfoTmp.F_area_city_name = maps[0]["F_area_name"].(string)
+							parentId := helper.StrToInt(maps[0]["F_area_parent"].(string))
+							if areaInfoTmp.F_area_city_id > 0{
+								//查学校所属省的ID,name
+								var maps []orm.Params
+								num, err := o.Raw("SELECT F_area_id,F_area_name FROM t_area WHERE F_area_level = 1 AND F_area_id = ? LIMIT 1",parentId).Values(&maps)
+								if err == nil && num > 0 {
+									areaInfoTmp.F_area_province_id = helper.StrToInt(maps[0]["F_area_id"].(string))
+									areaInfoTmp.F_area_province_name = maps[0]["F_area_name"].(string)
+									areaInfoTmp.F_school_id = schoolId
+								}
 							}
 						}
 					}
 				}
 			}
+			if areaInfoTmp.F_area_province_id > 0 && len(areaInfoTmp.F_area_province_name) > 0 && areaInfoTmp.F_area_city_id > 0 &&		len(areaInfoTmp.F_area_city_name) > 0 && areaInfoTmp.F_area_county_id > 0 && len(areaInfoTmp.F_area_county_name) > 0{
+				areaInfo = areaInfoTmp
+			}
 		}
 	}
-	if areaInfoTmp.F_area_province_id > 0 && len(areaInfoTmp.F_area_province_name) > 0 && areaInfoTmp.F_area_city_id > 0 && len(areaInfoTmp.F_area_city_name) > 0 && areaInfoTmp.F_area_county_id > 0 && len(areaInfoTmp.F_area_county_name) > 0{
-		areaInfo = areaInfoTmp
-	}
+	
 	return areaInfo
 }
 

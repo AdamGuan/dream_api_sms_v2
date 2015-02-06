@@ -99,7 +99,7 @@ func (u *MUser) AddUser(parames map[string]string)int{
 		/**/
 		breakd := 0
 		now := helper.GetNowDateTime()
-		set := "F_user_name = '"+userName+"',F_user_password='"+userPwd+"',F_crate_datetime='"+now+"',F_modify_datetime='"+now+"',"
+		set := "F_user_name = '"+userName+"',F_user_password = '"+userPwd+"',F_crate_datetime='"+now+"',F_modify_datetime='"+now+"',"
 		for filed,value := range parames{
 			switch filed {
 				case "gender":
