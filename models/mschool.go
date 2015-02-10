@@ -61,7 +61,7 @@ func (u *MSchool) QuerySchools(name string,stype int,areaId int,areaName string,
 	}
 
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_school"+where).Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_school"+where+" LIMIT 100").Values(&maps)
 	if err == nil && num > 0 {
 		schools := make(schoolList,num)
 		for key,item := range maps{
