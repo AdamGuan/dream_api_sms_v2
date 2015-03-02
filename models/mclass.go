@@ -25,10 +25,11 @@ type classInfo struct{
 }
 
 //创建一个班级
-func (u *MClass) CreateAClass(userName string,className string,schoolId int,gradeId int)int{
+func (u *MClass) CreateAClass(userName string,className string,schoolId int,gradeId int)(result int,classId int){
 	o := orm.NewOrm()
 	//查询学校是否存在
-	result := -11
+	result = -11
+	classId = 0
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_school_id FROM t_school WHERE F_school_id = ? LIMIT 1",schoolId).Values(&maps)
 	if err == nil && num > 0 {
@@ -40,7 +41,7 @@ func (u *MClass) CreateAClass(userName string,className string,schoolId int,grad
 		if len(className) > 0 && len(className) <= 40{
 			result = -13
 			var maps []orm.Params
-			num, err := o.Raw("SELECT F_class_id FROM t_class WHERE F_school_id = ? AND F_grade_id = ? AND F_class_name = ? LIMIT 1",schoolId,gradeId,className).Values(&maps)
+			num, err := o.Raw("SELECT t_class.F_class_id FROM t_class,t_user WHERE t_class.F_school_id = ? AND t_class.F_grade_id = ? AND t_class.F_class_name = ? AND t_class.F_class_id = t_user.F_class_id AND t_user.F_user_name != ? LIMIT 1",schoolId,gradeId,className,userName).Values(&maps)
 			if err == nil && num <= 0 {
 				result = 0
 			}
@@ -60,20 +61,25 @@ func (u *MClass) CreateAClass(userName string,className string,schoolId int,grad
 		res, err := o.Raw("INSERT INTO t_class SET F_class_name = ?,F_school_id=?,F_grade_id=?", className,schoolId,gradeId).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
-			classId, _ := res.LastInsertId()
-			if num >0 && classId > 0{
+			classIdTmp, _ := res.LastInsertId()
+			if num >0 && classIdTmp > 0{
 				//给对应的用户绑定这个class
-				res, err = o.Raw("UPDATE t_user SET F_class_id = ? WHERE F_user_name = ?", classId,userName).Exec()
+				res, err = o.Raw("UPDATE t_user SET F_class_id = ?,F_school_id=?,F_grade_id=? WHERE F_user_name = ?", classIdTmp,schoolId,gradeId,userName).Exec()
 				if err == nil {
+					result = 0
+					classId = int(classIdTmp)
+					/*
 					num, _ = res.RowsAffected()
 					if num > 0{
 						result = 0
+						classId = int(classIdTmp)
 					}
+					*/
 				}
 			}
 		}
 	}
-	return result
+	return
 }
 
 //根据学校以及年级获取所有班级信息

@@ -27,6 +27,7 @@ func (u0 *TmpController) jsonEcho(datas map[string]interface{},u *TmpController)
 
 // @Title 清空全部用户数据(临时用)
 // @Description 清空全部用户数据(临时用)
+// @Param	wakaka			query	int	false	炸弹
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /alluser [delete]
@@ -34,9 +35,13 @@ func (u *TmpController) DeleteAllUser() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	wakaka := u.Ctx.Request.FormValue("wakaka")
+
+//	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+//	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if wakaka == "-10"{
 		//model ini
 		var tmpObj *models.MTmp
 		tmpObj.DeleteAllUser()
@@ -60,9 +65,9 @@ func (u *TmpController) DeleteUser() {
 	u.Ctx.Request.ParseForm()
 	wakaka := u.Ctx.Request.FormValue("wakaka")
 
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug || wakaka == "-10"{
+//	appConf, _ := config.NewConfig("ini", "conf/app.conf")
+//	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	if wakaka == "-10"{
 		mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
 		//model ini
 		var tmpObj *models.MTmp

@@ -50,3 +50,14 @@ func (u *MSign) CheckToken(userName string,pkg string,token string) bool{
 	}
 	return false
 }
+
+//删除token
+func (u *MSign) DeleteAllPkgToken(userName string) bool{
+	//get token
+	o := orm.NewOrm()
+	if len(userName) > 0 {
+		o.Raw("DELETE FROM t_token WHERE F_user_name=?", userName).Exec()
+		return true
+	}
+	return false
+}

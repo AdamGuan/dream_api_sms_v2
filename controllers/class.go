@@ -57,7 +57,7 @@ func (u0 *ClassController) checkSign(u *ClassController)int {
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
 // @Param	pnum		header	string	true	手机号码
-// @Success	200 {object} models.MSchoolResp
+// @Success	200 {object} models.MClassAddResp
 // @Failure 401 无权访问
 // @router / [post]
 func (u *ClassController) AddAClass() {
@@ -75,7 +75,7 @@ func (u *ClassController) AddAClass() {
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	if datas["responseNo"] == 0 {
-		datas["responseNo"] = classObj.CreateAClass(mobilePhoneNumber,className,helper.StrToInt(schoolId),helper.StrToInt(gradeId))
+		datas["responseNo"],datas["F_class_id"] = classObj.CreateAClass(mobilePhoneNumber,className,helper.StrToInt(schoolId),helper.StrToInt(gradeId))
 	}
 	//return
 	u.jsonEcho(datas,u)

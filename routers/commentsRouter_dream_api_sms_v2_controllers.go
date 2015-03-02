@@ -6,62 +6,6 @@ import (
 
 func init() {
 	
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
-		beego.ControllerComments{
-			"QuerySchools",
-			`/`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
-		beego.ControllerComments{
-			"GetAllGrade",
-			`/grades`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
-		beego.ControllerComments{
-			"GetSchoolArea",
-			`/area/:schoolIds`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
-		beego.ControllerComments{
-			"GetSchoolName",
-			`/name/:schoolIds`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
-		beego.ControllerComments{
-			"Smsvalid",
-			`/smsvalid/:mobilePhoneNumber`,
-			[]string{"post"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
-		beego.ControllerComments{
-			"RegisterGetSms",
-			`/register/:mobilePhoneNumber`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
-		beego.ControllerComments{
-			"ResetPwdGetSms",
-			`/resetpwd/:mobilePhoneNumber`,
-			[]string{"get"},
-			nil})
-
-	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
-		beego.ControllerComments{
-			"FindPwdGetSms",
-			`/pwd/:mobilePhoneNumber`,
-			[]string{"get"},
-			nil})
-
 	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:TmpController"],
 		beego.ControllerComments{
 			"DeleteAllUser",
@@ -153,6 +97,27 @@ func init() {
 			[]string{"put"},
 			nil})
 
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"],
+		beego.ControllerComments{
+			"UploadAvatar",
+			`/avatar/:mobilePhoneNumber`,
+			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"],
+		beego.ControllerComments{
+			"GetSystemAvatarList",
+			`/avatarlist`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:UserController"],
+		beego.ControllerComments{
+			"ModifyPhone",
+			`/phone/:mobilePhoneNumber`,
+			[]string{"put"},
+			nil})
+
 	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:AreaController"],
 		beego.ControllerComments{
 			"GetAllProvinces",
@@ -206,6 +171,69 @@ func init() {
 		beego.ControllerComments{
 			"GetAllClasses",
 			`/:schoolId`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
+		beego.ControllerComments{
+			"QuerySchools",
+			`/`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
+		beego.ControllerComments{
+			"GetAllGrade",
+			`/grades`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
+		beego.ControllerComments{
+			"GetSchoolArea",
+			`/area/:schoolIds`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
+		beego.ControllerComments{
+			"GetSchoolName",
+			`/name/:schoolIds`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
+		beego.ControllerComments{
+			"Smsvalid",
+			`/smsvalid/:mobilePhoneNumber`,
+			[]string{"post"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
+		beego.ControllerComments{
+			"RegisterGetSms",
+			`/register/:mobilePhoneNumber`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
+		beego.ControllerComments{
+			"ResetPwdGetSms",
+			`/resetpwd/:mobilePhoneNumber`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
+		beego.ControllerComments{
+			"FindPwdGetSms",
+			`/pwd/:mobilePhoneNumber`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SmsController"],
+		beego.ControllerComments{
+			"ChangePhoneSms",
+			`/phone/:mobilePhoneNumber`,
 			[]string{"get"},
 			nil})
 

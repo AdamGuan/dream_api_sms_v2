@@ -26,6 +26,10 @@ func main() {
 	if debug{
 		beego.StaticDir["/swagger"] = "swagger"
 	}
+	//用户头像(自己上传的)
+	beego.SetStaticPath("/avatar", "staticssss/avatar/1") 
+	//用户头像(系统提供的)
+	beego.SetStaticPath("/avatar2", "staticssss/avatar/2") 
 	beego.Errorhandler("404", page_not_found)
 	beego.Run()
 }

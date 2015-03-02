@@ -177,3 +177,39 @@ func JoinString(list []string,flag string)string{
 	}
 	return result
 }
+
+func StringInArray(value string,list []string)bool{
+	result := false
+	for _,item := range list{
+		if value == item{
+			result = true
+			break
+		}
+	}
+	return result
+}
+
+// 检查文件或目录是否存在
+// 如果由 filename 指定的文件或目录存在则返回 true，否则返回 false
+func Exist(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil || os.IsExist(err)
+}
+
+//检查昵称有效性
+func CheckNickNameValid(nickName string)bool{
+	matched, err := regexp.MatchString("^[\u4e00-\u9fa5a-zA-Z0-9]{0,20}$", nickName)
+	if err == nil && matched{
+		return true
+	}
+	return false
+}
+
+//检查真实名有效性
+func CheckRealNameValid(realName string)bool{
+	matched, err := regexp.MatchString("^[\u4e00-\u9fa5a-zA-Z0-9]{0,20}$", realName)
+	if err == nil && matched{
+		return true
+	}
+	return false
+}

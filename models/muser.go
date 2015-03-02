@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"crypto/md5"
 	"strings"
+	"github.com/astaxie/beego/config" 
+	"github.com/astaxie/beego"
 )
 
 func init() {
@@ -19,6 +21,7 @@ type userInfo struct {
 	F_phone_number string
 	F_gender string
 	F_grade string
+	F_grade_id int
 	F_birthday string
 	F_school string
 	F_school_id int
@@ -29,10 +32,17 @@ type userInfo struct {
 	F_county string
 	F_county_id int
 	F_user_realname string
+	F_user_nickname string
 	F_crate_datetime string
 	F_modify_datetime string
 	F_class_id int
 	F_class_name string
+	F_avatar_url string
+}
+
+type avatarSysInfoList []struct{
+	F_avatar_url string
+	F_avatar_id int
 }
 
 //检查用户名是否可用
@@ -165,11 +175,11 @@ func (u *MUser) AddUser(parames map[string]string)int{
 						result = -10
 					}
 				case "realname":
-					if len(value) > 0{
+					if helper.CheckRealNameValid(value){
 						set += "F_user_realname='"+value+"',"
 					}else{
 						breakd = 1
-						result = -10
+						result = -24
 					}
 				default:
 			}
@@ -272,6 +282,7 @@ func (u *MUser) GetUserInfo(userName string)userInfo{
 				tmp,ok := Grade[maps[0]["F_grade_id"].(string)]
 				if ok{
 					info.F_grade = tmp
+					info.F_grade_id = helper.StrToInt(maps[0]["F_grade_id"].(string))
 				}
 			}
 			//生日
@@ -296,6 +307,11 @@ func (u *MUser) GetUserInfo(userName string)userInfo{
 			if maps[0]["F_user_realname"] != nil{
 				info.F_user_realname = maps[0]["F_user_realname"].(string)
 			}
+			//昵称
+			info.F_user_nickname = ""
+			if maps[0]["F_user_nickname"] != nil{
+				info.F_user_nickname = maps[0]["F_user_nickname"].(string)
+			}
 			//创建时间
 			info.F_crate_datetime = ""
 			if maps[0]["F_crate_datetime"] != nil{
@@ -313,6 +329,13 @@ func (u *MUser) GetUserInfo(userName string)userInfo{
 			num, err := o.Raw("SELECT F_class_name FROM t_class WHERE F_class_id = ? LIMIT 1",maps[0]["F_class_id"].(string)).Values(&maps2)
 			if err == nil && num > 0 {
 				info.F_class_name = maps2[0]["F_class_name"].(string)
+			}
+			//头像
+			avatartmp := maps[0]["F_avatarname"].(string)
+			if len(avatartmp) > 0{
+				info.F_avatar_url = u.getUserAvatarUrl(avatartmp,helper.StrToInt(avatartmp[0:1]))
+			}else{
+				info.F_avatar_url = ""
 			}
 		}
 	}
@@ -392,8 +415,22 @@ func (u *MUser) ModifyUserInfo(parames map[string]string)int{
 						result = -10
 					}
 				case "realname":
-					if len(value) > 0{
+					if helper.CheckRealNameValid(value){
 						set += "F_user_realname='"+value+"',"
+					}else{
+						breakd = 1
+						result = -24
+					}
+				case "nickname":
+					if helper.CheckNickNameValid(value){
+						set += "F_user_nickname='"+value+"',"
+					}else{
+						breakd = 1
+						result = -25
+					}
+				case "avatarSysName":
+					if len(value) > 0{
+						set += "F_avatarname='"+value+"',"
 					}else{
 						breakd = 1
 						result = -10
@@ -445,12 +482,14 @@ func (u *MUser) UserChangeClass(userName string,classId int)int{
 	//查询班级是否存在
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_class_id FROM t_class WHERE F_class_id = ? LIMIT 1",classId).Values(&maps)
+	num, err := o.Raw("SELECT t_class.* FROM t_class,t_user WHERE t_class.F_class_id = ? AND t_class.F_class_id = t_user.F_class_id LIMIT 1",classId).Values(&maps)
 	if err == nil && num > 0 {
 		result = -1
 		//修改用户的班级
+		F_school_id := maps[0]["t_class.F_school_id"]
+		F_grade_id := maps[0]["t_class.F_grade_id"]
 		now := helper.GetNowDateTime()
-		res, err := o.Raw("UPDATE t_user SET F_class_id = ?,F_modify_datetime= ? WHERE F_user_name = ?",classId,now,userName).Exec()
+		res, err := o.Raw("UPDATE t_user SET F_class_id = ?,F_school_id=?,F_grade_id=?,F_modify_datetime= ? WHERE F_user_name = ?",classId,F_school_id,F_grade_id,now,userName).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
 			if num >0 {
@@ -459,5 +498,89 @@ func (u *MUser) UserChangeClass(userName string,classId int)int{
 		}
 	}
 
+	return result
+}
+
+//用户头像修改
+func (u *MUser) UserAvatarNameModify(userName string,avatarName string)bool{
+	result := false
+	o := orm.NewOrm()
+	now := helper.GetNowDateTime()
+	res, err := o.Raw("UPDATE t_user SET F_avatarname = ?,F_modify_datetime= ? WHERE F_user_name = ?",avatarName,now,userName).Exec()
+	if err == nil {
+		num, _ := res.RowsAffected()
+		if num >0 {
+			result = true
+		}
+	}
+	return result
+}
+
+//获取用户头像url
+func (u *MUser) getUserAvatarUrl(avatarName string,atype int)string{
+	url := ""
+	//domain
+	otherconf, _ := config.NewConfig("ini", "conf/other.conf")
+	doamin := otherconf.String(beego.RunMode+"::domain")
+	//path
+	pre := "avatar/"
+	if atype == 2{
+		pre = "avatar2/"
+		//build url
+		url = doamin+"/"+pre+avatarName
+	}else{
+		//build url
+		url = doamin+"/"+pre+helper.Md5(avatarName)[0:2]+"/"+avatarName
+	}
+	return url
+}
+
+//获取系统内置用户头像url列表
+func (u *MUser) GetAvatarUrlList()avatarSysInfoList{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_sys_avatar where 1").Values(&maps)
+	if err == nil && num > 0 {
+		urlList := make(avatarSysInfoList,num)
+		for key,item := range maps{
+			urlList[key].F_avatar_url = u.getUserAvatarUrl(item["F_avatar_name"].(string),2)
+			urlList[key].F_avatar_id = helper.StrToInt(item["F_id"].(string))
+		}
+		return urlList
+	}
+	return make(avatarSysInfoList,0)
+}
+
+//根据系统头像ID获取头像名称
+func (u *MUser) GetAvatarNameFromId(id int)string{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_avatar_name FROM t_sys_avatar where F_id=?",id).Values(&maps)
+	if err == nil && num > 0 {
+		return maps[0]["F_avatar_name"].(string)
+	}
+	return ""
+}
+
+//修改用户手机号码
+func (u *MUser) ModifyUserPhone(userName string,newUserName string)int{
+	result := -1
+	res := u.CheckUserNameExists(userName)
+	if res {
+		//检查是否新的手机号码已注册
+		o := orm.NewOrm()
+		var maps []orm.Params
+		num, err := o.Raw("SELECT F_user_name FROM t_user where F_user_name=?",newUserName).Values(&maps)
+		if err == nil && num <= 0 {
+			//更新手机号码
+			o := orm.NewOrm()
+			_, err := o.Raw("UPDATE t_user SET F_user_name=?,F_modify_datetime=? WHERE F_user_name=?",newUserName,helper.GetNowDateTime(),userName).Exec()
+			if err == nil {
+				result = 0
+			}
+		}else{
+			result = -23
+		}
+	}
 	return result
 }

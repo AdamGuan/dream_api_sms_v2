@@ -25,6 +25,7 @@ type MUserLoginResp struct {
 	F_phone_number string
 	F_gender string
 	F_grade string
+	F_grade_id int
 	F_birthday string
 	F_school string
 	F_school_id int
@@ -35,10 +36,12 @@ type MUserLoginResp struct {
 	F_county string
 	F_county_id int
 	F_user_realname string
+	F_user_nickname string
 	F_crate_datetime string
 	F_modify_datetime string
 	F_class_id int
 	F_class_name string
+	F_avatar_url string
 }
 
 type MUserInfoResp struct {
@@ -47,6 +50,7 @@ type MUserInfoResp struct {
 	F_phone_number string
 	F_gender string
 	F_grade string
+	F_grade_id int
 	F_birthday string
 	F_school string
 	F_school_id int
@@ -57,10 +61,12 @@ type MUserInfoResp struct {
 	F_county string
 	F_county_id int
 	F_user_realname string
+	F_user_nickname string
 	F_crate_datetime string
 	F_modify_datetime string
 	F_class_id int
 	F_class_name string
+	F_avatar_url string
 }
 
 type MAreaResp struct {
@@ -86,6 +92,12 @@ type MGradeResp struct {
 	responseNo  int
 	responseMsg string
 	gradeList []string
+}
+
+type MClassAddResp struct {
+	responseNo  int
+	responseMsg string
+	F_class_id int
 }
 
 type MClassListInfoResp struct {
@@ -129,4 +141,20 @@ type MAreaInfoResp struct {
 		F_area_id int
 		F_area_name string
 	}
+}
+
+type MAvatarlistResp struct {
+	responseNo  int
+	responseMsg string
+	avatarList []struct{
+		F_avatar_url string
+		F_avatar_id int
+	}
+}
+
+type MModifyPhoneResp struct {
+	responseNo  int
+	responseMsg string
+	token string
+	tokenExpireDatetime string
 }

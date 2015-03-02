@@ -33,8 +33,26 @@ func (u0 *SmsController) jsonEcho(datas map[string]interface{},u *SmsController)
 	u.ServeJson()
 }
 
-//sign check, token为包名md5
+//sign check
 func (u0 *SmsController) checkSign(u *SmsController)int {
+	result := -6
+	pkg := u.Ctx.Request.Header.Get("pkg")
+	sign := u.Ctx.Request.Header.Get("sign")
+	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
+	var pkgObj *models.MPkg
+	if !pkgObj.CheckPkgExists(pkg){
+		result = -7
+	}else{
+		var signObj *models.MSign
+		if re := signObj.CheckSign(sign, mobilePhoneNumber, pkg,""); re == true {
+			result = 0
+		}
+	}
+	return result
+}
+
+//sign check, token为包名md5
+func (u0 *SmsController) checkSign2(u *SmsController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
@@ -72,7 +90,7 @@ func (u *SmsController) Smsvalid() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && len(num) > 0 {
 		datas["responseNo"] = -1
@@ -111,7 +129,7 @@ func (u *SmsController) RegisterGetSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -159,7 +177,7 @@ func (u *SmsController) ResetPwdGetSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -207,7 +225,7 @@ func (u *SmsController) FindPwdGetSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -229,6 +247,57 @@ func (u *SmsController) FindPwdGetSms() {
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -4
+	}
+
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 发送一条短信验证码(更换手机号码)
+// @Description 发送一条短信验证码(更换手机号码)(token: 登录时获取)
+// @Param	mobilePhoneNumber	path	string	true	手机号码(旧的号码)
+// @Param	newPhone			query	string	true	手机号码(新的号码)
+// @Param	sign			header	string	true	签名
+// @Param	pkg			header	string	true	包名
+// @Param	pnum		header	string	true	手机号码(旧的号码)
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /phone/:mobilePhoneNumber [get]
+func (u *SmsController) ChangePhoneSms() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var smsObj *models.MSms
+	var userObj *models.MUser
+	var pkgObj *models.MPkg
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	pkg := u.Ctx.Request.Header.Get("Pkg")
+	newPhone := u.Ctx.Request.FormValue("newPhone")
+	//check sign
+	datas["responseNo"] = u.checkSign(u)
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckMPhoneValid(newPhone) {
+		datas["responseNo"] = -1
+		res := userObj.CheckUserNameExists(mobilePhoneNumber)
+		if res {
+			pkgConfig := pkgObj.GetPkgConfig(pkg)
+			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone,pkg) {
+				smsObj.AddMsmRate(newPhone,pkg)
+				res := smsObj.GetMsm(newPhone,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+				if len(res) == 0{
+					datas["responseNo"] = 0
+					smsObj.AddMsmRate(newPhone,pkg)
+				}else{
+					smsObj.DeleteMsmRate(newPhone,pkg)
+				}
+			}
+		}else{
+			datas["responseNo"] = -4
+		}
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
 	}
 
 	//return

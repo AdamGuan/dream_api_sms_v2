@@ -6,13 +6,19 @@ import (
 	"net/http"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
-	//"fmt"
-	//"strings"
+	"fmt"
+	"strings"
+	"os"
 )
 
 //用户
 type UserController struct {
 	beego.Controller
+}
+
+//上传文件用的size接口
+type Sizer interface {
+	Size() int64
 }
 
 //json echo
@@ -39,6 +45,9 @@ func (u0 *UserController) checkSign(u *UserController)int {
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
+	fmt.Println("pkg:"+pkg)
+	fmt.Println("sign:"+sign)
+	fmt.Println("mobilePhoneNumber:"+mobilePhoneNumber)
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
@@ -199,6 +208,7 @@ func (u *UserController) CheckUserAndPwd() {
 						datas["F_phone_number"] = info.F_phone_number
 						datas["F_gender"] = info.F_gender
 						datas["F_grade"] = info.F_grade
+						datas["F_grade_id"] = info.F_grade_id
 						datas["F_birthday"] = info.F_birthday
 						datas["F_school"] = info.F_school
 						datas["F_school_id"] = info.F_school_id
@@ -209,10 +219,12 @@ func (u *UserController) CheckUserAndPwd() {
 						datas["F_county"] = info.F_county
 						datas["F_county_id"] = info.F_county_id
 						datas["F_user_realname"] = info.F_user_realname
+						datas["F_user_nickname"] = info.F_user_nickname
 						datas["F_crate_datetime"] = info.F_crate_datetime
 						datas["F_modify_datetime"] = info.F_modify_datetime
 						datas["F_class_id"] = info.F_class_id
 						datas["F_class_name"] = info.F_class_name
+						datas["F_avatar_url"] = info.F_avatar_url
 					}
 				}
 			}else{
@@ -369,6 +381,7 @@ func (u *UserController) GetUserInfo() {
 			datas["F_phone_number"] = info.F_phone_number
 			datas["F_gender"] = info.F_gender
 			datas["F_grade"] = info.F_grade
+			datas["F_grade_id"] = info.F_grade_id
 			datas["F_birthday"] = info.F_birthday
 			datas["F_school"] = info.F_school
 			datas["F_school_id"] = info.F_school_id
@@ -379,10 +392,12 @@ func (u *UserController) GetUserInfo() {
 			datas["F_county"] = info.F_county
 			datas["F_county_id"] = info.F_county_id
 			datas["F_user_realname"] = info.F_user_realname
+			datas["F_user_nickname"] = info.F_user_nickname
 			datas["F_crate_datetime"] = info.F_crate_datetime
 			datas["F_modify_datetime"] = info.F_modify_datetime
 			datas["F_class_id"] = info.F_class_id
 			datas["F_class_name"] = info.F_class_name
+			datas["F_avatar_url"] = info.F_avatar_url
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -392,7 +407,7 @@ func (u *UserController) GetUserInfo() {
 }
 
 // @Title 修改用户信息
-// @Description 修改用户信息(token: 登录时获取)
+// @Description 修改用户信息(token: 登录时获取)(上传的头像name为"avatar",头像为用户上传的时候参数avatarType值为1)
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	gender				form	string	false	性别(值: [男|女])
 // @Param	grade				form	string	false	年级(小学一年级 -> 高中三年级)
@@ -402,6 +417,9 @@ func (u *UserController) GetUserInfo() {
 // @Param	city				form	int		false	市ID
 // @Param	county				form	int		false	县ID
 // @Param	realname			form	string	false	真实姓名
+// @Param	nickname			form	string	false	昵称
+// @Param	avatarType			form	int		false	头像类型(1:用户上传，2用户从系统头像选择)
+// @Param	avatarId			form	int		false	系统头像ID(选择系统头像,参数avatarType为2)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
 // @Param	pnum				header	string	true	手机号码
@@ -409,6 +427,7 @@ func (u *UserController) GetUserInfo() {
 // @Failure 401 无权访问
 // @router /:mobilePhoneNumber [put]
 func (u *UserController) ModifyUserInfo() {
+	//uploadAvatar(u *UserController,mobilePhoneNumber string)
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -416,17 +435,50 @@ func (u *UserController) ModifyUserInfo() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	avatarType := helper.StrToInt(u.Ctx.Request.FormValue("avatarType"))
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
-		datas["responseNo"] = -1
-		parames := make(map[string]string)
-		for k,v := range u.Ctx.Request.PostForm{
-			parames[k] = v[0]
+		//头像修改
+		avatarSysName := ""
+		avatarExists := 0
+		if avatarType == 1 || avatarType == 2{
+			if avatarType == 1{	//上传
+				datas["responseNo"] = u.uploadAvatar(u,mobilePhoneNumber)
+			}else if avatarType == 2{	//系统选择
+				avatarId := helper.StrToInt(u.Ctx.Request.FormValue("avatarId"))
+				if avatarId <= 0{
+					datas["responseNo"] = -10
+				}else{
+					//根据系统头像ID获取头像名称
+					avatarSysName = userObj.GetAvatarNameFromId(avatarId)
+					if len(avatarSysName) <= 0{
+						datas["responseNo"] = -10
+					}
+				}
+			}
+			avatarExists = 1
 		}
-		parames["mobilePhoneNumber"] = mobilePhoneNumber
-		datas["responseNo"] = userObj.ModifyUserInfo(parames)
+		//其它信息的修改
+		if datas["responseNo"] == 0{
+			datas["responseNo"] = -1
+			parames := make(map[string]string)
+			for k,v := range u.Ctx.Request.PostForm {
+				if k != "avatarType" && k != "avatar" && k != "avatarId"{
+					parames[k] = v[0]
+				}
+			}
+			if len(avatarSysName) > 0{
+				parames["avatarSysName"] = avatarSysName
+			}
+			if (avatarExists == 1 && len(parames) > 0) || (avatarExists != 1){
+				parames["mobilePhoneNumber"] = mobilePhoneNumber
+				datas["responseNo"] = userObj.ModifyUserInfo(parames)
+			}else{
+				datas["responseNo"] = 0
+			}
+		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
 	}
@@ -467,10 +519,10 @@ func (u *UserController) UserLogout() {
 	u.jsonEcho(datas,u)
 }
 
-// @Title 修改用户的年级
-// @Description 修改用户的年级
+// @Title 修改用户的班级
+// @Description 修改用户的班级(token: 登录时获取)
 // @Param	mobilePhoneNumber	path	string	true	手机号码
-// @Param	classId				query	int		true	年级ID
+// @Param	classId				query	int		true	班级ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
 // @Param	pnum				header	string	true	手机号码
@@ -491,6 +543,157 @@ func (u *UserController) ModifyUserClass() {
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = userObj.UserChangeClass(mobilePhoneNumber,helper.StrToInt(classId))
+	}
+	//return
+	u.jsonEcho(datas,u)
+}
+
+
+// @Title 上传用户头像
+// @Description 上传用户头像(token: 登录时获取) (上传的头像name为"avatar")
+// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	pnum				header	string	true	手机号码
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /avatar/:mobilePhoneNumber [put]
+func (u *UserController) UploadAvatar() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	//check sign
+	datas["responseNo"] = u.checkSign(u)
+	if datas["responseNo"] == 0 {
+		datas["responseNo"] = u.uploadAvatar(u,mobilePhoneNumber)
+	}
+	
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// 上传用户头像
+func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber string) int{
+	result := -1
+
+	otherconf, _ := config.NewConfig("ini", "conf/other.conf")
+	filename := otherconf.String("uploadAvatarFilename")
+	allowType := otherconf.String("uploadAvatarType")
+	savePath := otherconf.String("uploadAvatarSavePath")
+
+	file,header,err := u.GetFile(filename)
+	if err == nil {
+		//文件类型
+		contentType := header.Header.Get("Content-Type")
+		typeList := strings.Split(allowType,",")
+		valid := helper.StringInArray(contentType,typeList)
+		if valid {
+			contentType = strings.Replace(contentType,"image/","",-1)
+			//文件大小
+			if fileSizer, ok := file.(Sizer); ok {
+				fileSize := fileSizer.Size()
+				if fileSize <= 2*1024*1024{
+					valid = true
+				}else{
+					valid = false
+					result = -21
+				}
+			}
+		}else{
+			valid = false
+			result = -22
+		}
+
+		//存储头像
+		if valid{
+			//文件存储
+			saveFileName := "1_"+mobilePhoneNumber+"_"+helper.GetGuid()+"."+contentType
+			saveFilePath := savePath+helper.Md5(saveFileName)[0:2]
+			if !helper.Exist(saveFilePath){
+				os.Mkdir(saveFilePath,0764)
+				os.Create(saveFilePath+"/index.html")
+			}
+			err := u.SaveToFile(filename,saveFilePath+"/"+saveFileName)
+			if err == nil{
+				//数据库记录
+				//model ini
+				var userObj *models.MUser
+				if userObj.UserAvatarNameModify(mobilePhoneNumber,saveFileName){
+					result = 0
+				}
+			}
+		}
+	}
+	
+	return result
+}
+
+// @Title 获取服务端提供的头像
+// @Description 获取服务端提供的头像
+// @Success	200 {object} models.MAvatarlistResp
+// @Failure 401 无权访问
+// @router /avatarlist [get]
+func (u *UserController) GetSystemAvatarList() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": 0}
+	//model ini
+	var userObj *models.MUser
+
+	tmp := userObj.GetAvatarUrlList()
+	if len(tmp) <= 0{
+		datas["responseNo"] = -17
+	}else{
+		datas["avatarList"] = tmp
+	}
+	
+	//return
+	u.jsonEcho(datas,u)
+}
+
+// @Title 修改用户手机号码
+// @Description 修改用户手机号码(token: 登录时获取)
+// @Param	mobilePhoneNumber	path	string	true	手机号码(旧的手机号码)
+// @Param	newPhone			form	string	true	手机号码(新的手机号码)
+// @Param	num					form	string	true	验证码(经过验证成功后的)
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	pnum				header	string	true	手机号码(旧的手机号码)
+// @Success	200 {object} models.MModifyPhoneResp
+// @Failure 401 无权访问
+// @router /phone/:mobilePhoneNumber [put]
+func (u *UserController) ModifyPhone() {
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MUser
+	var smsObj *models.MSms
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	newPhone := u.Ctx.Request.FormValue("newPhone")
+	num := u.Ctx.Request.FormValue("num")
+	pkg := u.Ctx.Request.Header.Get("pkg")
+	//check sign
+	datas["responseNo"] = u.checkSign(u)
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckMPhoneValid(newPhone) {
+		datas["responseNo"] = -1
+		if smsObj.CheckMsmActionvalid(newPhone,pkg,num) == true{
+			datas["responseNo"] = userObj.ModifyUserPhone(mobilePhoneNumber,newPhone)
+			if datas["responseNo"] == 0{
+				//删除旧的手机号码的token
+				var signObj *models.MSign
+				signObj.DeleteAllPkgToken(mobilePhoneNumber)
+				token,tokenExpireDatetime := userObj.GetToken(newPhone,pkg)
+				datas["token"] = token
+				datas["tokenExpireDatetime"] = tokenExpireDatetime
+			}
+		}
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
 	}
 	//return
 	u.jsonEcho(datas,u)

@@ -75,7 +75,6 @@ func (u *MSms) DeleteMsmActionvalid(userName string,pkgName string,sms string){
 
 //验证t_sms_action_valid
 func (u *MSms) CheckMsmActionvalid(userName string,pkgName string,sms string)bool{
-	//写入数据库
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_action FROM t_sms_action_valid WHERE F_action=? LIMIT 1", helper.Md5(userName+pkgName+sms)).Values(&maps)
