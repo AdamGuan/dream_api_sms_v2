@@ -25,6 +25,7 @@ func (u0 *TmpController) jsonEcho(datas map[string]interface{},u *TmpController)
 	u.ServeJson()
 }
 
+/*
 // @Title 清空全部用户数据(临时用)
 // @Description 清空全部用户数据(临时用)
 // @Param	wakaka			query	int	false	炸弹
@@ -39,16 +40,20 @@ func (u *TmpController) DeleteAllUser() {
 	u.Ctx.Request.ParseForm()
 	wakaka := u.Ctx.Request.FormValue("wakaka")
 
-//	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-//	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if wakaka == "-10"{
-		//model ini
-		var tmpObj *models.MTmp
-		tmpObj.DeleteAllUser()
+	appConf, err := config.NewConfig("ini", "conf/app.conf")
+	if err == nil{
+		cwakaka,err := appConf.Int(beego.RunMode+"::wakaka")
+		if err == nil && cwakaka == wakaka{
+			//model ini
+			var tmpObj *models.MTmp
+			tmpObj.DeleteAllUser()
+		}
 	}
+
 	//return
 	u.jsonEcho(datas,u)
 }
+*/
 
 // @Title 清空指定用户数据(临时用)
 // @Description 清空指定用户数据(临时用)
@@ -63,16 +68,20 @@ func (u *TmpController) DeleteUser() {
 
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	wakaka := u.Ctx.Request.FormValue("wakaka")
+	wakaka := helper.StrToInt(u.Ctx.Request.FormValue("wakaka"))
 
-//	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-//	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if wakaka == "-10"{
-		mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
-		//model ini
-		var tmpObj *models.MTmp
-		tmpObj.DeleteUser(mobilePhoneNumber)
+	appConf, err := config.NewConfig("ini", "conf/app.conf")
+	if err == nil{
+		cwakaka,err := appConf.Int(beego.RunMode+"::wakaka")
+		if err == nil && cwakaka == wakaka{
+			//
+			mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
+			//model ini
+			var tmpObj *models.MTmp
+			tmpObj.DeleteUser(mobilePhoneNumber)
+		}
 	}
+	
 	//return
 	u.jsonEcho(datas,u)
 }

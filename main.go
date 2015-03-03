@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"runtime"
 	"github.com/astaxie/beego/config" 
+//	"fmt"
 )
 
 func page_not_found(rw http.ResponseWriter, r *http.Request) {

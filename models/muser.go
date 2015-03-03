@@ -520,8 +520,8 @@ func (u *MUser) UserAvatarNameModify(userName string,avatarName string)bool{
 func (u *MUser) getUserAvatarUrl(avatarName string,atype int)string{
 	url := ""
 	//domain
-	otherconf, _ := config.NewConfig("ini", "conf/other.conf")
-	doamin := otherconf.String(beego.RunMode+"::domain")
+	appconf, _ := config.NewConfig("ini", "conf/app.conf")
+	doamin := appconf.String(beego.RunMode+"::domain")
 	//path
 	pre := "avatar/"
 	if atype == 2{

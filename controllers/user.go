@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
-	"fmt"
+//	"fmt"
 	"strings"
 	"os"
 )
@@ -45,9 +45,6 @@ func (u0 *UserController) checkSign(u *UserController)int {
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
-	fmt.Println("pkg:"+pkg)
-	fmt.Println("sign:"+sign)
-	fmt.Println("mobilePhoneNumber:"+mobilePhoneNumber)
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
