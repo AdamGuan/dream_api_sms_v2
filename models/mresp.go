@@ -22,6 +22,7 @@ type MUserLoginResp struct {
 	responseMsg string
 	token string
 	tokenExpireDatetime string
+	F_uid string
 	F_phone_number string
 	F_gender string
 	F_grade string
@@ -47,6 +48,7 @@ type MUserLoginResp struct {
 type MUserInfoResp struct {
 	responseNo  int
 	responseMsg string
+	F_uid string
 	F_phone_number string
 	F_gender string
 	F_grade string

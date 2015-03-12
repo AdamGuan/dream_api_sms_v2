@@ -62,6 +62,97 @@ func init() {
 			[]string{"get"},
 			nil})
 
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"RegisterByPhone",
+			`/phone-register`,
+			[]string{"post"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"ResetPwdByPhone",
+			`/resetpwd`,
+			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"CheckUserAndPwdByPhone",
+			`/login/:mobilePhoneNumber`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"FindPwdByPhone",
+			`/pwd/:mobilePhoneNumber`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"ModifyPwdByUid",
+			`/pwd/:uid`,
+			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"CheckUserExists",
+			`/exists/:mobilePhoneNumber`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"GetUserInfo",
+			`/:uid`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"ModifyUserInfo",
+			`/:uid`,
+			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"UserLogout",
+			`/logout/:uid`,
+			[]string{"delete"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"ModifyUserClass",
+			`/class/:uid`,
+			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"UploadAvatar",
+			`/avatar/:uid`,
+			[]string{"put"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"GetSystemAvatarList",
+			`/avatarlist`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:ConsumerController"],
+		beego.ControllerComments{
+			"ModifyPhone",
+			`/phone/:mobilePhoneNumber`,
+			[]string{"put"},
+			nil})
+
 	beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"] = append(beego.GlobalControllerRouter["dream_api_sms_v2/controllers:SchoolController"],
 		beego.ControllerComments{
 			"QuerySchools",

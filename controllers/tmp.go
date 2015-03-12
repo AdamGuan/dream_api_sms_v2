@@ -77,8 +77,11 @@ func (u *TmpController) DeleteUser() {
 			//
 			mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
 			//model ini
+			var userObj *models.MConsumer
+			uid := userObj.GetUidByPhone(mobilePhoneNumber)
+
 			var tmpObj *models.MTmp
-			tmpObj.DeleteUser(mobilePhoneNumber)
+			tmpObj.DeleteUser(uid)
 		}
 	}
 	

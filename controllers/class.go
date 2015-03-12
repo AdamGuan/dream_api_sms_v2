@@ -37,12 +37,16 @@ func (u0 *ClassController) checkSign(u *ClassController)int {
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
+
+	var userObj *models.MConsumer
+	uid := userObj.GetUidByPhone(mobilePhoneNumber)
+
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
 	}else{
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, mobilePhoneNumber, pkg,""); re == true {
+		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
 			result = 0
 		}
 	}
@@ -75,7 +79,10 @@ func (u *ClassController) AddAClass() {
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	if datas["responseNo"] == 0 {
-		datas["responseNo"],datas["F_class_id"] = classObj.CreateAClass(mobilePhoneNumber,className,helper.StrToInt(schoolId),helper.StrToInt(gradeId))
+		var userObj *models.MConsumer
+		uid := userObj.GetUidByPhone(mobilePhoneNumber)
+
+		datas["responseNo"],datas["F_class_id"] = classObj.CreateAClass(uid,className,helper.StrToInt(schoolId),helper.StrToInt(gradeId))
 	}
 	//return
 	u.jsonEcho(datas,u)

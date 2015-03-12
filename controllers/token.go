@@ -52,7 +52,9 @@ func (u *TokenController) CheckToken() {
 	mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//检查参数
-	result := signObj.CheckToken(mobilePhoneNumber,pkg,token)
+	var userObj *models.MConsumer
+	uid := userObj.GetUidByPhone(mobilePhoneNumber)
+	result := signObj.CheckToken(uid,pkg,token)
 	if !result{
 		datas["responseNo"] = -18
 	}

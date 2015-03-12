@@ -11,18 +11,18 @@ import (
 	"os"
 )
 
-//用户(注意：请使用下面的api consumer, 留user这个api仅仅为了兼容以前的使用)
-type UserController struct {
+//用户
+type ConsumerController struct {
 	beego.Controller
 }
 
 //上传文件用的size接口
-type Sizer interface {
+type Sizer2 interface {
 	Size() int64
 }
 
 //json echo
-func (u0 *UserController) jsonEcho(datas map[string]interface{},u *UserController) {
+func (u0 *ConsumerController) jsonEcho(datas map[string]interface{},u *ConsumerController) {
 	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
 		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
@@ -40,12 +40,11 @@ func (u0 *UserController) jsonEcho(datas map[string]interface{},u *UserControlle
 }
 
 //sign check
-func (u0 *UserController) checkSign(u *UserController)int {
+func (u0 *ConsumerController) checkSign(u *ConsumerController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
-	pnum := u.Ctx.Request.Header.Get("pnum")
-	uid := u.getUidByPhone(pnum)
+	uid := u.Ctx.Request.Header.Get("huid")
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
@@ -59,7 +58,7 @@ func (u0 *UserController) checkSign(u *UserController)int {
 }
 
 //sign check, , token为包名的md5值
-func (u0 *UserController) checkSign2(u *UserController)int {
+func (u0 *ConsumerController) checkSign2(u *ConsumerController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
@@ -75,14 +74,8 @@ func (u0 *UserController) checkSign2(u *UserController)int {
 	return result
 }
 
-//根据电话号码获取uid
-func (u0 *UserController) getUidByPhone(pnum string)string {
-	var userObj *models.MConsumer
-	return userObj.GetUidByPhone(pnum)
-}
-
-// @Title 注册
-// @Description 注册(token: md5(pkg))
+// @Title 注册(手机号码注册)
+// @Description 注册(手机号码注册)(token: md5(pkg))
 // @Param	mobilePhoneNumber	form	string	true	手机号码
 // @Param	pwd					form	string	true	密码
 // @Param	gender				form	string	false	性别(值: [男|女])
@@ -98,8 +91,8 @@ func (u0 *UserController) getUidByPhone(pnum string)string {
 // @Param	pkg					header	string	true	包名
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
-// @router /register [post]
-func (u *UserController) Register() {
+// @router /phone-register [post]
+func (u *ConsumerController) RegisterByPhone() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -134,8 +127,8 @@ func (u *UserController) Register() {
 	u.jsonEcho(datas,u)
 }
 
-// @Title 重置密码
-// @Description 重置密码(token: md5(pkg))
+// @Title 重置密码(利用手机号码重置密码)
+// @Description 重置密码(利用手机号码重置密码)(token: md5(pkg))
 // @Param	mobilePhoneNumber	form	string	true	手机号码
 // @Param	pwd			form	string	true	密码
 // @Param	num			form	string	true	验证码(经过验证成功后的)
@@ -144,7 +137,7 @@ func (u *UserController) Register() {
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /resetpwd [put]
-func (u *UserController) ResetPwd() {
+func (u *ConsumerController) ResetPwdByPhone() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -172,8 +165,8 @@ func (u *UserController) ResetPwd() {
 	u.jsonEcho(datas,u)
 }
 
-// @Title 登录
-// @Description 登录(token: md5(pkg))
+// @Title 登录(利用手机号码登录)
+// @Description 登录(利用手机号码登录)(token: md5(pkg))
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	pwd			query	string	true	密码
 // @Param	sign		header	string	true	签名
@@ -181,7 +174,7 @@ func (u *UserController) ResetPwd() {
 // @Success	200 {object} models.MUserLoginResp
 // @Failure 401 无权访问
 // @router /login/:mobilePhoneNumber [get]
-func (u *UserController) CheckUserAndPwd() {
+func (u *ConsumerController) CheckUserAndPwdByPhone() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -243,8 +236,8 @@ func (u *UserController) CheckUserAndPwd() {
 	u.jsonEcho(datas,u)
 }
 
-// @Title 找回密码
-// @Description 找回密码(token: md5(pkg))
+// @Title 找回密码(利用手机号码找回)
+// @Description 找回密码(利用手机号码找回)(token: md5(pkg))
 // @Param	mobilePhoneNumber	path	string	true	手机号码
 // @Param	num			query	string	true	验证码(经过验证成功后的)
 // @Param	sign		header	string	true	签名
@@ -252,7 +245,7 @@ func (u *UserController) CheckUserAndPwd() {
 // @Success	200 {object} models.MFindPwdResp
 // @Failure 401 无权访问
 // @router /pwd/:mobilePhoneNumber [get]
-func (u *UserController) FindPwd() {
+func (u *ConsumerController) FindPwdByPhone() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -289,32 +282,32 @@ func (u *UserController) FindPwd() {
 
 // @Title 修改密码
 // @Description 修改密码(token: 登录时获取)
-// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	uid				path	string	true	用户ID
 // @Param	oldPwd			form	string	true	旧密码
 // @Param	newPwd			form	string	true	新密码
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
+// @Param	huid			header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
-// @router /pwd/:mobilePhoneNumber [put]
-func (u *UserController) ModifyPwd() {
+// @router /pwd/:uid [put]
+func (u *ConsumerController) ModifyPwdByUid() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Input.Param(":uid")
 	oldPwd := u.Ctx.Request.FormValue("oldPwd")
 	newPwd := u.Ctx.Request.FormValue("newPwd")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
-	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(oldPwd) && helper.CheckPwdValid(newPwd) {
+	if datas["responseNo"] == 0 && helper.CheckPwdValid(oldPwd) && helper.CheckPwdValid(newPwd) {
 		datas["responseNo"] = -1
-		if userObj.CheckPhoneAndPwd(mobilePhoneNumber,oldPwd){
-			res2 := userObj.ModifyUserPwdByPhone(mobilePhoneNumber,newPwd)
+		if userObj.CheckUserIdAndPwd(uid,oldPwd){
+			res2 := userObj.ModifyUserPwdByUid(uid,newPwd)
 			datas["responseNo"] = res2
 		}else{
 			datas["responseNo"] = -8
@@ -334,7 +327,7 @@ func (u *UserController) ModifyPwd() {
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /exists/:mobilePhoneNumber [get]
-func (u *UserController) CheckUserExists() {
+func (u *ConsumerController) CheckUserExists() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -360,27 +353,27 @@ func (u *UserController) CheckUserExists() {
 
 // @Title 获取用户信息
 // @Description 获取用户信息(token: 登录时获取)
-// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	uid	path	string	true	用户ID
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
+// @Param	huid		header	string	true	用户ID
 // @Success	200 {object} models.MUserInfoResp
 // @Failure 401 无权访问
-// @router /:mobilePhoneNumber [get]
-func (u *UserController) GetUserInfo() {
+// @router /:uid [get]
+func (u *ConsumerController) GetUserInfo() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Input.Param(":uid")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
-	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
-		info := userObj.GetUserInfoByPhone(mobilePhoneNumber)
+		info := userObj.GetUserInfoByUid(uid)
 		if len(info.F_phone_number) > 0{
 			datas["responseNo"] = 0
 			datas["F_uid"] = info.F_uid
@@ -414,7 +407,7 @@ func (u *UserController) GetUserInfo() {
 
 // @Title 修改用户信息
 // @Description 修改用户信息(token: 登录时获取)(上传的头像name为"avatar",头像为用户上传的时候参数avatarType值为1)
-// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	uid	path	string	true	用户ID
 // @Param	gender				form	string	false	性别(值: [男|女])
 // @Param	grade				form	string	false	年级(小学一年级 -> 高中三年级)
 // @Param	birthday			form	string	false	生日(格式:1999-09-10)
@@ -428,30 +421,29 @@ func (u *UserController) GetUserInfo() {
 // @Param	avatarId			form	int		false	系统头像ID(选择系统头像,参数avatarType为2)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
+// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
-// @router /:mobilePhoneNumber [put]
-func (u *UserController) ModifyUserInfo() {
-	//uploadAvatar(u *UserController,mobilePhoneNumber string)
+// @router /:uid [put]
+func (u *ConsumerController) ModifyUserInfo() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Input.Param(":uid")
 	avatarType := helper.StrToInt(u.Ctx.Request.FormValue("avatarType"))
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
-	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+	if datas["responseNo"] == 0 {
 		//头像修改
 		avatarSysName := ""
 		avatarExists := 0
 		if avatarType == 1 || avatarType == 2{
 			if avatarType == 1{	//上传
-				datas["responseNo"] = u.uploadAvatar(u,mobilePhoneNumber)
+				datas["responseNo"] = u.uploadAvatar(u,uid)
 			}else if avatarType == 2{	//系统选择
 				avatarId := helper.StrToInt(u.Ctx.Request.FormValue("avatarId"))
 				if avatarId <= 0{
@@ -479,8 +471,7 @@ func (u *UserController) ModifyUserInfo() {
 				parames["avatarSysName"] = avatarSysName
 			}
 			if (avatarExists == 1 && len(parames) > 0) || (avatarExists != 1){
-//				parames["mobilePhoneNumber"] = mobilePhoneNumber
-				parames["uid"] = u.getUidByPhone(mobilePhoneNumber)
+				parames["uid"] = uid
 				datas["responseNo"] = userObj.ModifyUserInfo(parames)
 			}else{
 				datas["responseNo"] = 0
@@ -495,28 +486,28 @@ func (u *UserController) ModifyUserInfo() {
 
 // @Title 用户登出
 // @Description 用户登出(token: 登录时获取)
-// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	uid	path	string	true	用户ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
+// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
-// @router /logout/:mobilePhoneNumber [delete]
-func (u *UserController) UserLogout() {
+// @router /logout/:uid [delete]
+func (u *ConsumerController) UserLogout() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Input.Param(":uid")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
-	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
-		if userObj.UserLoginout(u.getUidByPhone(mobilePhoneNumber),pkg) == true{
+		if userObj.UserLoginout(uid,pkg) == true{
 			datas["responseNo"] = 0
 		}
 	}else if datas["responseNo"] == 0{
@@ -528,28 +519,28 @@ func (u *UserController) UserLogout() {
 
 // @Title 修改用户的班级
 // @Description 修改用户的班级(token: 登录时获取)
-// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	uid	path	string	true	用户ID
 // @Param	classId				query	int		true	班级ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
+// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
-// @router /class/:mobilePhoneNumber [put]
-func (u *UserController) ModifyUserClass() {
+// @router /class/:uid [put]
+func (u *ConsumerController) ModifyUserClass() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Input.Param(":uid")
 	classId := u.Ctx.Request.FormValue("classId")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
 	if datas["responseNo"] == 0 {
-		datas["responseNo"] = userObj.UserChangeClass(u.getUidByPhone(mobilePhoneNumber),helper.StrToInt(classId))
+		datas["responseNo"] = userObj.UserChangeClass(uid,helper.StrToInt(classId))
 	}
 	//return
 	u.jsonEcho(datas,u)
@@ -558,24 +549,24 @@ func (u *UserController) ModifyUserClass() {
 
 // @Title 上传用户头像
 // @Description 上传用户头像(token: 登录时获取) (上传的头像name为"avatar")
-// @Param	mobilePhoneNumber	path	string	true	手机号码
+// @Param	uid	path	string	true	用户ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	pnum				header	string	true	手机号码
+// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
-// @router /avatar/:mobilePhoneNumber [put]
-func (u *UserController) UploadAvatar() {
+// @router /avatar/:uid [put]
+func (u *ConsumerController) UploadAvatar() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Input.Param(":uid")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	if datas["responseNo"] == 0 {
-		datas["responseNo"] = u.uploadAvatar(u,mobilePhoneNumber)
+		datas["responseNo"] = u.uploadAvatar(u,uid)
 	}
 	
 	//return
@@ -583,7 +574,7 @@ func (u *UserController) UploadAvatar() {
 }
 
 // 上传用户头像
-func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber string) int{
+func (u0 *ConsumerController) uploadAvatar(u *ConsumerController,uid string) int{
 	result := -1
 
 	otherconf, _ := config.NewConfig("ini", "conf/other.conf")
@@ -600,7 +591,7 @@ func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber strin
 		if valid {
 			contentType = strings.Replace(contentType,"image/","",-1)
 			//文件大小
-			if fileSizer, ok := file.(Sizer); ok {
+			if fileSizer, ok := file.(Sizer2); ok {
 				fileSize := fileSizer.Size()
 				if fileSize <= 2*1024*1024{
 					valid = true
@@ -617,7 +608,7 @@ func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber strin
 		//存储头像
 		if valid{
 			//文件存储
-			saveFileName := "1_"+mobilePhoneNumber+"_"+helper.GetGuid()+"."+contentType
+			saveFileName := "1_"+uid+"_"+helper.GetGuid()+"."+contentType
 			saveFilePath := savePath+helper.Md5(saveFileName)[0:2]
 			if !helper.Exist(saveFilePath){
 				os.Mkdir(saveFilePath,0764)
@@ -628,7 +619,7 @@ func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber strin
 				//数据库记录
 				//model ini
 				var userObj *models.MConsumer
-				if userObj.UserAvatarNameModify(u.getUidByPhone(mobilePhoneNumber),saveFileName){
+				if userObj.UserAvatarNameModify(uid,saveFileName){
 					result = 0
 				}
 			}
@@ -643,7 +634,7 @@ func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber strin
 // @Success	200 {object} models.MAvatarlistResp
 // @Failure 401 无权访问
 // @router /avatarlist [get]
-func (u *UserController) GetSystemAvatarList() {
+func (u *ConsumerController) GetSystemAvatarList() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -667,11 +658,11 @@ func (u *UserController) GetSystemAvatarList() {
 // @Param	num					form	string	true	验证码(经过验证成功后的)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	pnum				header	string	true	手机号码(旧的手机号码)
+// @Param	huid				header	string	true	手机号码(旧的手机号码)
 // @Success	200 {object} models.MModifyPhoneResp
 // @Failure 401 无权访问
 // @router /phone/:mobilePhoneNumber [put]
-func (u *UserController) ModifyPhone() {
+func (u *ConsumerController) ModifyPhone() {
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini

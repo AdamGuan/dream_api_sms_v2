@@ -122,7 +122,7 @@ func (u *SmsController) RegisterGetSms() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var smsObj *models.MSms
-	var userObj *models.MUser
+	var userObj *models.MConsumer
 	var pkgObj *models.MPkg
 	//parse request parames
 	u.Ctx.Request.ParseForm()
@@ -133,7 +133,7 @@ func (u *SmsController) RegisterGetSms() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
-		res2 := userObj.CheckUserNameValid(mobilePhoneNumber)
+		res2 := userObj.CheckPhoneValid(mobilePhoneNumber)
 		if res2 == 0{
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg){
@@ -170,7 +170,7 @@ func (u *SmsController) ResetPwdGetSms() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var smsObj *models.MSms
-	var userObj *models.MUser
+	var userObj *models.MConsumer
 	var pkgObj *models.MPkg
 	//parse request parames
 	u.Ctx.Request.ParseForm()
@@ -181,7 +181,7 @@ func (u *SmsController) ResetPwdGetSms() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
-		res := userObj.CheckUserNameExists(mobilePhoneNumber)
+		res := userObj.CheckPhoneExists(mobilePhoneNumber)
 		if res {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
@@ -218,7 +218,7 @@ func (u *SmsController) FindPwdGetSms() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var smsObj *models.MSms
-	var userObj *models.MUser
+	var userObj *models.MConsumer
 	var pkgObj *models.MPkg
 	//parse request parames
 	u.Ctx.Request.ParseForm()
@@ -229,7 +229,7 @@ func (u *SmsController) FindPwdGetSms() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
-		res := userObj.CheckUserNameExists(mobilePhoneNumber)
+		res := userObj.CheckPhoneExists(mobilePhoneNumber)
 		if res {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
@@ -268,7 +268,7 @@ func (u *SmsController) ChangePhoneSms() {
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var smsObj *models.MSms
-	var userObj *models.MUser
+	var userObj *models.MConsumer
 	var pkgObj *models.MPkg
 	//parse request parames
 	u.Ctx.Request.ParseForm()
@@ -280,7 +280,7 @@ func (u *SmsController) ChangePhoneSms() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckMPhoneValid(newPhone) {
 		datas["responseNo"] = -1
-		res := userObj.CheckUserNameExists(mobilePhoneNumber)
+		res := userObj.CheckPhoneExists(mobilePhoneNumber)
 		if res {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone,pkg) {
