@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-//用户
+//用户(注意：请使用下面的api consumer, 留user这个api仅仅为了兼容以前的使用)
 type UserController struct {
 	beego.Controller
 }
