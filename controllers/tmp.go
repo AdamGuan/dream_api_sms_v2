@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
+	"fmt"
 )
 
 //临时工具
@@ -87,4 +88,40 @@ func (u *TmpController) DeleteUser() {
 	
 	//return
 	u.jsonEcho(datas,u)
+}
+
+// @Title test
+// @Description test
+// @Param	phone			query	string	false	手机号码
+// @Param	wakaka			query	int	false	炸弹
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /ttt [get]
+func (u *TmpController) Test() {
+	//ini return
+//	datas := map[string]interface{}{"responseNo": 0}
+
+	u.Ctx.Request.ParseForm()
+	phone := u.Ctx.Request.FormValue("phone")
+	/*
+	defer func(){
+		str := recover()
+		if str != nil{
+			fmt.Println(str)
+		}
+	}()
+	
+*/
+
+	if phone == "abc"{
+		c := 10
+		b := 10
+		d := c -b
+		a := 10/d
+		fmt.Println("a:",a)
+	}
+	
+//	fmt.Println(u.Ctx.Output.IsServerError())
+	//return
+//	u.jsonEcho(datas,u)
 }

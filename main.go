@@ -3,21 +3,24 @@ package main
 import (
 	_ "dream_api_sms_v2/docs"
 	_ "dream_api_sms_v2/routers"
+	"dream_api_sms_v2/controllers"
 
 	"github.com/astaxie/beego"
-	"encoding/json"
-	"io"
-	"net/http"
 	"runtime"
 	"github.com/astaxie/beego/config" 
-//	"fmt"
+
+//	"encoding/json"
+//	"io"
+//	"net/http"
 )
 
-func page_not_found(rw http.ResponseWriter, r *http.Request) {
-	returndata := map[string]string{"responseCode": "404"}
+/*
+func server_err(rw http.ResponseWriter, r *http.Request) {
+	returndata := map[string]string{"responseCode": "500"}
 	data, _ := json.Marshal(returndata)
 	io.WriteString(rw, string(data))
 }
+*/
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -31,6 +34,7 @@ func main() {
 	beego.SetStaticPath("/avatar", "staticssss/avatar/1") 
 	//用户头像(系统提供的)
 	beego.SetStaticPath("/avatar2", "staticssss/avatar/2") 
-	beego.Errorhandler("404", page_not_found)
+//	beego.Errorhandler("500", server_err)
+	beego.ErrorController(&controllers.ErrorController{})
 	beego.Run()
 }
