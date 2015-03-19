@@ -30,6 +30,9 @@ func (u0 *SmsController) jsonEcho(datas map[string]interface{},u *SmsController)
 	}
 
 	u.Data["json"] = datas
+	//log
+	u.logEcho(datas)
+
 	u.ServeJson()
 }
 
@@ -39,12 +42,35 @@ func (u0 *SmsController) checkSign(u *SmsController)int {
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
+
+	var userObj *models.MConsumer
+	uid := userObj.GetUidByPhone(mobilePhoneNumber)
+
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
 	}else{
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, mobilePhoneNumber, pkg,""); re == true {
+		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
+			result = 0
+		}
+	}
+	return result
+}
+
+//sign check3
+func (u0 *SmsController) checkSign3(u *SmsController)int {
+	result := -6
+	pkg := u.Ctx.Request.Header.Get("pkg")
+	sign := u.Ctx.Request.Header.Get("sign")
+	uid := u.Ctx.Request.Header.Get("huid")
+
+	var pkgObj *models.MPkg
+	if !pkgObj.CheckPkgExists(pkg){
+		result = -7
+	}else{
+		var signObj *models.MSign
+		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
 			result = 0
 		}
 	}
@@ -56,7 +82,6 @@ func (u0 *SmsController) checkSign2(u *SmsController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
-//	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
@@ -79,6 +104,8 @@ func (u0 *SmsController) checkSign2(u *SmsController)int {
 // @Failure 401 无权访问
 // @router /smsvalid/:mobilePhoneNumber [post]
 func (u *SmsController) Smsvalid() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -96,7 +123,7 @@ func (u *SmsController) Smsvalid() {
 		datas["responseNo"] = -1
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
 		if len(pkgConfig) > 0{
-			res := smsObj.ValidMsm(num,mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"])
+			res := smsObj.ValidMsm(pkg,num,mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"])
 			if len(res) == 0{
 				datas["responseNo"] = 0
 				smsObj.AddMsmActionvalid(mobilePhoneNumber,pkg,num)
@@ -118,6 +145,8 @@ func (u *SmsController) Smsvalid() {
 // @Failure 401 无权访问
 // @router /register/:mobilePhoneNumber [get]
 func (u *SmsController) RegisterGetSms() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -147,6 +176,9 @@ func (u *SmsController) RegisterGetSms() {
 				}
 			}
 		}else{
+			if res2 == -23{
+				res2 = -2
+			}
 			datas["responseNo"] = res2
 		}
 	}else if datas["responseNo"] == 0{
@@ -166,6 +198,8 @@ func (u *SmsController) RegisterGetSms() {
 // @Failure 401 无权访问
 // @router /resetpwd/:mobilePhoneNumber [get]
 func (u *SmsController) ResetPwdGetSms() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -214,6 +248,8 @@ func (u *SmsController) ResetPwdGetSms() {
 // @Failure 401 无权访问
 // @router /pwd/:mobilePhoneNumber [get]
 func (u *SmsController) FindPwdGetSms() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -253,48 +289,56 @@ func (u *SmsController) FindPwdGetSms() {
 	u.jsonEcho(datas,u)
 }
 
-// @Title 发送一条短信验证码(更换手机号码)
-// @Description 发送一条短信验证码(更换手机号码)(token: 登录时获取)
+// @Title 发送一条短信验证码(更换手机号码)(请使用下面的api代替,留这个api兼容之前的调用)
+// @Description 发送一条短信验证码(更换手机号码)(token: 登录时获取)(请使用下面的api代替,留这个api兼容之前的调用)
 // @Param	mobilePhoneNumber	path	string	true	手机号码(旧的号码)
 // @Param	newPhone			query	string	true	手机号码(新的号码)
-// @Param	sign			header	string	true	签名
-// @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码(旧的号码)
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	pnum				header	string	true	手机号码(旧的号码)
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /phone/:mobilePhoneNumber [get]
 func (u *SmsController) ChangePhoneSms() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var smsObj *models.MSms
-	var userObj *models.MConsumer
 	var pkgObj *models.MPkg
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	newPhone := u.Ctx.Request.FormValue("newPhone")
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	pnum := u.Ctx.Request.Header.Get("pnum")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
-	//检查参数
-	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckMPhoneValid(newPhone) {
+	//确定旧的手机号码是否是自己的
+	if pnum != mobilePhoneNumber{
 		datas["responseNo"] = -1
-		res := userObj.CheckPhoneExists(mobilePhoneNumber)
-		if res {
-			pkgConfig := pkgObj.GetPkgConfig(pkg)
-			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone,pkg) {
+	}
+	//检查新手机号码是否已被使用
+	if datas["responseNo"] == 0{
+		var userObj *models.MConsumer
+		if userObj.CheckPhoneExists(newPhone){
+			datas["responseNo"] = -23
+		}
+	}
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(newPhone) {
+		datas["responseNo"] = -1
+		pkgConfig := pkgObj.GetPkgConfig(pkg)
+		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone,pkg) {
+			smsObj.AddMsmRate(newPhone,pkg)
+			res := smsObj.GetMsm(newPhone,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+			if len(res) == 0{
+				datas["responseNo"] = 0
 				smsObj.AddMsmRate(newPhone,pkg)
-				res := smsObj.GetMsm(newPhone,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
-				if len(res) == 0{
-					datas["responseNo"] = 0
-					smsObj.AddMsmRate(newPhone,pkg)
-				}else{
-					smsObj.DeleteMsmRate(newPhone,pkg)
-				}
+			}else{
+				smsObj.DeleteMsmRate(newPhone,pkg)
 			}
-		}else{
-			datas["responseNo"] = -4
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
@@ -302,4 +346,68 @@ func (u *SmsController) ChangePhoneSms() {
 
 	//return
 	u.jsonEcho(datas,u)
+}
+
+// @Title 发送一条短信验证码(更换手机号码)
+// @Description 发送一条短信验证码(更换手机号码)(token: 登录时获取)
+// @Param	mobilePhoneNumber	path	string	true	手机号码(新的号码)
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MResp
+// @Failure 401 无权访问
+// @router /mphone/:mobilePhoneNumber [get]
+func (u *SmsController) ChangePhoneSms2() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var smsObj *models.MSms
+	var pkgObj *models.MPkg
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	pkg := u.Ctx.Request.Header.Get("Pkg")
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	//check sign
+	datas["responseNo"] = u.checkSign3(u)
+	//检查新手机号码是否已被使用
+	if datas["responseNo"] == 0{
+		var userObj *models.MConsumer
+		if userObj.CheckPhoneExists(mobilePhoneNumber){
+			datas["responseNo"] = -23
+		}
+	}
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+		datas["responseNo"] = -1
+		pkgConfig := pkgObj.GetPkgConfig(pkg)
+		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
+			smsObj.AddMsmRate(mobilePhoneNumber,pkg)
+			res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+			if len(res) == 0{
+				datas["responseNo"] = 0
+				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
+			}else{
+				smsObj.DeleteMsmRate(mobilePhoneNumber,pkg)
+			}
+		}
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+
+	//return
+	u.jsonEcho(datas,u)
+}
+
+//记录请求
+func (u *SmsController) logRequest() {
+	var logObj *models.MLog
+	logObj.LogRequest(u.Ctx)
+}
+
+//记录返回
+func (u *SmsController) logEcho(datas map[string]interface{}) {
+	var logObj *models.MLog
+	logObj.LogEcho(datas)
 }

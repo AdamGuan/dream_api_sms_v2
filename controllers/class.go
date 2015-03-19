@@ -28,6 +28,9 @@ func (u0 *ClassController) jsonEcho(datas map[string]interface{},u *ClassControl
 	}
 
 	u.Data["json"] = datas
+	//log
+	u.logEcho(datas)
+
 	u.ServeJson()
 }
 
@@ -36,11 +39,12 @@ func (u0 *ClassController) checkSign(u *ClassController)int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
-	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
-
-	var userObj *models.MConsumer
-	uid := userObj.GetUidByPhone(mobilePhoneNumber)
-
+	uid := u.Ctx.Request.Header.Get("pnum")
+	//判断是否为手机号码
+	if helper.CheckMPhoneValid(uid){
+		var userObj *models.MConsumer
+		uid = userObj.GetUidByPhone(uid)
+	}
 	var pkgObj *models.MPkg
 	if !pkgObj.CheckPkgExists(pkg){
 		result = -7
@@ -60,11 +64,13 @@ func (u0 *ClassController) checkSign(u *ClassController)int {
 // @Param	gradeId		form	int		true	年级ID
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
+// @Param	pnum		header	string	true	手机号码 或是 uid
 // @Success	200 {object} models.MClassAddResp
 // @Failure 401 无权访问
 // @router / [post]
 func (u *ClassController) AddAClass() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -94,11 +100,14 @@ func (u *ClassController) AddAClass() {
 // @Param	gradeId		query	int		true	年级ID
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	pnum		header	string	true	手机号码
+// @Param	pnum		header	string	true	手机号码 或是 uid
 // @Success	200 {object} models.MClassListInfoResp
 // @Failure 401 无权访问
 // @router /:schoolId [get]
 func (u *ClassController) GetAllClasses() {
+	//log
+	u.logRequest()
+
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -120,4 +129,16 @@ func (u *ClassController) GetAllClasses() {
 	}
 	//return
 	u.jsonEcho(datas,u)
+}
+
+//记录请求
+func (u *ClassController) logRequest() {
+	var logObj *models.MLog
+	logObj.LogRequest(u.Ctx)
+}
+
+//记录返回
+func (u *ClassController) logEcho(datas map[string]interface{}) {
+	var logObj *models.MLog
+	logObj.LogEcho(datas)
 }

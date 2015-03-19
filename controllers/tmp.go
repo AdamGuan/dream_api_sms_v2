@@ -5,7 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
-	"fmt"
+//	"fmt"
 )
 
 //临时工具
@@ -23,6 +23,9 @@ func (u0 *TmpController) jsonEcho(datas map[string]interface{},u *TmpController)
 	}
 
 	u.Data["json"] = datas
+	//log
+	u.logEcho(datas)
+
 	u.ServeJson()
 }
 
@@ -64,6 +67,8 @@ func (u *TmpController) DeleteAllUser() {
 // @Failure 401 无权访问
 // @router /user [delete]
 func (u *TmpController) DeleteUser() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 
@@ -90,6 +95,7 @@ func (u *TmpController) DeleteUser() {
 	u.jsonEcho(datas,u)
 }
 
+/*
 // @Title test
 // @Description test
 // @Param	phone			query	string	false	手机号码
@@ -97,21 +103,14 @@ func (u *TmpController) DeleteUser() {
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /ttt [get]
-func (u *TmpController) Test() {
+	func (u *TmpController) Test() {
+	
 	//ini return
 //	datas := map[string]interface{}{"responseNo": 0}
 
 	u.Ctx.Request.ParseForm()
 	phone := u.Ctx.Request.FormValue("phone")
-	/*
-	defer func(){
-		str := recover()
-		if str != nil{
-			fmt.Println(str)
-		}
-	}()
 	
-*/
 
 	if phone == "abc"{
 		c := 10
@@ -124,4 +123,18 @@ func (u *TmpController) Test() {
 //	fmt.Println(u.Ctx.Output.IsServerError())
 	//return
 //	u.jsonEcho(datas,u)
+	
+}
+*/
+
+//记录请求
+func (u *TmpController) logRequest() {
+	var logObj *models.MLog
+	logObj.LogRequest(u.Ctx)
+}
+
+//记录返回
+func (u *TmpController) logEcho(datas map[string]interface{}) {
+	var logObj *models.MLog
+	logObj.LogEcho(datas)
 }

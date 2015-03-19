@@ -3,21 +3,22 @@ package controllers
 import (
 	"dream_api_sms_v2/models"
 	"github.com/astaxie/beego"
-//	"net/http"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
-	"github.com/astaxie/beego/utils"
-	"github.com/astaxie/beego/logs"
-//	"fmt"
+//	"github.com/astaxie/beego/utils"
 )
 
 type ErrorController struct {
 	beego.Controller
 }
 
+func init() {
+}
+
 //json echo
 func (u0 *ErrorController) jsonEcho(datas map[string]interface{},u *ErrorController) {
 //	u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
+//u.Ctx.Output.SetStatus(401)
 	u.Ctx.Output.ContentType("application/json; charset=utf-8")
 	
 	datas["responseMsg"] = ""
@@ -32,46 +33,50 @@ func (u0 *ErrorController) jsonEcho(datas map[string]interface{},u *ErrorControl
 
 func (u *ErrorController) Error401() {
 	//ini return
-	u.Ctx.Output.SetStatus(401)
 	datas := map[string]interface{}{"responseNo": 401}
+	//log
+	u.errerLog("401")
 	//return
 	u.jsonEcho(datas,u)
 }
 
 func (u *ErrorController) Error403() {
 	//ini return
-	u.Ctx.Output.SetStatus(403)
 	datas := map[string]interface{}{"responseNo": 403}
+	//log
+	u.errerLog("403")
 	//return
 	u.jsonEcho(datas,u)
 }
 
 func (u *ErrorController) Error404() {
 	//ini return
-	u.Ctx.Output.SetStatus(404)
 	datas := map[string]interface{}{"responseNo": 404}
+	//log
+	u.errerLog("404")
 	//return
 	u.jsonEcho(datas,u)
 }
 
 func (u *ErrorController) Error500() {
 	//ini return
-	u.Ctx.Output.SetStatus(500)
 	datas := map[string]interface{}{"responseNo": 500}
+	//log
+	u.errerLog("500")
 	//return
 	u.jsonEcho(datas,u)
 }
 
 func (u *ErrorController) Error503() {
 	//ini return
-	u.Ctx.Output.SetStatus(503)
 	datas := map[string]interface{}{"responseNo": 503}
 	//log
-	//"Body", u.Ctx.Input.Body(), 
-	str := "503\n"+utils.GetDisplayString("Body", u.Ctx.Input.CopyBody(), "IP", u.Ctx.Input.IP(), "Uri", u.Ctx.Input.Uri(),"Method", u.Ctx.Input.Method())
-	log := logs.NewLogger(10000)
-	log.SetLogger("file", `{"filename":"test.log"}`)
-	log.Error(str)
+	u.errerLog("503")
 	//return
 	u.jsonEcho(datas,u)
+}
+
+func (u *ErrorController) errerLog(code string) {
+	var logObj models.MLog
+	logObj.LogRequestErr500(u.Ctx,code)
 }

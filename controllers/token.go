@@ -30,6 +30,9 @@ func (u0 *TokenController) jsonEcho(datas map[string]interface{},u *TokenControl
 	}
 
 	u.Data["json"] = datas
+	//log
+	u.logEcho(datas)
+
 	u.ServeJson()
 }
 
@@ -42,6 +45,8 @@ func (u0 *TokenController) jsonEcho(datas map[string]interface{},u *TokenControl
 // @Failure 401 无权访问
 // @router /verify/:token [get]
 func (u *TokenController) CheckToken() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -60,4 +65,16 @@ func (u *TokenController) CheckToken() {
 	}
 	//return
 	u.jsonEcho(datas,u)
+}
+
+//记录请求
+func (u *TokenController) logRequest() {
+	var logObj *models.MLog
+	logObj.LogRequest(u.Ctx)
+}
+
+//记录返回
+func (u *TokenController) logEcho(datas map[string]interface{}) {
+	var logObj *models.MLog
+	logObj.LogEcho(datas)
 }

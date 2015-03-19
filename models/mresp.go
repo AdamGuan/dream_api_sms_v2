@@ -43,6 +43,7 @@ type MUserLoginResp struct {
 	F_class_id int
 	F_class_name string
 	F_avatar_url string
+	F_user_email string
 }
 
 type MUserInfoResp struct {
@@ -69,6 +70,7 @@ type MUserInfoResp struct {
 	F_class_id int
 	F_class_name string
 	F_avatar_url string
+	F_user_email string
 }
 
 type MAreaResp struct {
@@ -155,6 +157,13 @@ type MAvatarlistResp struct {
 }
 
 type MModifyPhoneResp struct {
+	responseNo  int
+	responseMsg string
+	token string
+	tokenExpireDatetime string
+}
+
+type MModifyEmailResp struct {
 	responseNo  int
 	responseMsg string
 	token string

@@ -1,5 +1,3 @@
-<li style="color:red;font-weight:bold;">外网api地址：useracc.dream.cn , 外网api没有说明文档, 端口与内网都一样</li>
-
 ALTER TABLE `t_user`
 	ADD COLUMN `F_user_nickname` VARCHAR(50) NOT NULL DEFAULT '' COMMENT '昵称' AFTER `F_user_realname`;
 
@@ -49,12 +47,40 @@ ALTER TABLE `t_token`
 ALTER TABLE `t_token`
 	CHANGE COLUMN `F_user_name` `F_user_name` VARCHAR(50) NOT NULL COMMENT '用户ID' FIRST;
 
-ALTER TABLE `t_sms_rate`
-	ALTER `F_action` DROP DEFAULT;
-ALTER TABLE `t_sms_rate`
-	CHANGE COLUMN `F_action` `F_action` CHAR(32) NOT NULL COMMENT '动作，(md5(uid+pkg))' FIRST;
+ALTER TABLE `t_sms_action_valid`
+	ADD COLUMN `F_last_timestamp` DATETIME NOT NULL COMMENT '最后更新时间' AFTER `F_action`;
 
-ALTER TABLE `t_sms_action_valid`
-	ALTER `F_action` DROP DEFAULT;
-ALTER TABLE `t_sms_action_valid`
-	CHANGE COLUMN `F_action` `F_action` CHAR(32) NOT NULL COMMENT '动作，(md5(uid+pkg+sms))' FIRST;
+
+
+
+ALTER TABLE `t_user`
+	ADD COLUMN `F_user_email` VARCHAR(50) NOT NULL COMMENT 'eamil地址' AFTER `F_user_phone`;
+
+
+ALTER TABLE `t_user`
+	ADD COLUMN `F_status` TINYINT(1) NOT NULL DEFAULT '1' COMMENT '1有效,0无效' AFTER `F_avatarname`,
+	DROP INDEX `F_user_phone`,
+	ADD INDEX `F_user_phone` (`F_user_phone`),
+	ADD INDEX `F_user_email` (`F_user_email`);
+
+CREATE TABLE `t_email_action_valid` (
+	`F_action` CHAR(32) NOT NULL COMMENT '动作，(md5(email+pkg+sms))',
+	`F_last_timestamp` DATETIME NOT NULL COMMENT '最后更新时间',
+	UNIQUE INDEX `F_action` (`F_action`)
+)
+COMMENT='记录每个动作对应的eamil证码，用于安全验证。暂时的，会改为redis'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM
+;
+
+CREATE TABLE `t_email_rate` (
+	`F_action` CHAR(32) NOT NULL COMMENT '动作，(md5(email+pkg))',
+	`F_last_timestamp` DATETIME NOT NULL COMMENT '时间',
+	UNIQUE INDEX `F_action` (`F_action`)
+)
+COMMENT='记录email发送的频率，用于限制email的频繁发送，暂时的，会改为redis'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM
+;
+
+INSERT INTO `t_config_response` (`F_response_no`, `F_response_msg`) VALUES (-26, '新账号已被注册');

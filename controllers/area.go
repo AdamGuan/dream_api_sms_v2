@@ -189,3 +189,15 @@ func (u *AreaController) GetCountyName() {
 	//return
 	u.jsonEcho(datas,u)
 }
+
+//记录请求
+func (u *AreaController) logRequest() {
+	var logObj *models.MLog
+	logObj.LogRequest(u.Ctx)
+}
+
+//记录返回
+func (u *AreaController) logEcho(datas map[string]interface{}) {
+	var logObj *models.MLog
+	logObj.LogEcho(datas)
+}

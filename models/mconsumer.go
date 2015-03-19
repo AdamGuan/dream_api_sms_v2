@@ -39,6 +39,7 @@ type userInfoa struct {
 	F_class_id int
 	F_class_name string
 	F_avatar_url string
+	F_user_email string
 }
 
 type avatarSysInfoLista []struct{
@@ -58,6 +59,18 @@ func (u *MConsumer) GetUidByPhone(phone string)string{
 	return uid
 }
 
+//根据email获取uid
+func (u *MConsumer) GetUidByEmail(email string)string{
+	uid := ""
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? LIMIT 1", email).Values(&maps)
+	if err == nil && num > 0 {
+		uid = maps[0]["F_user_name"].(string)
+	}
+	return uid
+}
+
 //检查手机号码是否可用
 func (u *MConsumer) CheckPhoneValid(phone string)int{
 	o := orm.NewOrm()
@@ -68,6 +81,17 @@ func (u *MConsumer) CheckPhoneValid(phone string)int{
 	}
 	return -23
 
+}
+
+//检查email是否可做新用户使用
+func (u *MConsumer) CheckEmailValid(email string)bool{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? LIMIT 1", email).Values(&maps)
+	if err == nil && num <= 0 {
+		return true
+	}
+	return false
 }
 
 //检查用户ID是否可用
@@ -101,6 +125,14 @@ func (u *MConsumer) CheckPhoneExists(phone string)bool{
 	return false
 }
 
+//检查email是否存在
+func (u *MConsumer) CheckEmailExists(email string)bool{
+	if !u.CheckEmailValid(email) {
+		return true
+	}
+	return false
+}
+
 //检查uid是否存在
 func (u *MConsumer) CheckUserIdExists(uid string)bool{
 	if !u.checkUserIdValid(uid){
@@ -123,6 +155,20 @@ func (u *MConsumer) CheckPhoneAndPwd(phone string,userPwd string)bool{
 	return false
 }
 
+//检查email与密码是否正确
+func (u *MConsumer) CheckEmailAndPwd(email string,userPwd string)bool{
+	if len(email) <= 0 || len(userPwd) <= 0{
+		return false
+	}
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? AND F_user_password = ? LIMIT 1", email,userPwd).Values(&maps)
+	if err == nil && num > 0 {
+		return true
+	}
+	return false
+}
+
 //检查用户ID与密码是否正确
 func (u *MConsumer) CheckUserIdAndPwd(uid string,userPwd string)bool{
 	if len(uid) <= 0 || len(userPwd) <= 0{
@@ -131,6 +177,17 @@ func (u *MConsumer) CheckUserIdAndPwd(uid string,userPwd string)bool{
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_password = ? LIMIT 1", uid,userPwd).Values(&maps)
+	if err == nil && num > 0 {
+		return true
+	}
+	return false
+}
+
+//检查uid与email是否匹配
+func (u *MConsumer) CheckUidAndEmail(uid string,email string)bool{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_email = ? LIMIT 1", uid,email).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -150,12 +207,44 @@ func (u *MConsumer) AddUserByPhone(parames map[string]string)int{
 	result := -16
 	phone,ok := parames["mobilePhoneNumber"]
 	if ok{
-		result = u.CheckPhoneValid(phone)
+		result = 0
+		if u.CheckPhoneValid(phone) != 0{
+			result = -2
+		}
 	}
+	if result == 0{
+		return u.addUser(parames)
+	}
+	return result
+}
+
+//添加用户(根据email)
+func (u *MConsumer) AddUserByEmail(parames map[string]string)int{
+	result := -16
+	email,ok := parames["email"]
+	if ok{
+		result = 0
+		if !u.CheckEmailValid(email) {
+			result = -2
+		}
+	}
+	if result == 0{
+		return u.addUser(parames)
+	}
+	return result
+}
+
+//添加用户
+func (u *MConsumer) addUser(parames map[string]string)int{
+	result := -10
+	//检查pwd
 	userPwd,ok := parames["pwd"]
-	if result == 0 && ok{
+	if ok{
 		result = u.CheckUserPwdValid(userPwd)
+	}else{
+		result = -9
 	}
+	//foreach
 	if result == 0{
 		/**/
 		breakd := 0
@@ -233,12 +322,34 @@ func (u *MConsumer) AddUserByPhone(parames map[string]string)int{
 						result = -24
 					}
 				case "mobilePhoneNumber":
+					result = -10
 					phone,ok := parames["mobilePhoneNumber"]
 					if ok{
-						set += "F_user_phone="+phone+","
+						if u.CheckPhoneValid(phone) != 0{
+							result = -2
+						}else{
+							result = 0
+						}
+					}
+					if result == 0{
+						set += "F_user_phone='"+phone+"',"
 					}else{
 						breakd = 1
-						result = -10
+					}
+				case "email":
+					result = -10
+					email,ok := parames["email"]
+					if ok{
+						if !u.CheckEmailValid(email) {
+							result = -2
+						}else{
+							result = 0
+						}
+					}
+					if result == 0{
+						set += "F_user_email='"+email+"',"
+					}else{
+						breakd = 1
 					}
 				default:
 			}
@@ -298,6 +409,25 @@ func (u *MConsumer) ModifyUserPwdByPhone(phone string,userPwd string)int{
 		//写入数据库
 		o := orm.NewOrm()
 		_, err := o.Raw("UPDATE t_user SET F_user_password=?,F_modify_datetime=? WHERE F_user_phone=?",userPwd,helper.GetNowDateTime(),phone).Exec()
+		if err == nil {
+			result = 0
+		}
+	}
+	return result
+}
+
+//修改用户密码(根据email)
+func (u *MConsumer) ModifyUserPwdByEmail(email string,userPwd string)int{
+	result := -1
+	res := u.CheckEmailExists(email)
+	if res {
+		result = u.CheckUserPwdValid(userPwd)
+	}
+	if result == 0{
+		result = -1
+		//写入数据库
+		o := orm.NewOrm()
+		_, err := o.Raw("UPDATE t_user SET F_user_password=?,F_modify_datetime=? WHERE F_user_email=?",userPwd,helper.GetNowDateTime(),email).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -373,6 +503,7 @@ func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
 		if err == nil && num > 0 {
 			info.F_uid = maps[0]["F_user_name"].(string)
 			info.F_phone_number = maps[0]["F_user_phone"].(string)
+			info.F_user_email = maps[0]["F_user_email"].(string)
 			//性别
 			gender := maps[0]["F_gender"].(string)
 			genderint := helper.StrToInt(gender)
@@ -676,43 +807,57 @@ func (u *MConsumer) GetAvatarNameFromId(id int)string{
 }
 
 //修改用户手机号码
-func (u *MConsumer) ModifyUserPhone(phone string,newPhone string)int{
+func (u *MConsumer) ModifyUserPhoneByPhone(phone string,newPhone string)int{
 	result := -1
 	res := u.CheckPhoneExists(phone)
 	if res {
-		//检查是否新的手机号码已注册
-		o := orm.NewOrm()
-		//是手机号码同uid的用户
-		if u.CheckUserIdExists(phone){
-			var maps []orm.Params
-			num, err := o.Raw("SELECT F_user_name FROM t_user where F_user_phone=?",newPhone).Values(&maps)
-			if err == nil && num <= 0 {
-				//更新手机号码
-				o := orm.NewOrm()
-				_, err := o.Raw("UPDATE t_user SET F_user_name=?,F_user_phone=?,F_modify_datetime=? WHERE F_user_phone=?",newPhone,newPhone,helper.GetNowDateTime(),phone).Exec()
-				if err == nil {
-					result = 0
-				}
-			}else{
-				result = -23
-			}
-
-		}else{
-			var maps []orm.Params
-			num, err := o.Raw("SELECT F_user_name FROM t_user where F_user_phone=?",newPhone).Values(&maps)
-			if err == nil && num <= 0 {
-				//更新手机号码
-				o := orm.NewOrm()
-				
-				_, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_phone=?",newPhone,helper.GetNowDateTime(),phone).Exec()
-				if err == nil {
-					result = 0
-				}
-			}else{
-				result = -23
+		result = u.CheckPhoneValid(newPhone)
+		if result == 0 {
+			//更新手机号码
+			o := orm.NewOrm()
+			_, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_phone=?",newPhone,helper.GetNowDateTime(),phone).Exec()
+			if err == nil {
+				result = 0
 			}
 		}
-		
+	}
+	return result
+}
+
+//修改用户手机号码
+func (u *MConsumer) ModifyUserPhone(phone string,uid string)int{
+	result := -1
+	
+	result = u.CheckPhoneValid(phone)
+	if result == 0 {
+		o := orm.NewOrm()
+		res, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_name=?",phone,helper.GetNowDateTime(),uid).Exec()
+		if err == nil {
+			num, err := res.RowsAffected()
+			if err == nil && num > 0{
+				result = 0
+			}
+		}
+	}
+	return result
+}
+
+//修改email
+func (u *MConsumer) ModifyUserEmail(email string,uid string)int{
+	result := -1
+	
+	res := u.CheckEmailValid(email)
+	if res{
+		o := orm.NewOrm()
+		res, err := o.Raw("UPDATE t_user SET F_user_email=?,F_modify_datetime=? WHERE F_user_name=?",email,helper.GetNowDateTime(),uid).Exec()
+		if err == nil {
+			num, err := res.RowsAffected()
+			if err == nil && num > 0{
+				result = 0
+			}
+		}
+	}else{
+		result = -26
 	}
 	return result
 }

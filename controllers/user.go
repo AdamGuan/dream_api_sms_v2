@@ -36,6 +36,9 @@ func (u0 *UserController) jsonEcho(datas map[string]interface{},u *UserControlle
 	}
 
 	u.Data["json"] = datas
+	//log
+	u.logEcho(datas)
+
 	u.ServeJson()
 }
 
@@ -100,6 +103,8 @@ func (u0 *UserController) getUidByPhone(pnum string)string {
 // @Failure 401 无权访问
 // @router /register [post]
 func (u *UserController) Register() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -145,6 +150,8 @@ func (u *UserController) Register() {
 // @Failure 401 无权访问
 // @router /resetpwd [put]
 func (u *UserController) ResetPwd() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -182,6 +189,8 @@ func (u *UserController) ResetPwd() {
 // @Failure 401 无权访问
 // @router /login/:mobilePhoneNumber [get]
 func (u *UserController) CheckUserAndPwd() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -253,6 +262,8 @@ func (u *UserController) CheckUserAndPwd() {
 // @Failure 401 无权访问
 // @router /pwd/:mobilePhoneNumber [get]
 func (u *UserController) FindPwd() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -299,6 +310,8 @@ func (u *UserController) FindPwd() {
 // @Failure 401 无权访问
 // @router /pwd/:mobilePhoneNumber [put]
 func (u *UserController) ModifyPwd() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -335,6 +348,8 @@ func (u *UserController) ModifyPwd() {
 // @Failure 401 无权访问
 // @router /exists/:mobilePhoneNumber [get]
 func (u *UserController) CheckUserExists() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -368,6 +383,8 @@ func (u *UserController) CheckUserExists() {
 // @Failure 401 无权访问
 // @router /:mobilePhoneNumber [get]
 func (u *UserController) GetUserInfo() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -433,6 +450,8 @@ func (u *UserController) GetUserInfo() {
 // @Failure 401 无权访问
 // @router /:mobilePhoneNumber [put]
 func (u *UserController) ModifyUserInfo() {
+	//log
+	u.logRequest()
 	//uploadAvatar(u *UserController,mobilePhoneNumber string)
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
@@ -503,6 +522,8 @@ func (u *UserController) ModifyUserInfo() {
 // @Failure 401 无权访问
 // @router /logout/:mobilePhoneNumber [delete]
 func (u *UserController) UserLogout() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -537,6 +558,8 @@ func (u *UserController) UserLogout() {
 // @Failure 401 无权访问
 // @router /class/:mobilePhoneNumber [put]
 func (u *UserController) ModifyUserClass() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -566,6 +589,8 @@ func (u *UserController) ModifyUserClass() {
 // @Failure 401 无权访问
 // @router /avatar/:mobilePhoneNumber [put]
 func (u *UserController) UploadAvatar() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	
@@ -644,6 +669,8 @@ func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber strin
 // @Failure 401 无权访问
 // @router /avatarlist [get]
 func (u *UserController) GetSystemAvatarList() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": 0}
 	//model ini
@@ -672,6 +699,8 @@ func (u *UserController) GetSystemAvatarList() {
 // @Failure 401 无权访问
 // @router /phone/:mobilePhoneNumber [put]
 func (u *UserController) ModifyPhone() {
+	//log
+	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
@@ -683,13 +712,18 @@ func (u *UserController) ModifyPhone() {
 	newPhone := u.Ctx.Request.FormValue("newPhone")
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
+	pnum := u.Ctx.Request.Header.Get("pnum")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
+	//确定旧的手机号码是否是自己的
+	if pnum != mobilePhoneNumber{
+		datas["responseNo"] = -1
+	}
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckMPhoneValid(newPhone) {
 		datas["responseNo"] = -1
 		if smsObj.CheckMsmActionvalid(newPhone,pkg,num) == true{
-			datas["responseNo"] = userObj.ModifyUserPhone(mobilePhoneNumber,newPhone)
+			datas["responseNo"] = userObj.ModifyUserPhoneByPhone(mobilePhoneNumber,newPhone)
 			if datas["responseNo"] == 0{
 				//删除旧的手机号码的token
 				var signObj *models.MSign
@@ -704,4 +738,16 @@ func (u *UserController) ModifyPhone() {
 	}
 	//return
 	u.jsonEcho(datas,u)
+}
+
+//记录请求
+func (u *UserController) logRequest() {
+	var logObj *models.MLog
+	logObj.LogRequest(u.Ctx)
+}
+
+//记录返回
+func (u *UserController) logEcho(datas map[string]interface{}) {
+	var logObj *models.MLog
+	logObj.LogEcho(datas)
 }
