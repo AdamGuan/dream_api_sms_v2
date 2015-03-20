@@ -83,4 +83,30 @@ COLLATE='utf8_general_ci'
 ENGINE=MyISAM
 ;
 
+
+
+CREATE TABLE `t_auth_qq` (
+	`F_user_name` VARCHAR(50) NOT NULL COMMENT '用户ID',
+	`F_qq_number` VARCHAR(50) NOT NULL COMMENT 'qq号码',
+	UNIQUE INDEX `F_user_name` (`F_user_name`),
+	UNIQUE INDEX `F_qq_number` (`F_qq_number`)
+)
+COMMENT='qq认证信息'
+ENGINE=MyISAM
+;
+
+CREATE TABLE `t_auth_xinlangweibo` (
+	`F_user_name` VARCHAR(50) NOT NULL COMMENT '用户ID',
+	`F_xinlangweibo_user` VARCHAR(50) NOT NULL COMMENT '新浪微博登录名',
+	UNIQUE INDEX `F_user_name` (`F_user_name`),
+	UNIQUE INDEX `F_xinlangweibo_user` (`F_xinlangweibo_user`)
+)
+COMMENT='新浪微博认证信息'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM
+;
+
+
+
+
 INSERT INTO `t_config_response` (`F_response_no`, `F_response_msg`) VALUES (-26, '新账号已被注册');
