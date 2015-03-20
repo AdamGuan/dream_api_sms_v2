@@ -6,12 +6,9 @@ import (
 	"net/http"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
-//	"fmt"
-	"strings"
-	"os"
 )
 
-//用户
+//qq(第三方)
 type QqController struct {
 	beego.Controller
 }
@@ -54,8 +51,8 @@ func (u0 *QqController) checkSign(u *QqController)int {
 	return result
 }
 
-// @Title 登录(利用手机号码登录)
-// @Description 登录(利用手机号码登录)(token: md5(pkg))
+// @Title 登录
+// @Description 登录(token: md5(pkg))
 // @Param	qq				path	string	true	qq号码
 // @Param	access_token	query	string	true	access_token
 // @Param	appid			query	string	true	appid(oauth_consumer_key)
@@ -85,25 +82,25 @@ func (u *QqController) LoginQQ() {
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 		//检查qq信息的有效性
-		//检查qq号码是否已存在
-		if !userObj.CheckPhoneExists(mobilePhoneNumber){
-			datas["responseNo"] = -4
-		}else{
-			res := userObj.CheckPhoneAndPwd(mobilePhoneNumber,pwd)
-			if res{
-				uid := userObj.GetUidByPhone(mobilePhoneNumber)
-				if len(uid) > 0{
-					info := u.login(uid,pkg)
-					if len(info) > 0{
-						datas["responseNo"] = 0
-						for key,value := range info{
-							datas[key] = value
-						}
+		if len(access_token) > 0 && len(appid) > 0 && len(openid) > 0 && len(qq) > 0{
+			//检查qq号码是否已存在
+			uid := userObj.GetUidByQQ(qq)
+			if len(uid) <= 0{
+				//写入一条qq数据
+				uid = userObj.InsertQQ(qq)
+			}
+			if len(uid) > 0{
+				//返回登录信息
+				info := u.login(uid,pkg)
+				if len(info) > 0{
+					datas["responseNo"] = 0
+					for key,value := range info{
+						datas[key] = value
 					}
 				}
-			}else{
-				datas["responseNo"] = -9
 			}
+		}else{
+			datas["responseNo"] = -10
 		}
 	}
 	//return
@@ -111,7 +108,7 @@ func (u *QqController) LoginQQ() {
 }
 
 //登录
-func (u *ConsumerController) login(uid string,pkg string)map[string]interface{} {
+func (u *QqController) login(uid string,pkg string)map[string]interface{} {
 	userInfo := map[string]interface{}{}
 	//model ini
 	var userObj *models.MConsumer
@@ -154,13 +151,13 @@ func (u *ConsumerController) login(uid string,pkg string)map[string]interface{} 
 }
 
 //记录请求
-func (u *ConsumerController) logRequest() {
+func (u *QqController) logRequest() {
 	var logObj *models.MLog
 	logObj.LogRequest(u.Ctx)
 }
 
 //记录返回
-func (u *ConsumerController) logEcho(datas map[string]interface{}) {
+func (u *QqController) logEcho(datas map[string]interface{}) {
 	var logObj *models.MLog
 	logObj.LogEcho(datas)
 }

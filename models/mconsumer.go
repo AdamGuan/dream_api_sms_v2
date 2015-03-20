@@ -861,3 +861,50 @@ func (u *MConsumer) ModifyUserEmail(email string,uid string)int{
 	}
 	return result
 }
+
+//根据QQ号码返回UID
+func (u *MConsumer) GetUidByQQ(qq string)string{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_qq where F_qq_number=? LIMIT 1",qq).Values(&maps)
+	if err == nil && num > 0 {
+		return maps[0]["F_user_name"].(string)
+	}
+	return ""
+}
+
+//insert 一条qq认证信息
+func (u *MConsumer) InsertQQ(qq string)string{
+	uid := u.addUserQQ()
+	if len(uid) > 0{
+		o := orm.NewOrm()
+		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_number=?",uid,qq).Exec()
+		if err == nil {
+			num, _ := res.RowsAffected()
+			if num >0{
+				return uid
+			}
+		}else{
+			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1",uid).Exec()
+		}
+	}
+	return ""
+}
+
+//添加qq到t_user,并返回uid
+func (u *MConsumer) addUserQQ()string{
+	now := helper.GetNowDateTime()
+	uid := u.CreateUid()
+	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
+	set = "F_user_name='"+uid+"',"+set
+	o := orm.NewOrm()
+	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+	if err == nil {
+		num, _ := res.RowsAffected()
+		if num >0{
+			return uid
+		}
+	}
+
+	return ""
+}
