@@ -79,17 +79,17 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
-		//检查qq信息的有效性
+		//检查新浪微博信息的有效性
 		if len(uid) > 0 && len(access_token) > 0 && len(user) > 0{
-			//检查qq号码是否已存在
-			uid := userObj.GetUidByQQ(qq)
-			if len(uid) <= 0{
-				//写入一条qq数据
-				uid = userObj.InsertQQ(qq)
+			//检查新浪微博是否已存在
+			uuid := userObj.GetUidByXinlangweibo(user)
+			if len(uuid) <= 0{
+				//写入一条新浪微博数据
+				uuid = userObj.InsertXinlangweibo(user)
 			}
-			if len(uid) > 0{
+			if len(uuid) > 0{
 				//返回登录信息
-				info := u.login(uid,pkg)
+				info := u.login(uuid,pkg)
 				if len(info) > 0{
 					datas["responseNo"] = 0
 					for key,value := range info{

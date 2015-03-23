@@ -10,6 +10,11 @@ import (
 
 func init() {
 	ns := beego.NewNamespace("/v2",
+		beego.NSNamespace("/weibo",
+			beego.NSInclude(
+				&controllers.XinlangweiboController{},
+			),
+		),
 		beego.NSNamespace("/qq",
 			beego.NSInclude(
 				&controllers.QqController{},
