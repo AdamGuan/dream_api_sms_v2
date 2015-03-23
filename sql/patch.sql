@@ -107,6 +107,16 @@ ENGINE=MyISAM
 ;
 
 
+ALTER TABLE `t_auth_qq`
+	ALTER `F_qq_number` DROP DEFAULT;
+ALTER TABLE `t_auth_qq`
+	CHANGE COLUMN `F_qq_number` `F_qq_openid` VARCHAR(50) NOT NULL COMMENT 'qq openid' AFTER `F_user_name`;
+
+ALTER TABLE `t_auth_xinlangweibo`
+	ALTER `F_xinlangweibo_user` DROP DEFAULT;
+ALTER TABLE `t_auth_xinlangweibo`
+	CHANGE COLUMN `F_xinlangweibo_user` `F_xinlangweibo_openid` VARCHAR(50) NOT NULL COMMENT '新浪微博openid' AFTER `F_user_name`;
+
 
 
 INSERT INTO `t_config_response` (`F_response_no`, `F_response_msg`) VALUES (-26, '新账号已被注册');
