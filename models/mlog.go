@@ -39,7 +39,7 @@ func init() {
 
 	SmsLog = logs.NewLogger(10000)
 	str,_ = json.Marshal(map[string]string{"filename":smsLogFile})
-	DebugLog.SetLogger("file", string(str))
+	SmsLog.SetLogger("file", string(str))
 
 	EmailLog = logs.NewLogger(10000)
 	str,_ = json.Marshal(map[string]string{"filename":emailLogFile})
