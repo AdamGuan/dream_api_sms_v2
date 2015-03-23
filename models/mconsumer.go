@@ -866,7 +866,7 @@ func (u *MConsumer) ModifyUserEmail(email string,uid string)int{
 func (u *MConsumer) GetUidByQQ(qq string)string{
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_auth_qq where F_qq_number=? LIMIT 1",qq).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_qq where F_qq_openid=? LIMIT 1",qq).Values(&maps)
 	if err == nil && num > 0 {
 		return maps[0]["F_user_name"].(string)
 	}
@@ -878,7 +878,7 @@ func (u *MConsumer) InsertQQ(qq string)string{
 	uid := u.addUserQQ()
 	if len(uid) > 0{
 		o := orm.NewOrm()
-		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_number=?",uid,qq).Exec()
+		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_openid=?",uid,qq).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
 			if num >0{
@@ -913,7 +913,7 @@ func (u *MConsumer) addUserQQ()string{
 func (u *MConsumer) GetUidByXinlangweibo(name string)string{
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_auth_xinlangweibo where F_xinlangweibo_user=? LIMIT 1",name).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_xinlangweibo where F_xinlangweibo_openid=? LIMIT 1",name).Values(&maps)
 	if err == nil && num > 0 {
 		return maps[0]["F_user_name"].(string)
 	}
@@ -925,7 +925,7 @@ func (u *MConsumer) InsertXinlangweibo(name string)string{
 	uid := u.addUserXinlangweibo()
 	if len(uid) > 0{
 		o := orm.NewOrm()
-		res, err := o.Raw("INSERT INTO t_auth_xinlangweibo SET F_user_name=?,F_xinlangweibo_user=?",uid,name).Exec()
+		res, err := o.Raw("INSERT INTO t_auth_xinlangweibo SET F_user_name=?,F_xinlangweibo_openid=?",uid,name).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
 			if num >0{

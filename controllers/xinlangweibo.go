@@ -53,14 +53,13 @@ func (u0 *XinlangweiboController) checkSign(u *XinlangweiboController)int {
 
 // @Title 登录
 // @Description 登录(token: md5(pkg))
-// @Param	user			path	string	true	新浪微博登录名
 // @Param	uid				query	string	true	授权时的uid
 // @Param	access_token	query	string	true	用户授权时生成的access_token
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
 // @Success	200 {object} models.MUserLoginResp
 // @Failure 401 无权访问
-// @router /login/:user [get]
+// @router /login [get]
 func (u *XinlangweiboController) LoginXinalngweibo() {
 	//log
 	u.logRequest()
@@ -70,8 +69,7 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	user := u.Ctx.Input.Param(":user")
-	uid := u.Ctx.Request.FormValue("uid")
+	openid := u.Ctx.Request.FormValue("uid")
 	access_token := u.Ctx.Request.FormValue("access_token")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
@@ -80,12 +78,12 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 		//检查新浪微博信息的有效性
-		if len(uid) > 0 && len(access_token) > 0 && len(user) > 0{
+		if len(openid) > 0 && len(access_token) > 0 {
 			//检查新浪微博是否已存在
-			uuid := userObj.GetUidByXinlangweibo(user)
+			uuid := userObj.GetUidByXinlangweibo(openid)
 			if len(uuid) <= 0{
 				//写入一条新浪微博数据
-				uuid = userObj.InsertXinlangweibo(user)
+				uuid = userObj.InsertXinlangweibo(openid)
 			}
 			if len(uuid) > 0{
 				//返回登录信息

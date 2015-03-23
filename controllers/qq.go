@@ -53,7 +53,6 @@ func (u0 *QqController) checkSign(u *QqController)int {
 
 // @Title 登录
 // @Description 登录(token: md5(pkg))
-// @Param	qq				path	string	true	qq号码
 // @Param	access_token	query	string	true	access_token
 // @Param	appid			query	string	true	appid(oauth_consumer_key)
 // @Param	openid			query	string	true	openid
@@ -61,7 +60,7 @@ func (u0 *QqController) checkSign(u *QqController)int {
 // @Param	pkg			header	string	true	包名
 // @Success	200 {object} models.MUserLoginResp
 // @Failure 401 无权访问
-// @router /login/:qq [get]
+// @router /login [get]
 func (u *QqController) LoginQQ() {
 	//log
 	u.logRequest()
@@ -71,7 +70,6 @@ func (u *QqController) LoginQQ() {
 	var userObj *models.MConsumer
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	qq := u.Ctx.Input.Param(":qq")
 	access_token := u.Ctx.Request.FormValue("access_token")
 	appid := u.Ctx.Request.FormValue("appid")
 	openid := u.Ctx.Request.FormValue("openid")
@@ -82,12 +80,12 @@ func (u *QqController) LoginQQ() {
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 		//检查qq信息的有效性
-		if len(access_token) > 0 && len(appid) > 0 && len(openid) > 0 && len(qq) > 0{
+		if len(access_token) > 0 && len(appid) > 0 && len(openid) > 0 {
 			//检查qq号码是否已存在
-			uid := userObj.GetUidByQQ(qq)
+			uid := userObj.GetUidByQQ(openid)
 			if len(uid) <= 0{
 				//写入一条qq数据
-				uid = userObj.InsertQQ(qq)
+				uid = userObj.InsertQQ(openid)
 			}
 			if len(uid) > 0{
 				//返回登录信息
