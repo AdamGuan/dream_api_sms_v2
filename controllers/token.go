@@ -2,38 +2,11 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
-	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
-	//"fmt"
-	//"strings"
 )
 
 //token
 type TokenController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *TokenController) jsonEcho(datas map[string]interface{},u *TokenController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
+	BaseController
 }
 
 // @Title 检查token是否正确
@@ -64,17 +37,5 @@ func (u *TokenController) CheckToken() {
 		datas["responseNo"] = -18
 	}
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *TokenController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *TokenController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }

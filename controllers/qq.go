@@ -2,53 +2,11 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
-	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
 )
 
 //qq(第三方)
 type QqController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *QqController) jsonEcho(datas map[string]interface{},u *QqController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
-
-//sign check, , token为包名的md5值
-func (u0 *QqController) checkSign(u *QqController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
-			result = 0
-		}
-	}
-	return result
+	BaseController
 }
 
 // @Title 登录
@@ -75,7 +33,7 @@ func (u *QqController) LoginQQ() {
 	openid := u.Ctx.Request.FormValue("openid")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
@@ -102,7 +60,7 @@ func (u *QqController) LoginQQ() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 //登录
@@ -146,16 +104,4 @@ func (u *QqController) login(uid string,pkg string)map[string]interface{} {
 		}
 	}
 	return userInfo
-}
-
-//记录请求
-func (u *QqController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *QqController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
 }

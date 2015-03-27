@@ -2,59 +2,12 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
 	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
 )
 
 //班级
 type ClassController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *ClassController) jsonEcho(datas map[string]interface{},u *ClassController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
-
-//sign check
-func (u0 *ClassController) checkSign(u *ClassController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	uid := u.Ctx.Request.Header.Get("pnum")
-	//判断是否为手机号码
-	if helper.CheckMPhoneValid(uid){
-		var userObj *models.MConsumer
-		uid = userObj.GetUidByPhone(uid)
-	}
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
-			result = 0
-		}
-	}
-	return result
+	BaseController
 }
 
 // @Title 添加一个班级
@@ -83,7 +36,7 @@ func (u *ClassController) AddAClass() {
 	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
 
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign3()
 	if datas["responseNo"] == 0 {
 		var userObj *models.MConsumer
 		uid := userObj.GetUidByPhone(mobilePhoneNumber)
@@ -91,7 +44,7 @@ func (u *ClassController) AddAClass() {
 		datas["responseNo"],datas["F_class_id"] = classObj.CreateAClass(uid,className,helper.StrToInt(schoolId),helper.StrToInt(gradeId))
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 获取某个学校下的所有班级信息
@@ -118,7 +71,7 @@ func (u *ClassController) GetAllClasses() {
 	gradeId := u.Ctx.Request.FormValue("gradeId")
 
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign3()
 	if datas["responseNo"] == 0 {
 		tmp := classObj.GetSchoolClassInfo(helper.StrToInt(schoolId),helper.StrToInt(gradeId))
 		if len(tmp) > 0{
@@ -128,17 +81,5 @@ func (u *ClassController) GetAllClasses() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *ClassController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *ClassController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }

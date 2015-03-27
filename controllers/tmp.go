@@ -10,24 +10,9 @@ import (
 
 //临时工具
 type TmpController struct {
-	beego.Controller
+	BaseController
 }
 
-//json echo
-func (u0 *TmpController) jsonEcho(datas map[string]interface{},u *TmpController) {
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
 
 /*
 // @Title 清空全部用户数据(临时用)
@@ -55,7 +40,7 @@ func (u *TmpController) DeleteAllUser() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 */
 
@@ -92,7 +77,7 @@ func (u *TmpController) DeleteUser() {
 	}
 	
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 /*
@@ -122,19 +107,7 @@ func (u *TmpController) DeleteUser() {
 	
 //	fmt.Println(u.Ctx.Output.IsServerError())
 	//return
-//	u.jsonEcho(datas,u)
+//	u.jsonEcho(datas)
 	
 }
 */
-
-//记录请求
-func (u *TmpController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *TmpController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
-}

@@ -2,32 +2,12 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
 	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
 )
 
 //学校
 type SchoolController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *SchoolController) jsonEcho(datas map[string]interface{},u *SchoolController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	u.ServeJson()
+	BaseController
 }
 
 // @Title 查询学校
@@ -77,7 +57,7 @@ func (u *SchoolController) QuerySchools() {
 		datas["responseNo"] = -10
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 获取所有年级
@@ -93,7 +73,7 @@ func (u *SchoolController) GetAllGrade() {
 	grades := schoolObj.GetAllGrade()
 	datas["gradeList"] = grades
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 根据学校查询所在地域
@@ -132,7 +112,7 @@ func (u *SchoolController) GetSchoolArea() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 根据学校ID查询学校名
@@ -165,17 +145,5 @@ func (u *SchoolController) GetSchoolName() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *SchoolController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *SchoolController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }

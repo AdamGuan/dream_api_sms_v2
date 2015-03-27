@@ -2,71 +2,12 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
 	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
 )
 
 //Email(每个用户email发送限制为1分钟的一次)
 type EmailController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *EmailController) jsonEcho(datas map[string]interface{},u *EmailController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
-
-//sign check
-func (u0 *EmailController) checkSign(u *EmailController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	uid := u.Ctx.Request.Header.Get("uid")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
-			result = 0
-		}
-	}
-	return result
-}
-
-//sign check, token为包名md5
-func (u0 *EmailController) checkSign2(u *EmailController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
-			result = 0
-		}
-	}
-	return result
+	BaseController
 }
 
 // @Title email验证码验证
@@ -92,7 +33,7 @@ func (u *EmailController) Emailvalid() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) && len(num) > 0 {
 		datas["responseNo"] = -1
@@ -107,7 +48,7 @@ func (u *EmailController) Emailvalid() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送email验证码(注册时)
@@ -132,7 +73,7 @@ func (u *EmailController) RegisterGetEmail() {
 	email := u.Ctx.Input.Param(":email")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) {
 		datas["responseNo"] = -1
@@ -159,7 +100,7 @@ func (u *EmailController) RegisterGetEmail() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送email验证码(重置密码时)
@@ -184,7 +125,7 @@ func (u *EmailController) ResetPwdGetEmail() {
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	email := u.Ctx.Input.Param(":email")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) {
 		datas["responseNo"] = -1
@@ -211,7 +152,7 @@ func (u *EmailController) ResetPwdGetEmail() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送email验证码(更换email)
@@ -219,7 +160,7 @@ func (u *EmailController) ResetPwdGetEmail() {
 // @Param	email		query	string	true	email(新的)
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	uid			header	string	true	uid
+// @Param	huid		header	string	true	uid
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /resetemail [get]
@@ -236,9 +177,8 @@ func (u *EmailController) ChangeEmailCode() {
 	u.Ctx.Request.ParseForm()
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	email := u.Ctx.Request.FormValue("email")
-//	uid := u.Ctx.Request.Header.Get("uid")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查新email是否已被使用
 	if datas["responseNo"] == 0{
 		if userObj.CheckEmailExists(email){
@@ -266,17 +206,5 @@ func (u *EmailController) ChangeEmailCode() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *EmailController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *EmailController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }

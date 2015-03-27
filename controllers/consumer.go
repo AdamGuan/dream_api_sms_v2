@@ -2,79 +2,20 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
 	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config" 
-//	"fmt"
 	"strings"
 	"os"
 )
 
 //用户
 type ConsumerController struct {
-	beego.Controller
+	BaseController
 }
 
 //上传文件用的size接口
 type Sizer2 interface {
 	Size() int64
-}
-
-//json echo
-func (u0 *ConsumerController) jsonEcho(datas map[string]interface{},u *ConsumerController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
-
-//sign check
-func (u0 *ConsumerController) checkSign(u *ConsumerController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	uid := u.Ctx.Request.Header.Get("huid")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
-			result = 0
-		}
-	}
-	return result
-}
-
-//sign check, , token为包名的md5值
-func (u0 *ConsumerController) checkSign2(u *ConsumerController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
-			result = 0
-		}
-	}
-	return result
 }
 
 // @Title 注册(手机号码注册)
@@ -110,7 +51,7 @@ func (u *ConsumerController) RegisterByPhone() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
@@ -129,7 +70,7 @@ func (u *ConsumerController) RegisterByPhone() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 注册(email注册)
@@ -165,7 +106,7 @@ func (u *ConsumerController) RegisterByEmail() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
@@ -184,7 +125,7 @@ func (u *ConsumerController) RegisterByEmail() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 重置密码(利用手机号码重置密码)
@@ -212,7 +153,7 @@ func (u *ConsumerController) ResetPwdByPhone() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
@@ -224,7 +165,7 @@ func (u *ConsumerController) ResetPwdByPhone() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 重置密码(利用email重置密码)
@@ -252,7 +193,7 @@ func (u *ConsumerController) ResetPwdByEmail() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
@@ -264,7 +205,7 @@ func (u *ConsumerController) ResetPwdByEmail() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 登录(利用手机号码登录)
@@ -289,7 +230,7 @@ func (u *ConsumerController) CheckUserAndPwdByPhone() {
 	pwd := u.Ctx.Request.FormValue("pwd")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
@@ -316,7 +257,7 @@ func (u *ConsumerController) CheckUserAndPwdByPhone() {
 		datas["responseNo"] = -5
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 登录(利用email登录)
@@ -341,7 +282,7 @@ func (u *ConsumerController) CheckUserAndPwdByEmail() {
 	pwd := u.Ctx.Request.FormValue("pwd")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
@@ -368,7 +309,7 @@ func (u *ConsumerController) CheckUserAndPwdByEmail() {
 		datas["responseNo"] = -5
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 //登录
@@ -437,7 +378,7 @@ func (u *ConsumerController) FindPwdByPhone() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -457,7 +398,7 @@ func (u *ConsumerController) FindPwdByPhone() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 修改密码
@@ -484,7 +425,7 @@ func (u *ConsumerController) ModifyPwdByUid() {
 	oldPwd := u.Ctx.Request.FormValue("oldPwd")
 	newPwd := u.Ctx.Request.FormValue("newPwd")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckPwdValid(oldPwd) && helper.CheckPwdValid(newPwd) {
 		datas["responseNo"] = -1
@@ -498,7 +439,7 @@ func (u *ConsumerController) ModifyPwdByUid() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 验证手机号码是否已注册
@@ -520,7 +461,7 @@ func (u *ConsumerController) CheckUserExists() {
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		if userObj.CheckPhoneExists(mobilePhoneNumber){
@@ -532,7 +473,7 @@ func (u *ConsumerController) CheckUserExists() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 获取用户信息
@@ -555,7 +496,7 @@ func (u *ConsumerController) GetUserInfo() {
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
@@ -589,7 +530,7 @@ func (u *ConsumerController) GetUserInfo() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 修改用户信息
@@ -624,7 +565,7 @@ func (u *ConsumerController) ModifyUserInfo() {
 	uid := u.Ctx.Input.Param(":uid")
 	avatarType := helper.StrToInt(u.Ctx.Request.FormValue("avatarType"))
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 {
 		//头像修改
@@ -670,7 +611,7 @@ func (u *ConsumerController) ModifyUserInfo() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 用户登出
@@ -694,7 +635,7 @@ func (u *ConsumerController) UserLogout() {
 	uid := u.Ctx.Input.Param(":uid")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
@@ -705,7 +646,7 @@ func (u *ConsumerController) UserLogout() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 修改用户的班级
@@ -730,13 +671,13 @@ func (u *ConsumerController) ModifyUserClass() {
 	uid := u.Ctx.Input.Param(":uid")
 	classId := u.Ctx.Request.FormValue("classId")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = userObj.UserChangeClass(uid,helper.StrToInt(classId))
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 
@@ -759,13 +700,13 @@ func (u *ConsumerController) UploadAvatar() {
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = u.uploadAvatar(u,uid)
 	}
 	
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // 上传用户头像
@@ -845,7 +786,7 @@ func (u *ConsumerController) GetSystemAvatarList() {
 	}
 	
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 修改用户手机号码
@@ -874,7 +815,7 @@ func (u *ConsumerController) ModifyPhone() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -893,7 +834,7 @@ func (u *ConsumerController) ModifyPhone() {
 		datas["responseNo"] = -10
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 修改eamil
@@ -922,7 +863,7 @@ func (u *ConsumerController) ModifyEmail() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) {
 		datas["responseNo"] = -1
@@ -941,17 +882,5 @@ func (u *ConsumerController) ModifyEmail() {
 		datas["responseNo"] = -10
 	}
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *ConsumerController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *ConsumerController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }

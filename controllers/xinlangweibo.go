@@ -2,53 +2,11 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
-	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
 )
 
 //新浪微博(第三方)
 type XinlangweiboController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *XinlangweiboController) jsonEcho(datas map[string]interface{},u *XinlangweiboController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
-
-//sign check, , token为包名的md5值
-func (u0 *XinlangweiboController) checkSign(u *XinlangweiboController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
-			result = 0
-		}
-	}
-	return result
+	BaseController
 }
 
 // @Title 登录
@@ -73,7 +31,7 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 	access_token := u.Ctx.Request.FormValue("access_token")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
@@ -100,7 +58,7 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 //登录
@@ -144,16 +102,4 @@ func (u *XinlangweiboController) login(uid string,pkg string)map[string]interfac
 		}
 	}
 	return userInfo
-}
-
-//记录请求
-func (u *XinlangweiboController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *XinlangweiboController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
 }

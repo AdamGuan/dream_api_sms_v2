@@ -2,15 +2,12 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
 	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
 )
 
 //地域
 type AreaController struct {
-	beego.Controller
+	BaseController
 }
 
 type areaInfoList map[string]struct{
@@ -21,24 +18,6 @@ type areaInfoList map[string]struct{
 type areaInfoItem struct{
 		F_area_id int
 		F_area_name string
-}
-
-//json echo
-func (u0 *AreaController) jsonEcho(datas map[string]interface{},u *AreaController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	u.ServeJson()
 }
 
 // @Title 获取所有省份
@@ -54,7 +33,7 @@ func (u *AreaController) GetAllProvinces() {
 	provinces := areaObj.GetAllProvinces()
 	datas["areaList"] = provinces
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 获取市
@@ -74,7 +53,7 @@ func (u *AreaController) GetCitys() {
 	citys := areaObj.GetCitys(helper.StrToInt(provinceId))
 	datas["areaList"] = citys
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 获取县
@@ -94,7 +73,7 @@ func (u *AreaController) GetCountys() {
 	countys := areaObj.GetCountys(helper.StrToInt(cityId))
 	datas["areaList"] = countys
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 根据省份ID获取名称
@@ -125,7 +104,7 @@ func (u *AreaController) GetProvinceName() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 根据市ID获取名称
@@ -156,7 +135,7 @@ func (u *AreaController) GetCityName() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 根据县ID获取名称
@@ -187,17 +166,5 @@ func (u *AreaController) GetCountyName() {
 		}
 	}
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *AreaController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *AreaController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }

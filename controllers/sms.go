@@ -2,96 +2,12 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
-	"github.com/astaxie/beego"
-	"net/http"
 	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
-	//"fmt"
-	//"strings"
 )
 
 //短信(每个用户短信发送限制为1分钟的一次)
 type SmsController struct {
-	beego.Controller
-}
-
-//json echo
-func (u0 *SmsController) jsonEcho(datas map[string]interface{},u *SmsController) {
-	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
-		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
-	datas["responseMsg"] = ""
-	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
-		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
-	}
-
-	u.Data["json"] = datas
-	//log
-	u.logEcho(datas)
-
-	u.ServeJson()
-}
-
-//sign check
-func (u0 *SmsController) checkSign(u *SmsController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	mobilePhoneNumber := u.Ctx.Request.Header.Get("pnum")
-
-	var userObj *models.MConsumer
-	uid := userObj.GetUidByPhone(mobilePhoneNumber)
-
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
-			result = 0
-		}
-	}
-	return result
-}
-
-//sign check3
-func (u0 *SmsController) checkSign3(u *SmsController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	uid := u.Ctx.Request.Header.Get("huid")
-
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
-			result = 0
-		}
-	}
-	return result
-}
-
-//sign check, token为包名md5
-func (u0 *SmsController) checkSign2(u *SmsController)int {
-	result := -6
-	pkg := u.Ctx.Request.Header.Get("pkg")
-	sign := u.Ctx.Request.Header.Get("sign")
-	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
-		result = -7
-	}else{
-		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
-			result = 0
-		}
-	}
-	return result
+	BaseController
 }
 
 // @Title 短信验证码验证
@@ -117,7 +33,7 @@ func (u *SmsController) Smsvalid() {
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && len(num) > 0 {
 		datas["responseNo"] = -1
@@ -133,7 +49,7 @@ func (u *SmsController) Smsvalid() {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送一条短信验证码(注册时)
@@ -158,7 +74,7 @@ func (u *SmsController) RegisterGetSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -186,7 +102,7 @@ func (u *SmsController) RegisterGetSms() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送一条短信验证码(重置密码时)
@@ -211,7 +127,7 @@ func (u *SmsController) ResetPwdGetSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -236,7 +152,7 @@ func (u *SmsController) ResetPwdGetSms() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送一条短信验证码(找回密码时)
@@ -261,7 +177,7 @@ func (u *SmsController) FindPwdGetSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	//check sign
-	datas["responseNo"] = u.checkSign2(u)
+	datas["responseNo"] = u.checkSign2()
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
@@ -286,7 +202,7 @@ func (u *SmsController) FindPwdGetSms() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送一条短信验证码(更换手机号码)(请使用下面的api代替,留这个api兼容之前的调用)
@@ -314,7 +230,7 @@ func (u *SmsController) ChangePhoneSms() {
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	pnum := u.Ctx.Request.Header.Get("pnum")
 	//check sign
-	datas["responseNo"] = u.checkSign(u)
+	datas["responseNo"] = u.checkSign3()
 	//确定旧的手机号码是否是自己的
 	if pnum != mobilePhoneNumber{
 		datas["responseNo"] = -1
@@ -345,7 +261,7 @@ func (u *SmsController) ChangePhoneSms() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas)
 }
 
 // @Title 发送一条短信验证码(更换手机号码)
@@ -370,7 +286,7 @@ func (u *SmsController) ChangePhoneSms2() {
 	pkg := u.Ctx.Request.Header.Get("Pkg")
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	//check sign
-	datas["responseNo"] = u.checkSign3(u)
+	datas["responseNo"] = u.checkSign()
 	//检查新手机号码是否已被使用
 	if datas["responseNo"] == 0{
 		var userObj *models.MConsumer
@@ -397,17 +313,5 @@ func (u *SmsController) ChangePhoneSms2() {
 	}
 
 	//return
-	u.jsonEcho(datas,u)
-}
-
-//记录请求
-func (u *SmsController) logRequest() {
-	var logObj *models.MLog
-	logObj.LogRequest(u.Ctx)
-}
-
-//记录返回
-func (u *SmsController) logEcho(datas map[string]interface{}) {
-	var logObj *models.MLog
-	logObj.LogEcho(datas)
+	u.jsonEcho(datas)
 }
