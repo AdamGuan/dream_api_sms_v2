@@ -119,4 +119,10 @@ ALTER TABLE `t_auth_xinlangweibo`
 
 
 
+INSERT INTO `t_config_pkg` (`F_pkg`, `F_app_name`,`F_app_id`,`F_app_key`,`F_app_master_key`,`F_app_msm_template`) VALUES ('com.readboy.oneononetutor', '一对一辅导','ogxif29tbur554rh6n2m9yefhajgqkjqwspvr4lzu9rczxvn','2qdmwrqh979waj4emidd0yh07jcu9xm5rz4vuqam1bt4lq0k','06midcv0qs66lq3w4e8r7s7njngcd18t19wv53huegtga47s','template1');
+INSERT INTO `t_config_pkg` (`F_pkg`, `F_app_name`,`F_app_id`,`F_app_key`,`F_app_master_key`,`F_app_msm_template`) VALUES ('com.readboy.oneononetutor.debug', '一对一辅导','ogxif29tbur554rh6n2m9yefhajgqkjqwspvr4lzu9rczxvn','2qdmwrqh979waj4emidd0yh07jcu9xm5rz4vuqam1bt4lq0k','06midcv0qs66lq3w4e8r7s7njngcd18t19wv53huegtga47s','template1');
+
+
+
+
 INSERT INTO `t_config_response` (`F_response_no`, `F_response_msg`) VALUES (-26, '新账号已被注册');

@@ -262,7 +262,7 @@ func (u *ConsumerController) CheckUserAndPwdByPhone() {
 
 // @Title 登录(利用email登录)
 // @Description 登录(利用email登录)(token: md5(pkg))
-// @Param	email		path	string	true	手机号码
+// @Param	email		path	string	true	email
 // @Param	pwd			query	string	true	密码
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
