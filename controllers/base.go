@@ -17,9 +17,9 @@ type BaseController struct {
 func (u *BaseController) jsonEcho(datas map[string]interface{}) {
 	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
 		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-//		u.Ctx.ResponseWriter.Header().Set("WWW-Authenticate", "Basic realm=\"fake\"")
 //		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-		u.Ctx.ResponseWriter.WriteHeader(http.StatusForbidden)
+//		u.Ctx.ResponseWriter.WriteHeader(http.StatusForbidden)
+		u.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 	} 
 	
 	datas["responseMsg"] = ""
