@@ -349,6 +349,7 @@ func (u *ConsumerController) login(uid string,pkg string)map[string]interface{} 
 				userInfo["F_class_name"] = info.F_class_name
 				userInfo["F_avatar_url"] = info.F_avatar_url
 				userInfo["F_user_email"] = info.F_user_email
+				userInfo["F_coin"] = info.F_coin
 			}
 		}
 	}
@@ -525,6 +526,7 @@ func (u *ConsumerController) GetUserInfo() {
 			datas["F_class_name"] = info.F_class_name
 			datas["F_avatar_url"] = info.F_avatar_url
 			datas["F_user_email"] = info.F_user_email
+			datas["F_coin"] = info.F_coin
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -883,4 +885,53 @@ func (u *ConsumerController) ModifyEmail() {
 	}
 	//return
 	u.jsonEcho(datas)
+}
+
+// @Title 添加用户金币
+// @Description 添加用户金币(token: 登录时获取)
+// @Param	uid					form	string	true	uid
+// @Param	coin				form	int		true	金币
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MModifyCoinResp
+// @Failure 401 无权访问
+// @router /coin [post]
+func (u *ConsumerController) AddCoin() {
+	/*
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	var smsObj *models.MSms
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
+	uid := u.Ctx.Request.FormValue("uid")
+	num := u.Ctx.Request.FormValue("num")
+	pkg := u.Ctx.Request.Header.Get("pkg")
+	//check sign
+	datas["responseNo"] = u.checkSign()
+	//检查参数
+	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+		datas["responseNo"] = -1
+		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
+			datas["responseNo"] = userObj.ModifyUserPhone(mobilePhoneNumber,uid)
+			if datas["responseNo"] == 0{
+				//删除旧的手机号码的token
+				var signObj *models.MSign
+				signObj.DeleteAllPkgToken(uid)
+				token,tokenExpireDatetime := userObj.GetTokenByUid(uid,pkg)
+				datas["token"] = token
+				datas["tokenExpireDatetime"] = tokenExpireDatetime
+			}
+		}
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+	*/
 }
