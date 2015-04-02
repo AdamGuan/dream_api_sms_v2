@@ -15,6 +15,7 @@ import (
 	//"net/url"
 	"time"
 	"regexp"
+	"math/rand"
 //	"github.com/astaxie/beego/config" 
 )
 
@@ -209,4 +210,10 @@ func CheckEmailValid(email string)bool{
 		return true
 	}
 	return false
+}
+
+//生成一个短信验证码
+func GetSmsNum()string{
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))
 }

@@ -23,10 +23,11 @@ type MSms struct {
 }
 
 //get a msm
-func (u *MSms) GetMsm(mobilePhoneNumber string,appId string,appKey string,appName string,appTemplate string) map[string]interface{} {
+func (u *MSms) GetMsm(mobilePhoneNumber string,appId string,appKey string,appName string,appTemplate string,pkgName string) map[string]interface{} {
 	url := "https://leancloud.cn/1.1/requestSmsCode"
 	method := "POST"
-	data := map[string]string{"mobilePhoneNumber": mobilePhoneNumber,"template":appTemplate,"appname":appName}
+	mycode := helper.GetSmsNum()
+	data := map[string]string{"mobilePhoneNumber": mobilePhoneNumber,"template":appTemplate,"appname":appName,"mycode":mycode}
 
 	//log curl
 	logStr := "\nCurl leancloud for request code\n"+utils.GetDisplayString("Url", url, "Method",method,"Data", data,"Appid", appId, "appKey", appKey)
@@ -34,6 +35,11 @@ func (u *MSms) GetMsm(mobilePhoneNumber string,appId string,appKey string,appNam
 	
 	//curl
 	resBody,resHeader := helper.CurlLeanCloud(url,method,data,appId,appKey);
+
+	//记录下smsnum
+	if len(resBody) == 0 {
+		u.AddMsmActionvalid(mobilePhoneNumber,pkgName,mycode)
+	}
 
 	//log curl return
 	logStr2 := "\nCurl leancloud for request code return\n"+utils.GetDisplayString("resBody", resBody,"resHeader",resHeader)
@@ -51,23 +57,7 @@ func (u *MSms) ValidMsm(pkgName string,sms string,mobilePhoneNumber string,appId
 	if err == nil && num > 0 {
 		return make(map[string]interface{},0)
 	}
-
-	url := "https://leancloud.cn/1.1/verifySmsCode/"+sms+"?mobilePhoneNumber="+mobilePhoneNumber
-	method := "POST"
-	data := map[string]string{}
-
-	//log curl
-	logStr := "\nCurl leancloud for verify code\n"+utils.GetDisplayString("Url", url, "Method",method,"Data", data,"Appid", appId, "appKey", appKey)
-	SmsLog.Info(logStr)
-
-	//向leancloud发送验证码验证请求
-	resBody,resHeader := helper.CurlLeanCloud(url,method,data,appId,appKey);
-
-	//log curl return
-	logStr2 := "\nCurl leancloud for verify code return\n"+utils.GetDisplayString("resBody", resBody,"resHeader",resHeader)
-	SmsLog.Info(logStr2)
-
-	return resBody
+	return map[string]interface{}{"code":-1}
 }
 
 //检查是否可以给用户发送短信了

@@ -42,7 +42,6 @@ func (u *SmsController) Smsvalid() {
 			res := smsObj.ValidMsm(pkg,num,mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"])
 			if len(res) == 0{
 				datas["responseNo"] = 0
-				smsObj.AddMsmActionvalid(mobilePhoneNumber,pkg,num)
 			}
 		}
 	}else if datas["responseNo"] == 0{
@@ -83,7 +82,7 @@ func (u *SmsController) RegisterGetSms() {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg){
 				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
 				if len(res) == 0{
 					datas["responseNo"] = 0
 					smsObj.AddMsmRate(mobilePhoneNumber,pkg)
@@ -136,7 +135,7 @@ func (u *SmsController) ResetPwdGetSms() {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
 				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
 				if len(res) == 0{
 					datas["responseNo"] = 0
 					smsObj.AddMsmRate(mobilePhoneNumber,pkg)
@@ -186,7 +185,7 @@ func (u *SmsController) FindPwdGetSms() {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
 			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
 				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
 				if len(res) == 0{
 					datas["responseNo"] = 0
 					smsObj.AddMsmRate(mobilePhoneNumber,pkg)
@@ -248,7 +247,7 @@ func (u *SmsController) ChangePhoneSms() {
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
 		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone,pkg) {
 			smsObj.AddMsmRate(newPhone,pkg)
-			res := smsObj.GetMsm(newPhone,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+			res := smsObj.GetMsm(newPhone,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
 			if len(res) == 0{
 				datas["responseNo"] = 0
 				smsObj.AddMsmRate(newPhone,pkg)
@@ -300,7 +299,7 @@ func (u *SmsController) ChangePhoneSms2() {
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
 		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
 			smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-			res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"])
+			res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
 			if len(res) == 0{
 				datas["responseNo"] = 0
 				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
