@@ -45,6 +45,9 @@ type DefaultSchoolListType map[string]struct{
 
 var DefaultSchoolList DefaultSchoolListType
 
+//用户注册送的coin
+var Coin int
+
 func init() {
 	
 	dbconf, _ := config.NewConfig("ini", "conf/db.conf")
@@ -74,6 +77,7 @@ func init() {
 	getProvince()
 	getSchool()
 	getDefaultSchool()
+	getCoinConfig()
 	
 	SchoolType = make(map[int]string)
 	SchoolType[1] = "小学"
@@ -168,6 +172,22 @@ func getDefaultSchool() {
 		DefaultSchoolList = make(DefaultSchoolListType,num)
 		for _, item := range maps {
 			DefaultSchoolList[item["F_school_id"].(string)] = DefaultSchoolItemType{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:helper.StrToInt(item["F_school_type"].(string)),F_belong_area_id:helper.StrToInt(item["F_belong_area_id"].(string))}
+		}
+	}
+}
+
+//获取coin config
+func getCoinConfig() {
+	Coin = 0
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_config_other").Values(&maps)
+	if err == nil && num > 0 {
+		for _, item := range maps {
+			if item["F_key"] == "coin"{
+				Coin = helper.StrToInt(item["F_value"].(string))
+				break
+			}
 		}
 	}
 }

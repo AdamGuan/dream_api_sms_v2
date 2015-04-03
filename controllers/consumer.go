@@ -349,6 +349,7 @@ func (u *ConsumerController) login(uid string,pkg string)map[string]interface{} 
 				userInfo["F_class_name"] = info.F_class_name
 				userInfo["F_avatar_url"] = info.F_avatar_url
 				userInfo["F_user_email"] = info.F_user_email
+				userInfo["F_coin"] = info.F_coin
 			}
 		}
 	}
@@ -525,6 +526,7 @@ func (u *ConsumerController) GetUserInfo() {
 			datas["F_class_name"] = info.F_class_name
 			datas["F_avatar_url"] = info.F_avatar_url
 			datas["F_user_email"] = info.F_user_email
+			datas["F_coin"] = info.F_coin
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -883,4 +885,114 @@ func (u *ConsumerController) ModifyEmail() {
 	}
 	//return
 	u.jsonEcho(datas)
+}
+
+// @Title 增加用户金币
+// @Description 增加用户金币(token: 登录时获取)
+// @Param	uid					form	string	true	uid
+// @Param	coin				form	int		true	金币
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MModifyCoinResp
+// @router /coin [post]
+func (u *ConsumerController) AddCoin() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Request.FormValue("uid")
+	coin := u.Ctx.Request.FormValue("coin")
+	coin2 := helper.StrToInt(coin)
+	//check sign
+	datas["responseNo"] = u.checkSign()
+	//check white ip
+	if !u.checkCoinIp(){
+		datas["responseNo"] = -1
+	}
+	//检查参数
+	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
+		datas["newCoin"] = userObj.AddCoin(uid,coin2)
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+// @Title 查询用户金币
+// @Description 查询用户金币(token: 登录时获取)
+// @Param	uid					query	string	true	uid
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MGetCoinResp
+// @router /coin [get]
+func (u *ConsumerController) GetCoin() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Request.FormValue("uid")
+	//check sign
+	datas["responseNo"] = u.checkSign()
+	//检查参数
+	if datas["responseNo"] == 0 && len(uid) > 0{
+		datas["coin"] = userObj.GetCoin(uid)
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+// @Title 扣除用户金币
+// @Description 扣除用户金币(token: 登录时获取)
+// @Param	uid					form	string	true	uid
+// @Param	coin				form	int		true	金币
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MModifyCoinResp
+// @router /coin [put]
+func (u *ConsumerController) ReduceCoin() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Request.FormValue("uid")
+	coin := u.Ctx.Request.FormValue("coin")
+	coin2 := helper.StrToInt(coin)
+	//check sign
+	datas["responseNo"] = u.checkSign()
+	//check white ip
+	if !u.checkCoinIp(){
+		datas["responseNo"] = -1
+	}
+	//检查参数
+	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
+		datas["newCoin"] = userObj.ReduceCoin(uid,coin2)
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+//检查update coin的ip是否存在于白名单中
+func (u *ConsumerController) checkCoinIp()bool {
+	var userObj *models.MConsumer
+	return userObj.CheckUpdateCoinWhiteIp(u.Ctx.Input.IP())
 }

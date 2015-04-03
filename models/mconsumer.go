@@ -40,6 +40,7 @@ type userInfoa struct {
 	F_class_name string
 	F_avatar_url string
 	F_user_email string
+	F_coin int
 }
 
 type avatarSysInfoLista []struct{
@@ -363,14 +364,27 @@ func (u *MConsumer) addUser(parames map[string]string)int{
 			result = -1
 			set = strings.Trim(set, ",")
 			if len(set) > 0{
-				set = "F_user_name='"+u.CreateUid()+"',"+set
+				uid := u.CreateUid()
+				set = "F_user_name='"+uid+"',"+set
 				o := orm.NewOrm()
 				res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
 				if err == nil {
 					num, _ := res.RowsAffected()
 					if num >0{
-						result = 0
+						//写入金币数量
+						set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
+						res, err := o.Raw("INSERT INTO t_coin SET "+set).Exec()
+						if err == nil{
+							num, _ := res.RowsAffected()
+							if num > 0{
+								result = 0
+							}
+						}
 					}
+				}
+				if result != 0{
+					o.Raw("DELETE FROM t_user WHERE F_user_name = '"+uid+"'").Exec()
+					o.Raw("DELETE FROM t_coin WHERE F_user_name = '"+uid+"'").Exec()
 				}
 			}
 		}
@@ -572,6 +586,8 @@ func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
 			}else{
 				info.F_avatar_url = ""
 			}
+			//金币
+			info.F_coin = u.GetCoin(userId)
 		}
 	}
 	return info
@@ -954,4 +970,68 @@ func (u *MConsumer) addUserXinlangweibo()string{
 	}
 
 	return ""
+}
+
+//获取用户金币
+func (u *MConsumer) GetCoin(uid string)int{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? AND F_coin_status = 1 LIMIT 1",uid).Values(&maps)
+	if err == nil && num > 0 {
+		return helper.StrToInt(maps[0]["F_coin"].(string))
+	}
+	return 0
+}
+
+//增加用户金币,返回用户的新金币数量
+func (u *MConsumer) AddCoin(uid string,coin int)int {
+	newCoin := 0
+	o := orm.NewOrm()
+	//添加用户金币
+	o.Raw("UPDATE t_coin SET F_coin = F_coin + ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	//获取用户金币
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
+	if err == nil && num > 0 {
+		newCoin = helper.StrToInt(maps[0]["F_coin"].(string))
+	}
+	return newCoin
+}
+
+//减少用户金币,返回用户的新金币数量
+func (u *MConsumer) ReduceCoin(uid string,coin int)int {
+	newCoin := 0
+	o := orm.NewOrm()
+	//添加用户金币
+	o.Raw("UPDATE t_coin SET F_coin = F_coin - ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	//获取用户金币
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
+	if err == nil && num > 0 {
+		newCoin = helper.StrToInt(maps[0]["F_coin"].(string))
+	}
+	return newCoin
+}
+
+//获取update coin white ip
+func (u *MConsumer) CheckUpdateCoinWhiteIp(ip string)bool {
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_ip_white_list WHERE F_ip = ? AND F_status = 1 AND F_type = 1",ip).Values(&maps)
+	if err == nil && num > 0 {
+		return true
+	}
+	return false
+}
+
+//获取注册所送的金币
+func (u *MConsumer) GetRegisterCoin()int {
+	coin := Coin
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_config_other WHERE F_key = \"coin\" LIMIT 1").Values(&maps)
+	if err == nil && num > 0 {
+		coin = helper.StrToInt(maps[0]["F_value"].(string))
+	}
+	return coin
 }

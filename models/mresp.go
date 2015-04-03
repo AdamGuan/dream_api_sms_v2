@@ -44,6 +44,7 @@ type MUserLoginResp struct {
 	F_class_name string
 	F_avatar_url string
 	F_user_email string
+	F_coin int
 }
 
 type MUserInfoResp struct {
@@ -71,6 +72,7 @@ type MUserInfoResp struct {
 	F_class_name string
 	F_avatar_url string
 	F_user_email string
+	F_coin int
 }
 
 type MAreaResp struct {
@@ -168,4 +170,16 @@ type MModifyEmailResp struct {
 	responseMsg string
 	token string
 	tokenExpireDatetime string
+}
+
+type MModifyCoinResp struct{
+	responseNo  int
+	responseMsg string
+	newCoin int
+}
+
+type MGetCoinResp struct{
+	responseNo  int
+	responseMsg string
+	coin int
 }
