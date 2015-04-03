@@ -171,3 +171,15 @@ type MModifyEmailResp struct {
 	token string
 	tokenExpireDatetime string
 }
+
+type MModifyCoinResp struct{
+	responseNo  int
+	responseMsg string
+	newCoin int
+}
+
+type MGetCoinResp struct{
+	responseNo  int
+	responseMsg string
+	coin int
+}

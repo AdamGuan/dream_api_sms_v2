@@ -887,51 +887,112 @@ func (u *ConsumerController) ModifyEmail() {
 	u.jsonEcho(datas)
 }
 
-// @Title 添加用户金币
-// @Description 添加用户金币(token: 登录时获取)
+// @Title 增加用户金币
+// @Description 增加用户金币(token: 登录时获取)
 // @Param	uid					form	string	true	uid
 // @Param	coin				form	int		true	金币
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
 // @Param	huid				header	string	true	uid
 // @Success	200 {object} models.MModifyCoinResp
-// @Failure 401 无权访问
 // @router /coin [post]
 func (u *ConsumerController) AddCoin() {
-	/*
 	//log
 	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
 	//model ini
 	var userObj *models.MConsumer
-	var smsObj *models.MSms
 	//parse request parames
 	u.Ctx.Request.ParseForm()
-	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	uid := u.Ctx.Request.FormValue("uid")
-	num := u.Ctx.Request.FormValue("num")
-	pkg := u.Ctx.Request.Header.Get("pkg")
+	coin := u.Ctx.Request.FormValue("coin")
+	coin2 := helper.StrToInt(coin)
 	//check sign
 	datas["responseNo"] = u.checkSign()
-	//检查参数
-	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
+	//check white ip
+	if !u.checkCoinIp(){
 		datas["responseNo"] = -1
-		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
-			datas["responseNo"] = userObj.ModifyUserPhone(mobilePhoneNumber,uid)
-			if datas["responseNo"] == 0{
-				//删除旧的手机号码的token
-				var signObj *models.MSign
-				signObj.DeleteAllPkgToken(uid)
-				token,tokenExpireDatetime := userObj.GetTokenByUid(uid,pkg)
-				datas["token"] = token
-				datas["tokenExpireDatetime"] = tokenExpireDatetime
-			}
-		}
+	}
+	//检查参数
+	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
+		datas["newCoin"] = userObj.AddCoin(uid,coin2)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
 	}
 	//return
 	u.jsonEcho(datas)
-	*/
+}
+
+// @Title 查询用户金币
+// @Description 查询用户金币(token: 登录时获取)
+// @Param	uid					query	string	true	uid
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MGetCoinResp
+// @router /coin [get]
+func (u *ConsumerController) GetCoin() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Request.FormValue("uid")
+	//check sign
+	datas["responseNo"] = u.checkSign()
+	//检查参数
+	if datas["responseNo"] == 0 && len(uid) > 0{
+		datas["coin"] = userObj.GetCoin(uid)
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+// @Title 扣除用户金币
+// @Description 扣除用户金币(token: 登录时获取)
+// @Param	uid					form	string	true	uid
+// @Param	coin				form	int		true	金币
+// @Param	sign				header	string	true	签名
+// @Param	pkg					header	string	true	包名
+// @Param	huid				header	string	true	uid
+// @Success	200 {object} models.MModifyCoinResp
+// @router /coin [put]
+func (u *ConsumerController) ReduceCoin() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Request.FormValue("uid")
+	coin := u.Ctx.Request.FormValue("coin")
+	coin2 := helper.StrToInt(coin)
+	//check sign
+	datas["responseNo"] = u.checkSign()
+	//check white ip
+	if !u.checkCoinIp(){
+		datas["responseNo"] = -1
+	}
+	//检查参数
+	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
+		datas["newCoin"] = userObj.ReduceCoin(uid,coin2)
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+//检查update coin的ip是否存在于白名单中
+func (u *ConsumerController) checkCoinIp()bool {
+	var userObj *models.MConsumer
+	return userObj.CheckUpdateCoinWhiteIp(u.Ctx.Input.IP())
 }

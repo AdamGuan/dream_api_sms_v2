@@ -18,4 +18,16 @@ CREATE TABLE `t_config_other` (
 COMMENT='其它配置信息'
 ENGINE=MyISAM
 ;
+
 INSERT INTO `t_config_other` (`F_key`, `F_value`) VALUES ('coin', '50');
+
+CREATE TABLE `t_ip_white_list` (
+	`F_ip` CHAR(15) NOT NULL COMMENT 'IP地址',
+	`F_type` TINYINT(1) NOT NULL DEFAULT '1' COMMENT '1:IP',
+	`F_status` TINYINT(1) NOT NULL DEFAULT '1' COMMENT '1:有效,0无效'
+)
+COMMENT='ip白名单'
+ENGINE=MyISAM
+;
+
+INSERT INTO `dream_api_sms_v2`.`t_ip_white_list` (`F_ip`) VALUES ('127.0.0.1');

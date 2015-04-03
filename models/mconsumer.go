@@ -372,7 +372,7 @@ func (u *MConsumer) addUser(parames map[string]string)int{
 					num, _ := res.RowsAffected()
 					if num >0{
 						//写入金币数量
-						set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(Coin)
+						set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
 						res, err := o.Raw("INSERT INTO t_coin SET "+set).Exec()
 						if err == nil{
 							num, _ := res.RowsAffected()
@@ -988,7 +988,7 @@ func (u *MConsumer) AddCoin(uid string,coin int)int {
 	newCoin := 0
 	o := orm.NewOrm()
 	//添加用户金币
-	o.Raw("UPDATE F_coin SET t_coin = t_coin + ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	o.Raw("UPDATE t_coin SET F_coin = F_coin + ? where F_user_name=? LIMIT 1",coin,uid).Exec()
 	//获取用户金币
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
@@ -1003,7 +1003,7 @@ func (u *MConsumer) ReduceCoin(uid string,coin int)int {
 	newCoin := 0
 	o := orm.NewOrm()
 	//添加用户金币
-	o.Raw("UPDATE F_coin SET t_coin = t_coin - ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	o.Raw("UPDATE t_coin SET F_coin = F_coin - ? where F_user_name=? LIMIT 1",coin,uid).Exec()
 	//获取用户金币
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
@@ -1011,4 +1011,27 @@ func (u *MConsumer) ReduceCoin(uid string,coin int)int {
 		newCoin = helper.StrToInt(maps[0]["F_coin"].(string))
 	}
 	return newCoin
+}
+
+//获取update coin white ip
+func (u *MConsumer) CheckUpdateCoinWhiteIp(ip string)bool {
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_ip_white_list WHERE F_ip = ? AND F_status = 1 AND F_type = 1",ip).Values(&maps)
+	if err == nil && num > 0 {
+		return true
+	}
+	return false
+}
+
+//获取注册所送的金币
+func (u *MConsumer) GetRegisterCoin()int {
+	coin := Coin
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_config_other WHERE F_key = \"coin\" LIMIT 1").Values(&maps)
+	if err == nil && num > 0 {
+		coin = helper.StrToInt(maps[0]["F_value"].(string))
+	}
+	return coin
 }
