@@ -30,4 +30,6 @@ COMMENT='ip白名单'
 ENGINE=MyISAM
 ;
 
-INSERT INTO `dream_api_sms_v2`.`t_ip_white_list` (`F_ip`) VALUES ('127.0.0.1');
+INSERT INTO `t_ip_white_list` (`F_ip`) VALUES ('127.0.0.1');
+INSERT INTO `t_ip_white_list` (`F_ip`) VALUES ('115.29.100.13');
+INSERT INTO `t_ip_white_list` (`F_ip`) VALUES ('192.168.16.146');
