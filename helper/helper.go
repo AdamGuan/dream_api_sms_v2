@@ -213,7 +213,11 @@ func CheckEmailValid(email string)bool{
 }
 
 //生成一个短信验证码
-func GetSmsNum()string{
+func GetSmsNum(bit int)string{
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))+IntToString(r.Intn(9))
+	str := ""
+	for i:=0;i<bit;i++{
+		str = str+IntToString(r.Intn(9))
+	}
+	return str
 }

@@ -26,7 +26,7 @@ type MSms struct {
 func (u *MSms) GetMsm(mobilePhoneNumber string,appId string,appKey string,appName string,appTemplate string,pkgName string) map[string]interface{} {
 	url := "https://leancloud.cn/1.1/requestSmsCode"
 	method := "POST"
-	mycode := helper.GetSmsNum()
+	mycode := helper.GetSmsNum(4)
 	data := map[string]string{"mobilePhoneNumber": mobilePhoneNumber,"template":appTemplate,"appname":appName,"mycode":mycode}
 
 	//log curl
