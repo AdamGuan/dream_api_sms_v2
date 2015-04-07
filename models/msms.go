@@ -26,7 +26,12 @@ type MSms struct {
 func (u *MSms) GetMsm(mobilePhoneNumber string,appId string,appKey string,appName string,appTemplate string,pkgName string) map[string]interface{} {
 	url := "https://leancloud.cn/1.1/requestSmsCode"
 	method := "POST"
+	/*bof需要修改*/
 	mycode := helper.GetSmsNum(4)
+	if pkgName == "cn.dream.android.shuati" || pkgName == "cn.dream.android.shuati.debug"{
+		mycode = helper.GetSmsNum(6)
+	}
+	/*eof需要修改*/
 	data := map[string]string{"mobilePhoneNumber": mobilePhoneNumber,"template":appTemplate,"appname":appName,"mycode":mycode}
 
 	//log curl

@@ -23,7 +23,6 @@ func (u *MTmp) DeleteUser(username string){
 	if len(username) > 0 {
 		o := orm.NewOrm()
 		o.Raw("DELETE FROM t_user WHERE F_user_name=?",username).Exec()
-		o.Raw("DELETE FROM t_sms_rate WHERE F_user_name like "+username+"%").Exec()
 		o.Raw("DELETE FROM t_token WHERE F_user_name=?",username).Exec()
 		o.Raw("DELETE FROM t_coin WHERE F_user_name=?",username).Exec()
 	}
