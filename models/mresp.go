@@ -175,11 +175,11 @@ type MModifyEmailResp struct {
 type MModifyCoinResp struct{
 	responseNo  int
 	responseMsg string
-	newCoin int
+	F_newCoin int
 }
 
 type MGetCoinResp struct{
 	responseNo  int
 	responseMsg string
-	coin int
+	F_coin int
 }

@@ -916,7 +916,7 @@ func (u *ConsumerController) AddCoin() {
 	}
 	//检查参数
 	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
-		datas["newCoin"] = userObj.AddCoin(uid,coin2)
+		datas["F_newCoin"] = userObj.AddCoin(uid,coin2)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
 	}
@@ -946,7 +946,7 @@ func (u *ConsumerController) GetCoin() {
 	datas["responseNo"] = u.checkSign()
 	//检查参数
 	if datas["responseNo"] == 0 && len(uid) > 0{
-		datas["coin"] = userObj.GetCoin(uid)
+		datas["F_coin"] = userObj.GetCoin(uid)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
 	}
@@ -983,7 +983,7 @@ func (u *ConsumerController) ReduceCoin() {
 	}
 	//检查参数
 	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
-		datas["newCoin"] = userObj.ReduceCoin(uid,coin2)
+		datas["F_newCoin"] = userObj.ReduceCoin(uid,coin2)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
 	}
