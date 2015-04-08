@@ -204,7 +204,7 @@ func (u *MConsumer) CheckUserPwdValid(userPwd string)int{
 }
 
 //添加用户(根据手机号码)
-func (u *MConsumer) AddUserByPhone(parames map[string]string)int{
+func (u *MConsumer) AddUserByPhone(parames map[string]string,pkg string)int{
 	result := -16
 	phone,ok := parames["mobilePhoneNumber"]
 	if ok{
@@ -214,13 +214,13 @@ func (u *MConsumer) AddUserByPhone(parames map[string]string)int{
 		}
 	}
 	if result == 0{
-		return u.addUser(parames)
+		return u.addUser(parames,pkg)
 	}
 	return result
 }
 
 //添加用户(根据email)
-func (u *MConsumer) AddUserByEmail(parames map[string]string)int{
+func (u *MConsumer) AddUserByEmail(parames map[string]string,pkg string)int{
 	result := -16
 	email,ok := parames["email"]
 	if ok{
@@ -230,13 +230,13 @@ func (u *MConsumer) AddUserByEmail(parames map[string]string)int{
 		}
 	}
 	if result == 0{
-		return u.addUser(parames)
+		return u.addUser(parames,pkg)
 	}
 	return result
 }
 
 //添加用户
-func (u *MConsumer) addUser(parames map[string]string)int{
+func (u *MConsumer) addUser(parames map[string]string,pkg string)int{
 	result := -10
 	//检查pwd
 	userPwd,ok := parames["pwd"]
@@ -380,6 +380,8 @@ func (u *MConsumer) addUser(parames map[string]string)int{
 								result = 0
 							}
 						}
+						//注册用户记录
+						u.addRegiestLog(uid,pkg)
 					}
 				}
 				if result != 0{
@@ -890,8 +892,8 @@ func (u *MConsumer) GetUidByQQ(qq string)string{
 }
 
 //insert 一条qq认证信息
-func (u *MConsumer) InsertQQ(qq string)string{
-	uid := u.addUserQQ()
+func (u *MConsumer) InsertQQ(qq string,pkg string)string{
+	uid := u.addUserQQ(pkg)
 	if len(uid) > 0{
 		o := orm.NewOrm()
 		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_openid=?",uid,qq).Exec()
@@ -908,7 +910,7 @@ func (u *MConsumer) InsertQQ(qq string)string{
 }
 
 //添加qq到t_user,并返回uid
-func (u *MConsumer) addUserQQ()string{
+func (u *MConsumer) addUserQQ(pkg string)string{
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
 	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
@@ -918,6 +920,9 @@ func (u *MConsumer) addUserQQ()string{
 	if err == nil {
 		num, _ := res.RowsAffected()
 		if num >0{
+			//注册记录
+			u.addRegiestLog(uid,pkg)
+
 			return uid
 		}
 	}
@@ -937,8 +942,8 @@ func (u *MConsumer) GetUidByXinlangweibo(name string)string{
 }
 
 //insert 一条新浪微博认证信息
-func (u *MConsumer) InsertXinlangweibo(name string)string{
-	uid := u.addUserXinlangweibo()
+func (u *MConsumer) InsertXinlangweibo(name string,pkg string)string{
+	uid := u.addUserXinlangweibo(pkg)
 	if len(uid) > 0{
 		o := orm.NewOrm()
 		res, err := o.Raw("INSERT INTO t_auth_xinlangweibo SET F_user_name=?,F_xinlangweibo_openid=?",uid,name).Exec()
@@ -955,7 +960,7 @@ func (u *MConsumer) InsertXinlangweibo(name string)string{
 }
 
 //添加新浪微博到t_user,并返回uid
-func (u *MConsumer) addUserXinlangweibo()string{
+func (u *MConsumer) addUserXinlangweibo(pkg string)string{
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
 	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
@@ -965,6 +970,9 @@ func (u *MConsumer) addUserXinlangweibo()string{
 	if err == nil {
 		num, _ := res.RowsAffected()
 		if num >0{
+			//注册记录
+			u.addRegiestLog(uid,pkg)
+
 			return uid
 		}
 	}
@@ -1042,4 +1050,10 @@ func (u *MConsumer) GetRegisterCoin()int {
 	}
 	return coin
 	*/
+}
+
+//注册记录
+func (u *MConsumer) addRegiestLog(uid string,pkg string) {
+	o := orm.NewOrm()
+	o.Raw("INSERT INTO t_register_history SET F_user_name = ?,F_pkg = ?,F_create_datetime = ?",uid,pkg,helper.GetNowDateTime()).Exec()
 }

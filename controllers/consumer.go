@@ -63,7 +63,7 @@ func (u *ConsumerController) RegisterByPhone() {
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
 			parames["pwd"] = pwd
 
-			res2 := userObj.AddUserByPhone(parames)
+			res2 := userObj.AddUserByPhone(parames,pkg)
 			datas["responseNo"] = res2
 		}
 	}else if datas["responseNo"] == 0{
@@ -118,7 +118,7 @@ func (u *ConsumerController) RegisterByEmail() {
 			parames["email"] = email
 			parames["pwd"] = pwd
 
-			res2 := userObj.AddUserByEmail(parames)
+			res2 := userObj.AddUserByEmail(parames,pkg)
 			datas["responseNo"] = res2
 		}
 	}else if datas["responseNo"] == 0{

@@ -41,7 +41,7 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 			uuid := userObj.GetUidByXinlangweibo(openid)
 			if len(uuid) <= 0{
 				//写入一条新浪微博数据
-				uuid = userObj.InsertXinlangweibo(openid)
+				uuid = userObj.InsertXinlangweibo(openid,pkg)
 			}
 			if len(uuid) > 0{
 				//返回登录信息

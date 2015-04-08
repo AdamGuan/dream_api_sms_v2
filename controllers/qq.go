@@ -43,7 +43,7 @@ func (u *QqController) LoginQQ() {
 			uid := userObj.GetUidByQQ(openid)
 			if len(uid) <= 0{
 				//写入一条qq数据
-				uid = userObj.InsertQQ(openid)
+				uid = userObj.InsertQQ(openid,pkg)
 			}
 			if len(uid) > 0{
 				//返回登录信息

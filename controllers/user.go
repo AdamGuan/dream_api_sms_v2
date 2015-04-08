@@ -128,7 +128,7 @@ func (u *UserController) Register() {
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
 			parames["pwd"] = pwd
 
-			res2 := userObj.AddUserByPhone(parames)
+			res2 := userObj.AddUserByPhone(parames,pkg)
 			datas["responseNo"] = res2
 		}
 	}else if datas["responseNo"] == 0{

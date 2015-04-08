@@ -52,3 +52,14 @@ COMMENT='金币交易记录'
 COLLATE='utf8_general_ci'
 ENGINE=MyISAM
 ;
+
+
+CREATE TABLE `t_register_history` (
+	`F_user_name` VARCHAR(50) NOT NULL COMMENT '用户ID',
+	`F_pkg` VARCHAR(250) NOT NULL COMMENT '包名',
+	`F_create_datetime` DATETIME NOT NULL COMMENT '创建时间',
+	UNIQUE INDEX `F_user_name` (`F_user_name`)
+)
+COMMENT='注册记录表'
+ENGINE=MyISAM
+;
