@@ -908,6 +908,7 @@ func (u *ConsumerController) AddCoin() {
 	uid := u.Ctx.Request.FormValue("uid")
 	coin := u.Ctx.Request.FormValue("coin")
 	coin2 := helper.StrToInt(coin)
+	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	//check white ip
@@ -916,7 +917,7 @@ func (u *ConsumerController) AddCoin() {
 	}
 	//检查参数
 	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
-		datas["F_newCoin"] = userObj.AddCoin(uid,coin2)
+		datas["F_newCoin"] = userObj.AddCoin(uid,coin2,pkg)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
 	}
@@ -975,6 +976,7 @@ func (u *ConsumerController) ReduceCoin() {
 	uid := u.Ctx.Request.FormValue("uid")
 	coin := u.Ctx.Request.FormValue("coin")
 	coin2 := helper.StrToInt(coin)
+	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	//check white ip
@@ -983,7 +985,7 @@ func (u *ConsumerController) ReduceCoin() {
 	}
 	//检查参数
 	if datas["responseNo"] == 0 && len(uid) > 0 && coin2 > 0 {
-		datas["F_newCoin"] = userObj.ReduceCoin(uid,coin2)
+		datas["F_newCoin"] = userObj.ReduceCoin(uid,coin2,pkg)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
 	}

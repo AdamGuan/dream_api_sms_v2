@@ -984,11 +984,13 @@ func (u *MConsumer) GetCoin(uid string)int{
 }
 
 //增加用户金币,返回用户的新金币数量
-func (u *MConsumer) AddCoin(uid string,coin int)int {
+func (u *MConsumer) AddCoin(uid string,coin int,pkg string)int {
 	newCoin := 0
 	o := orm.NewOrm()
 	//添加用户金币
 	o.Raw("UPDATE t_coin SET F_coin = F_coin + ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	//记录金币历史
+	o.Raw("INSERT INTO t_coin_history SET F_user_name = ?,F_coin = ?,F_pkg = ?,F_create_datetime = ?",uid,coin,pkg,helper.GetNowDateTime()).Exec()
 	//获取用户金币
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
@@ -999,11 +1001,14 @@ func (u *MConsumer) AddCoin(uid string,coin int)int {
 }
 
 //减少用户金币,返回用户的新金币数量
-func (u *MConsumer) ReduceCoin(uid string,coin int)int {
+func (u *MConsumer) ReduceCoin(uid string,coin int,pkg string)int {
 	newCoin := 0
 	o := orm.NewOrm()
-	//添加用户金币
+	//减少用户金币
 	o.Raw("UPDATE t_coin SET F_coin = F_coin - ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	//记录金币历史
+	coin = -1*coin
+	o.Raw("INSERT INTO t_coin_history SET F_user_name = ?,F_coin = ?,F_pkg = ?,F_create_datetime = ?",uid,coin,pkg,helper.GetNowDateTime()).Exec()
 	//获取用户金币
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
@@ -1026,6 +1031,8 @@ func (u *MConsumer) CheckUpdateCoinWhiteIp(ip string)bool {
 
 //获取注册所送的金币
 func (u *MConsumer) GetRegisterCoin()int {
+	return 0
+	/*
 	coin := Coin
 	o := orm.NewOrm()
 	var maps []orm.Params
@@ -1034,4 +1041,5 @@ func (u *MConsumer) GetRegisterCoin()int {
 		coin = helper.StrToInt(maps[0]["F_value"].(string))
 	}
 	return coin
+	*/
 }
