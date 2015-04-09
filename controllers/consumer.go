@@ -330,6 +330,7 @@ func (u *ConsumerController) login(uid string,pkg string)map[string]interface{} 
 				userInfo["F_uid"] = info.F_uid
 				userInfo["F_phone_number"] = info.F_phone_number
 				userInfo["F_gender"] = info.F_gender
+				userInfo["F_gender_id"] = info.F_gender_id
 				userInfo["F_grade"] = info.F_grade
 				userInfo["F_grade_id"] = info.F_grade_id
 				userInfo["F_birthday"] = info.F_birthday
@@ -507,6 +508,7 @@ func (u *ConsumerController) GetUserInfo() {
 			datas["F_uid"] = info.F_uid
 			datas["F_phone_number"] = info.F_phone_number
 			datas["F_gender"] = info.F_gender
+			datas["F_gender_id"] = info.F_gender_id
 			datas["F_grade"] = info.F_grade
 			datas["F_grade_id"] = info.F_grade_id
 			datas["F_birthday"] = info.F_birthday

@@ -25,6 +25,7 @@ type MUserLoginResp struct {
 	F_uid string
 	F_phone_number string
 	F_gender string
+	F_gender_id int
 	F_grade string
 	F_grade_id int
 	F_birthday string
@@ -53,6 +54,7 @@ type MUserInfoResp struct {
 	F_uid string
 	F_phone_number string
 	F_gender string
+	F_gender_id int
 	F_grade string
 	F_grade_id int
 	F_birthday string

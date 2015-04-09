@@ -21,6 +21,7 @@ type userInfoa struct {
 	F_uid string
 	F_phone_number string
 	F_gender string
+	F_gender_id int
 	F_grade string
 	F_grade_id int
 	F_birthday string
@@ -527,6 +528,7 @@ func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
 			if genderint != 1{
 				info.F_gender = "女"
 			}
+			info.F_gender_id = genderint
 			//年级
 			info.F_grade = ""
 			if maps[0]["F_grade_id"] != nil{
