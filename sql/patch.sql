@@ -63,3 +63,9 @@ CREATE TABLE `t_register_history` (
 COMMENT='注册记录表'
 ENGINE=MyISAM
 ;
+
+ALTER TABLE `t_user`
+	ADD COLUMN `F_user_password_sha1` CHAR(40) NOT NULL COMMENT '用户密码(sha1)' AFTER `F_user_password`;
+
+ALTER TABLE `t_user`
+	DROP COLUMN `F_user_password`;

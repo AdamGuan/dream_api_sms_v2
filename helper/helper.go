@@ -17,6 +17,7 @@ import (
 	"regexp"
 	"math/rand"
 //	"github.com/astaxie/beego/config" 
+	"crypto/sha1"
 )
 
 func init() {
@@ -220,4 +221,8 @@ func GetSmsNum(bit int)string{
 		str = str+IntToString(r.Intn(9))
 	}
 	return str
+}
+
+func Sha1(str string)string{
+	return fmt.Sprintf("%x", sha1.Sum([]byte(str)))
 }

@@ -148,9 +148,12 @@ func (u *MConsumer) CheckPhoneAndPwd(phone string,userPwd string)bool{
 	if len(phone) <= 0 || len(userPwd) <= 0{
 		return false
 	}
+	if len(userPwd) != 40{
+		userPwd = helper.Sha1(userPwd)
+	}
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_phone=? AND F_user_password = ? LIMIT 1", phone,userPwd).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_phone=? AND F_user_password_sha1 = ? LIMIT 1", phone,userPwd).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -162,9 +165,12 @@ func (u *MConsumer) CheckEmailAndPwd(email string,userPwd string)bool{
 	if len(email) <= 0 || len(userPwd) <= 0{
 		return false
 	}
+	if len(userPwd) != 40{
+		userPwd = helper.Sha1(userPwd)
+	}
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? AND F_user_password = ? LIMIT 1", email,userPwd).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? AND F_user_password_sha1 = ? LIMIT 1", email,userPwd).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -176,9 +182,12 @@ func (u *MConsumer) CheckUserIdAndPwd(uid string,userPwd string)bool{
 	if len(uid) <= 0 || len(userPwd) <= 0{
 		return false
 	}
+	if len(userPwd) != 40{
+		userPwd = helper.Sha1(userPwd)
+	}
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_password = ? LIMIT 1", uid,userPwd).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_password_sha1 = ? LIMIT 1", uid,userPwd).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -251,7 +260,10 @@ func (u *MConsumer) addUser(parames map[string]string,pkg string)int{
 		/**/
 		breakd := 0
 		now := helper.GetNowDateTime()
-		set := "F_user_password = '"+userPwd+"',F_crate_datetime='"+now+"',F_modify_datetime='"+now+"',"
+		if len(userPwd) != 40{
+			userPwd = helper.Sha1(userPwd)
+		}
+		set := "F_user_password_sha1 = '"+userPwd+"',F_crate_datetime='"+now+"',F_modify_datetime='"+now+"',"
 		for filed,value := range parames{
 			switch filed {
 				case "gender":
@@ -405,8 +417,11 @@ func (u *MConsumer) ModifyUserPwdByUid(userId string,userPwd string)int{
 	if result == 0{
 		result = -1
 		//写入数据库
+		if len(userPwd) != 40{
+			userPwd = helper.Sha1(userPwd)
+		}
 		o := orm.NewOrm()
-		_, err := o.Raw("UPDATE t_user SET F_user_password=?,F_modify_datetime=? WHERE F_user_name=?",userPwd,helper.GetNowDateTime(),userId).Exec()
+		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_name=?",userPwd,helper.GetNowDateTime(),userId).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -424,8 +439,11 @@ func (u *MConsumer) ModifyUserPwdByPhone(phone string,userPwd string)int{
 	if result == 0{
 		result = -1
 		//写入数据库
+		if len(userPwd) != 40{
+			userPwd = helper.Sha1(userPwd)
+		}
 		o := orm.NewOrm()
-		_, err := o.Raw("UPDATE t_user SET F_user_password=?,F_modify_datetime=? WHERE F_user_phone=?",userPwd,helper.GetNowDateTime(),phone).Exec()
+		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_phone=?",userPwd,helper.GetNowDateTime(),phone).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -443,8 +461,11 @@ func (u *MConsumer) ModifyUserPwdByEmail(email string,userPwd string)int{
 	if result == 0{
 		result = -1
 		//写入数据库
+		if len(userPwd) != 40{
+			userPwd = helper.Sha1(userPwd)
+		}
 		o := orm.NewOrm()
-		_, err := o.Raw("UPDATE t_user SET F_user_password=?,F_modify_datetime=? WHERE F_user_email=?",userPwd,helper.GetNowDateTime(),email).Exec()
+		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_email=?",userPwd,helper.GetNowDateTime(),email).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -455,31 +476,13 @@ func (u *MConsumer) ModifyUserPwdByEmail(email string,userPwd string)int{
 //获取用户的密码
 func (u *MConsumer) GetUserPwdByUid(userId string)string{
 	pwd := ""
-	if len(userId) > 0{
-		o := orm.NewOrm()
-		var maps []orm.Params
-		num, err := o.Raw("SELECT F_user_password FROM t_user WHERE F_user_name=? LIMIT 1", userId).Values(&maps)
-		if err == nil && num > 0 {
-			pwd = maps[0]["F_user_password"].(string)
-		}
-	}
 	return pwd
-
 }
 
 //获取用户的密码(根据手机号码)
 func (u *MConsumer) GetUserPwdByPhone(phone string)string{
 	pwd := ""
-	if len(phone) > 0{
-		o := orm.NewOrm()
-		var maps []orm.Params
-		num, err := o.Raw("SELECT F_user_password FROM t_user WHERE F_user_phone=? LIMIT 1", phone).Values(&maps)
-		if err == nil && num > 0 {
-			pwd = maps[0]["F_user_password"].(string)
-		}
-	}
 	return pwd
-
 }
 
 //获取用户token,并写入数据库
