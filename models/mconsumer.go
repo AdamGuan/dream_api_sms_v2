@@ -214,7 +214,7 @@ func (u *MConsumer) CheckUserPwdValid(userPwd string)int{
 }
 
 //添加用户(根据手机号码)
-func (u *MConsumer) AddUserByPhone(parames map[string]string,pkg string)int{
+func (u *MConsumer) AddUserByPhone(parames map[string]string,pkg string)(int,string){
 	result := -16
 	phone,ok := parames["mobilePhoneNumber"]
 	if ok{
@@ -226,11 +226,11 @@ func (u *MConsumer) AddUserByPhone(parames map[string]string,pkg string)int{
 	if result == 0{
 		return u.addUser(parames,pkg)
 	}
-	return result
+	return result,""
 }
 
 //添加用户(根据email)
-func (u *MConsumer) AddUserByEmail(parames map[string]string,pkg string)int{
+func (u *MConsumer) AddUserByEmail(parames map[string]string,pkg string)(int,string){
 	result := -16
 	email,ok := parames["email"]
 	if ok{
@@ -242,12 +242,13 @@ func (u *MConsumer) AddUserByEmail(parames map[string]string,pkg string)int{
 	if result == 0{
 		return u.addUser(parames,pkg)
 	}
-	return result
+	return result,""
 }
 
 //添加用户
-func (u *MConsumer) addUser(parames map[string]string,pkg string)int{
+func (u *MConsumer) addUser(parames map[string]string,pkg string)(int,string){
 	result := -10
+	uid := ""
 	//检查pwd
 	userPwd,ok := parames["pwd"]
 	if ok{
@@ -377,7 +378,7 @@ func (u *MConsumer) addUser(parames map[string]string,pkg string)int{
 			result = -1
 			set = strings.Trim(set, ",")
 			if len(set) > 0{
-				uid := u.CreateUid()
+				uid = u.CreateUid()
 				set = "F_user_name='"+uid+"',"+set
 				o := orm.NewOrm()
 				res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
@@ -404,7 +405,10 @@ func (u *MConsumer) addUser(parames map[string]string,pkg string)int{
 			}
 		}
 	}
-	return result
+	if result != 0{
+		uid = ""
+	}
+	return result,uid
 }
 
 //修改用户密码
@@ -885,6 +889,56 @@ func (u *MConsumer) ModifyUserEmail(email string,uid string)int{
 	return result
 }
 
+//根据微信号码返回UID
+func (u *MConsumer) GetUidByWeixin(qq string)string{
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_weixin where F_weixin_openid=? LIMIT 1",qq).Values(&maps)
+	if err == nil && num > 0 {
+		return maps[0]["F_user_name"].(string)
+	}
+	return ""
+}
+
+//insert 一条微信认证信息
+func (u *MConsumer) InsertWeixin(qq string,pkg string)string{
+	uid := u.addUserWeixin(pkg)
+	if len(uid) > 0{
+		o := orm.NewOrm()
+		res, err := o.Raw("INSERT INTO t_auth_weixin SET F_user_name=?,F_weixin_openid=?",uid,qq).Exec()
+		if err == nil {
+			num, _ := res.RowsAffected()
+			if num >0{
+				return uid
+			}
+		}else{
+			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1",uid).Exec()
+		}
+	}
+	return ""
+}
+
+//添加微信到t_user,并返回uid
+func (u *MConsumer) addUserWeixin(pkg string)string{
+	now := helper.GetNowDateTime()
+	uid := u.CreateUid()
+	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
+	set = "F_user_name='"+uid+"',"+set
+	o := orm.NewOrm()
+	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+	if err == nil {
+		num, _ := res.RowsAffected()
+		if num >0{
+			//注册记录
+			u.addRegiestLog(uid,pkg)
+
+			return uid
+		}
+	}
+
+	return ""
+}
+
 //根据QQ号码返回UID
 func (u *MConsumer) GetUidByQQ(qq string)string{
 	o := orm.NewOrm()
@@ -1061,4 +1115,20 @@ func (u *MConsumer) GetRegisterCoin()int {
 func (u *MConsumer) addRegiestLog(uid string,pkg string) {
 	o := orm.NewOrm()
 	o.Raw("INSERT INTO t_register_history SET F_user_name = ?,F_pkg = ?,F_create_datetime = ?",uid,pkg,helper.GetNowDateTime()).Exec()
+}
+
+//获取某个用户的头像
+func (u *MConsumer) GetUserAvatar(uid string) string{
+	F_avatar_url := ""
+	o := orm.NewOrm()
+	var maps []orm.Params
+	num, err := o.Raw("SELECT * FROM t_user WHERE F_user_name=? LIMIT 1", uid).Values(&maps)
+	if err == nil && num > 0 {
+		//头像
+		avatartmp := maps[0]["F_avatarname"].(string)
+		if len(avatartmp) > 0{
+			F_avatar_url = u.getUserAvatarUrl(avatartmp,helper.StrToInt(avatartmp[0:1]))
+		}
+	}
+	return F_avatar_url
 }

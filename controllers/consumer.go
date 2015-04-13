@@ -33,7 +33,7 @@ type Sizer2 interface {
 // @Param	num					form	string	true	验证码(经过验证成功后的)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Success	200 {object} models.MResp
+// @Success	200 {object} models.MRegisterResp
 // @Failure 401 无权访问
 // @router /phone-register [post]
 func (u *ConsumerController) RegisterByPhone() {
@@ -63,8 +63,11 @@ func (u *ConsumerController) RegisterByPhone() {
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
 			parames["pwd"] = pwd
 
-			res2 := userObj.AddUserByPhone(parames,pkg)
+			res2,uid := userObj.AddUserByPhone(parames,pkg)
 			datas["responseNo"] = res2
+			if len(uid) > 0{
+				datas["F_uid"] = uid
+			}
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -88,7 +91,7 @@ func (u *ConsumerController) RegisterByPhone() {
 // @Param	num					form	string	true	验证码
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Success	200 {object} models.MResp
+// @Success	200 {object} models.MRegisterResp
 // @Failure 401 无权访问
 // @router /email-register [post]
 func (u *ConsumerController) RegisterByEmail() {
@@ -118,8 +121,11 @@ func (u *ConsumerController) RegisterByEmail() {
 			parames["email"] = email
 			parames["pwd"] = pwd
 
-			res2 := userObj.AddUserByEmail(parames,pkg)
+			res2,uid := userObj.AddUserByEmail(parames,pkg)
 			datas["responseNo"] = res2
+			if len(uid) > 0{
+				datas["F_uid"] = uid
+			}
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
@@ -990,6 +996,35 @@ func (u *ConsumerController) ReduceCoin() {
 		datas["F_newCoin"] = userObj.ReduceCoin(uid,coin2,pkg)
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -10
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+// @Title 获取某个用户的头像
+// @Description 获取某个用户的头像
+// @Param	uid		path	string	true	用户ID
+// @Param	pkg		header	string	true	包名
+// @Success	200 {object} models.MUserAvatarResp
+// @Failure 401 无权访问
+// @router /avatar/:uid [get]
+func (u *ConsumerController) GetUserAvatar() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Input.Param(":uid")
+	//检查参数
+	if len(uid) > 0 {
+		url := userObj.GetUserAvatar(uid)
+		datas["responseNo"] = 0
+		datas["F_avatar_url"] = url
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -1
 	}
 	//return
 	u.jsonEcho(datas)

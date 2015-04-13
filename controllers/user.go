@@ -98,7 +98,7 @@ func (u0 *UserController) getUidByPhone(pnum string)string {
 // @Param	num					form	string	true	验证码(经过验证成功后的)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Success	200 {object} models.MResp
+// @Success	200 {object} models.MRegisterResp
 // @Failure 401 无权访问
 // @router /register [post]
 func (u *UserController) Register() {
@@ -128,8 +128,11 @@ func (u *UserController) Register() {
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
 			parames["pwd"] = pwd
 
-			res2 := userObj.AddUserByPhone(parames,pkg)
+			res2,uid := userObj.AddUserByPhone(parames,pkg)
 			datas["responseNo"] = res2
+			if len(uid) > 0{
+				datas["F_uid"] = uid
+			}
 		}
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1

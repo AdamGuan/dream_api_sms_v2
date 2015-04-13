@@ -5,6 +5,12 @@ type MResp struct {
 	responseMsg string
 }
 
+type MRegisterResp struct {
+	responseNo  int
+	responseMsg string
+	F_uid string
+}
+
 type MFindPwdResp struct {
 	responseNo  int
 	responseMsg string
@@ -184,4 +190,10 @@ type MGetCoinResp struct{
 	responseNo  int
 	responseMsg string
 	F_coin int
+}
+
+type MUserAvatarResp struct {
+	responseNo  int
+	responseMsg string
+	F_avatar_url string
 }

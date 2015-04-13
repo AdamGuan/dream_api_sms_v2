@@ -69,3 +69,26 @@ ALTER TABLE `t_user`
 
 ALTER TABLE `t_user`
 	DROP COLUMN `F_user_password`;
+
+
+
+
+CREATE TABLE `t_auth_weixin` (
+	`F_user_name` VARCHAR(50) NOT NULL COMMENT '用户ID',
+	`F_weixin_openid` VARCHAR(50) NOT NULL COMMENT 'weixin openid',
+	UNIQUE INDEX `F_user_name` (`F_user_name`),
+	UNIQUE INDEX `F_weixin_openid` (`F_weixin_openid`)
+)
+COMMENT='微信认证信息'
+COLLATE='utf8_general_ci'
+ENGINE=MyISAM
+;
+
+
+ALTER TABLE `t_auth_xinlangweibo`
+	DROP INDEX `F_xinlangweibo_user`,
+	ADD UNIQUE INDEX `F_xinlangweibo_openid` (`F_xinlangweibo_openid`);
+
+ALTER TABLE `t_auth_qq`
+	DROP INDEX `F_qq_number`,
+	ADD UNIQUE INDEX `F_qq_openid` (`F_qq_openid`);
