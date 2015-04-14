@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
+	"dream_api_sms_v2/helper"
 )
 
 //qq(第三方)
@@ -39,19 +40,23 @@ func (u *QqController) LoginQQ() {
 		datas["responseNo"] = -1
 		//检查qq信息的有效性
 		if len(access_token) > 0 && len(appid) > 0 && len(openid) > 0 {
-			//检查qq号码是否已存在
-			uid := userObj.GetUidByQQ(openid)
-			if len(uid) <= 0{
-				//写入一条qq数据
-				uid = userObj.InsertQQ(openid,pkg)
-			}
-			if len(uid) > 0{
-				//返回登录信息
-				info := u.login(uid,pkg)
-				if len(info) > 0{
-					datas["responseNo"] = 0
-					for key,value := range info{
-						datas[key] = value
+			res,_ := helper.CurlQq("https://graph.qq.com/user/get_user_info?access_token="+access_token+"&oauth_consumer_key="+appid+"&openid="+openid,"GET")
+			_,ok := res["nickname"]
+			if ok {
+				//检查qq号码是否已存在
+				uid := userObj.GetUidByQQ(openid)
+				if len(uid) <= 0{
+					//写入一条qq数据
+					uid = userObj.InsertQQ(openid,pkg)
+				}
+				if len(uid) > 0{
+					//返回登录信息
+					info := u.login(uid,pkg)
+					if len(info) > 0{
+						datas["responseNo"] = 0
+						for key,value := range info{
+							datas[key] = value
+						}
 					}
 				}
 			}

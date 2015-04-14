@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
+	"dream_api_sms_v2/helper"
 )
 
 //微信(第三方)
@@ -37,19 +38,26 @@ func (u *WeixinController) LoginWeixin() {
 		datas["responseNo"] = -1
 		//检查微信信息的有效性
 		if len(access_token) > 0 && len(openid) > 0 {
-			//检查微信号码是否已存在
-			uid := userObj.GetUidByWeixin(openid)
-			if len(uid) <= 0{
-				//写入一条微信数据
-				uid = userObj.InsertWeixin(openid,pkg)
-			}
-			if len(uid) > 0{
-				//返回登录信息
-				info := u.login(uid,pkg)
-				if len(info) > 0{
-					datas["responseNo"] = 0
-					for key,value := range info{
-						datas[key] = value
+			res,_ := helper.CurlQq("https://api.weixin.qq.com/sns/auth?access_token="+access_token+"&openid="+openid,"GET")
+			resErrcode,ok := res["errcode"]
+			if ok{
+				resErrcode2 := resErrcode.(float64)
+				if int(resErrcode2) == 0 {
+					//检查微信号码是否已存在
+					uid := userObj.GetUidByWeixin(openid)
+					if len(uid) <= 0{
+						//写入一条微信数据
+						uid = userObj.InsertWeixin(openid,pkg)
+					}
+					if len(uid) > 0{
+						//返回登录信息
+						info := u.login(uid,pkg)
+						if len(info) > 0{
+							datas["responseNo"] = 0
+							for key,value := range info{
+								datas[key] = value
+							}
+						}
 					}
 				}
 			}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"dream_api_sms_v2/models"
+	"dream_api_sms_v2/helper"
 )
 
 //新浪微博(第三方)
@@ -37,19 +38,23 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 		datas["responseNo"] = -1
 		//检查新浪微博信息的有效性
 		if len(openid) > 0 && len(access_token) > 0 {
-			//检查新浪微博是否已存在
-			uuid := userObj.GetUidByXinlangweibo(openid)
-			if len(uuid) <= 0{
-				//写入一条新浪微博数据
-				uuid = userObj.InsertXinlangweibo(openid,pkg)
-			}
-			if len(uuid) > 0{
-				//返回登录信息
-				info := u.login(uuid,pkg)
-				if len(info) > 0{
-					datas["responseNo"] = 0
-					for key,value := range info{
-						datas[key] = value
+			res,_ := helper.CurlXinglangweibo("https://api.weibo.com/oauth2/get_token_info?access_token="+access_token,"POST")
+			_,ok := res["uid"]
+			if ok {
+				//检查新浪微博是否已存在
+				uuid := userObj.GetUidByXinlangweibo(openid)
+				if len(uuid) <= 0{
+					//写入一条新浪微博数据
+					uuid = userObj.InsertXinlangweibo(openid,pkg)
+				}
+				if len(uuid) > 0{
+					//返回登录信息
+					info := u.login(uuid,pkg)
+					if len(info) > 0{
+						datas["responseNo"] = 0
+						for key,value := range info{
+							datas[key] = value
+						}
 					}
 				}
 			}

@@ -76,3 +76,13 @@ func (u0 *MLog) LogRequestErr500(u *context.Context,code string) {
 		ErrLog.Info(str)
 	}
 }
+
+//记录请求(debug等级)
+func (u0 *MLog) LogDebug(data interface{}) {
+	if Debug{
+		//log
+		str := "\nDebug\n"+utils.GetDisplayString("debug:",data)
+
+		DebugLog.Info(str)
+	}
+}

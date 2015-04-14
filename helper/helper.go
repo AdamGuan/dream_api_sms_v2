@@ -86,6 +86,60 @@ func CurlLeanCloud(requestUri string, method string, requestData map[string]stri
 	return p,resp.Header
 }
 
+//新浪微博 curl
+func CurlXinglangweibo(requestUri string, method string) (map[string]interface{},map[string][]string) {
+	geturl := requestUri
+	req, _ := http.NewRequest(method, geturl, nil)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	bodyByte, _ := ioutil.ReadAll(resp.Body)
+	p := map[string]interface{}{}
+	json.Unmarshal(bodyByte, &p)
+	return p,resp.Header
+}
+
+//qq curl
+func CurlQq(requestUri string, method string) (map[string]interface{},map[string][]string) {
+	geturl := requestUri
+	req, _ := http.NewRequest(method, geturl, nil)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	bodyByte, _ := ioutil.ReadAll(resp.Body)
+	p := map[string]interface{}{}
+	json.Unmarshal(bodyByte, &p)
+	return p,resp.Header
+}
+
+//微信 curl
+func CurlWeixin(requestUri string, method string) (map[string]interface{},map[string][]string) {
+	geturl := requestUri
+	req, _ := http.NewRequest(method, geturl, nil)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	bodyByte, _ := ioutil.ReadAll(resp.Body)
+	p := map[string]interface{}{}
+	json.Unmarshal(bodyByte, &p)
+	return p,resp.Header
+}
+
 //检查签名
 func CheckSign(sign string, token string) bool {
 	//sign = timestamp+md5(token+timestamp)
