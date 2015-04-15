@@ -929,6 +929,9 @@ func (u *MConsumer) addUserWeixin(pkg string)string{
 	if err == nil {
 		num, _ := res.RowsAffected()
 		if num >0{
+			//写入金币数量
+			set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
+			o.Raw("INSERT INTO t_coin SET "+set).Exec()
 			//注册记录
 			u.addRegiestLog(uid,pkg)
 
@@ -979,6 +982,9 @@ func (u *MConsumer) addUserQQ(pkg string)string{
 	if err == nil {
 		num, _ := res.RowsAffected()
 		if num >0{
+			//写入金币数量
+			set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
+			o.Raw("INSERT INTO t_coin SET "+set).Exec()
 			//注册记录
 			u.addRegiestLog(uid,pkg)
 
@@ -1029,6 +1035,9 @@ func (u *MConsumer) addUserXinlangweibo(pkg string)string{
 	if err == nil {
 		num, _ := res.RowsAffected()
 		if num >0{
+			//写入金币数量
+			set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
+			o.Raw("INSERT INTO t_coin SET "+set).Exec()
 			//注册记录
 			u.addRegiestLog(uid,pkg)
 
@@ -1040,12 +1049,16 @@ func (u *MConsumer) addUserXinlangweibo(pkg string)string{
 }
 
 //获取用户金币
-func (u *MConsumer) GetCoin(uid string)int{
+func (u *MConsumer) GetCoin(uid string)int {
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? AND F_coin_status = 1 LIMIT 1",uid).Values(&maps)
 	if err == nil && num > 0 {
 		return helper.StrToInt(maps[0]["F_coin"].(string))
+	}else{
+		//写入金币数量
+		set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
+		o.Raw("INSERT INTO t_coin SET "+set).Exec()
 	}
 	return 0
 }

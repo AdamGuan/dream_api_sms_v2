@@ -509,7 +509,7 @@ func (u *ConsumerController) GetUserInfo() {
 	if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 		info := userObj.GetUserInfoByUid(uid)
-		if len(info.F_phone_number) > 0{
+		if len(info.F_uid) > 0{
 			datas["responseNo"] = 0
 			datas["F_uid"] = info.F_uid
 			datas["F_phone_number"] = info.F_phone_number
