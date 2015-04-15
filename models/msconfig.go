@@ -60,9 +60,10 @@ func init() {
 	orm.DefaultTimeLoc = time.UTC
 	appConf, _ := config.NewConfig("ini", "conf/app.conf")
 	debug,_ := appConf.Bool(beego.RunMode+"::debug")
+	dblog,_ := appConf.Bool(beego.RunMode+"::dblog")
 	DebugErrlog,_ = appConf.Bool(beego.RunMode+"::errlog")
 	Debug = debug
-	if debug{
+	if dblog {
 		orm.Debug = true
 	}
 	otherConf, _ := config.NewConfig("ini", "conf/other.conf")

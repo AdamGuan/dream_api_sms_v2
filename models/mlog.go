@@ -77,7 +77,7 @@ func (u0 *MLog) LogRequestErr500(u *context.Context,code string) {
 	}
 }
 
-//记录请求(debug等级)
+//debug(debug等级)
 func (u0 *MLog) LogDebug(data interface{}) {
 	if Debug{
 		//log
