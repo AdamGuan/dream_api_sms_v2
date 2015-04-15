@@ -65,11 +65,6 @@ func init() {
 				&controllers.TokenController{},
 			),
 		),
-		beego.NSNamespace("/tmp",
-			beego.NSInclude(
-				&controllers.TmpController{},
-			),
-		),
 	)
 	beego.AddNamespace(ns)
 }

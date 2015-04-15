@@ -18,6 +18,9 @@ func (u *MTmp) DeleteAllUser(){
 	o.Raw("DELETE FROM t_token WHERE 1").Exec()
 	o.Raw("DELETE FROM t_coin WHERE 1").Exec()
 	o.Raw("DELETE FROM t_register_history WHERE 1").Exec()
+	o.Raw("DELETE FROM t_auth_qq WHERE 1").Exec()
+	o.Raw("DELETE FROM t_auth_weixin WHERE 1").Exec()
+	o.Raw("DELETE FROM t_auth_xinlangweibo WHERE 1").Exec()
 }
 
 func (u *MTmp) DeleteUser(username string){
@@ -27,5 +30,8 @@ func (u *MTmp) DeleteUser(username string){
 		o.Raw("DELETE FROM t_token WHERE F_user_name=?",username).Exec()
 		o.Raw("DELETE FROM t_coin WHERE F_user_name=?",username).Exec()
 		o.Raw("DELETE FROM t_register_history WHERE F_user_name=?",username).Exec()
+		o.Raw("DELETE FROM t_auth_qq WHERE F_user_name=?",username).Exec()
+		o.Raw("DELETE FROM t_auth_weixin WHERE F_user_name=?",username).Exec()
+		o.Raw("DELETE FROM t_auth_xinlangweibo WHERE F_user_name=?",username).Exec()
 	}
 }
