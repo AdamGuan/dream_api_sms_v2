@@ -30,6 +30,7 @@ type Sizer2 interface {
 // @Param	city				form	int		false	市ID
 // @Param	county				form	int		false	县ID
 // @Param	realname			form	string	false	真实姓名
+// @Param	nickname			form	string	false	昵称
 // @Param	num					form	string	true	验证码(经过验证成功后的)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
@@ -88,6 +89,7 @@ func (u *ConsumerController) RegisterByPhone() {
 // @Param	city				form	int		false	市ID
 // @Param	county				form	int		false	县ID
 // @Param	realname			form	string	false	真实姓名
+// @Param	nickname			form	string	false	昵称
 // @Param	num					form	string	true	验证码
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名

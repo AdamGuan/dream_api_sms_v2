@@ -336,6 +336,13 @@ func (u *MConsumer) addUser(parames map[string]string,pkg string)(int,string){
 						breakd = 1
 						result = -24
 					}
+				case "nickname":
+					if helper.CheckNickNameValid(value){
+						set += "F_user_nickname='"+value+"',"
+					}else{
+						breakd = 1
+						result = -25
+					}
 				case "mobilePhoneNumber":
 					result = -10
 					phone,ok := parames["mobilePhoneNumber"]
