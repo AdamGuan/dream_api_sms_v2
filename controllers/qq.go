@@ -15,6 +15,8 @@ type QqController struct {
 // @Param	access_token	query	string	true	access_token
 // @Param	appid			query	string	true	appid(oauth_consumer_key)
 // @Param	openid			query	string	true	openid
+// @Param	gender			query	string	false	性别(值: [男|女])
+// @Param	nickname		query	string	false	昵称
 // @Param	sign		header	string	true	签名
 // @Param	pkg			header	string	true	包名
 // @Success	200 {object} models.MUserLoginResp
@@ -32,6 +34,8 @@ func (u *QqController) LoginQQ() {
 	access_token := u.Ctx.Request.FormValue("access_token")
 	appid := u.Ctx.Request.FormValue("appid")
 	openid := u.Ctx.Request.FormValue("openid")
+	gender := u.Ctx.Request.FormValue("gender")
+	nickname := u.Ctx.Request.FormValue("nickname")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign2()
@@ -46,8 +50,29 @@ func (u *QqController) LoginQQ() {
 				//检查qq号码是否已存在
 				uid := userObj.GetUidByQQ(openid)
 				if len(uid) <= 0{
+					datas["responseNo"] = 0
 					//写入一条qq数据
-					uid = userObj.InsertQQ(openid,pkg)
+					paramesData := make(map[string]string)
+					paramesData["qq"] = openid
+					if len(gender) > 0 {
+						if gender != "男" && gender != "女" {
+							datas["responseNo"] = -10
+						}else{
+							gender2 := "1"
+							if gender == "男" {
+								gender2 = "1"
+							}else{
+								gender2 = "2"
+							}
+							paramesData["gender"] = gender2
+						}
+					}
+					if len(nickname) > 0 {
+						paramesData["nickname"] = nickname
+					}
+					if datas["responseNo"] == 0 {
+						uid = userObj.InsertQQ(paramesData,pkg)
+					}
 				}
 				if len(uid) > 0{
 					//返回登录信息

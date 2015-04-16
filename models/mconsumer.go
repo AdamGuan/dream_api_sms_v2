@@ -901,8 +901,9 @@ func (u *MConsumer) GetUidByWeixin(qq string)string{
 }
 
 //insert 一条微信认证信息
-func (u *MConsumer) InsertWeixin(qq string,pkg string)string{
-	uid := u.addUserWeixin(pkg)
+func (u *MConsumer) InsertWeixin(data map[string]string,pkg string)string{
+	qq := data["qq"]
+	uid := u.addUserWeixin(data,pkg)
 	if len(uid) > 0{
 		o := orm.NewOrm()
 		res, err := o.Raw("INSERT INTO t_auth_weixin SET F_user_name=?,F_weixin_openid=?",uid,qq).Exec()
@@ -919,11 +920,19 @@ func (u *MConsumer) InsertWeixin(qq string,pkg string)string{
 }
 
 //添加微信到t_user,并返回uid
-func (u *MConsumer) addUserWeixin(pkg string)string{
+func (u *MConsumer) addUserWeixin(data map[string]string,pkg string)string{
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
 	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
 	set = "F_user_name='"+uid+"',"+set
+	gender,ok := data["gender"]
+	if ok {
+		set = "F_gender='"+gender+"',"+set
+	}
+	nickName,ok := data["nickname"]
+	if ok {
+		set = "F_user_nickname='"+nickName+"',"+set
+	}
 	o := orm.NewOrm()
 	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
 	if err == nil {
@@ -954,8 +963,9 @@ func (u *MConsumer) GetUidByQQ(qq string)string{
 }
 
 //insert 一条qq认证信息
-func (u *MConsumer) InsertQQ(qq string,pkg string)string{
-	uid := u.addUserQQ(pkg)
+func (u *MConsumer) InsertQQ(data map[string]string,pkg string)string{
+	qq := data["qq"]
+	uid := u.addUserQQ(data,pkg)
 	if len(uid) > 0{
 		o := orm.NewOrm()
 		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_openid=?",uid,qq).Exec()
@@ -972,11 +982,19 @@ func (u *MConsumer) InsertQQ(qq string,pkg string)string{
 }
 
 //添加qq到t_user,并返回uid
-func (u *MConsumer) addUserQQ(pkg string)string{
+func (u *MConsumer) addUserQQ(data map[string]string,pkg string)string{
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
 	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
 	set = "F_user_name='"+uid+"',"+set
+	gender,ok := data["gender"]
+	if ok {
+		set = "F_gender='"+gender+"',"+set
+	}
+	nickName,ok := data["nickname"]
+	if ok {
+		set = "F_user_nickname='"+nickName+"',"+set
+	}
 	o := orm.NewOrm()
 	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
 	if err == nil {
@@ -1007,8 +1025,9 @@ func (u *MConsumer) GetUidByXinlangweibo(name string)string{
 }
 
 //insert 一条新浪微博认证信息
-func (u *MConsumer) InsertXinlangweibo(name string,pkg string)string{
-	uid := u.addUserXinlangweibo(pkg)
+func (u *MConsumer) InsertXinlangweibo(data map[string]string,pkg string)string{
+	name := data["name"]
+	uid := u.addUserXinlangweibo(data,pkg)
 	if len(uid) > 0{
 		o := orm.NewOrm()
 		res, err := o.Raw("INSERT INTO t_auth_xinlangweibo SET F_user_name=?,F_xinlangweibo_openid=?",uid,name).Exec()
@@ -1025,11 +1044,19 @@ func (u *MConsumer) InsertXinlangweibo(name string,pkg string)string{
 }
 
 //添加新浪微博到t_user,并返回uid
-func (u *MConsumer) addUserXinlangweibo(pkg string)string{
+func (u *MConsumer) addUserXinlangweibo(data map[string]string,pkg string)string{
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
 	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
 	set = "F_user_name='"+uid+"',"+set
+	gender,ok := data["gender"]
+	if ok {
+		set = "F_gender='"+gender+"',"+set
+	}
+	nickName,ok := data["nickname"]
+	if ok {
+		set = "F_user_nickname='"+nickName+"',"+set
+	}
 	o := orm.NewOrm()
 	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
 	if err == nil {
