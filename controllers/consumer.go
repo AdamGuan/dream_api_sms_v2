@@ -58,7 +58,7 @@ func (u *ConsumerController) RegisterByPhone() {
 		datas["responseNo"] = -1
 		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.PostForm{
+			for k,v := range u.Ctx.Request.Form{
 				parames[k] = v[0]
 			}
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
@@ -117,7 +117,7 @@ func (u *ConsumerController) RegisterByEmail() {
 		datas["responseNo"] = -1
 		if emailObj.CheckEmailActionvalid(email,pkg,num) == true{
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.PostForm{
+			for k,v := range u.Ctx.Request.Form{
 				parames[k] = v[0]
 			}
 			parames["email"] = email
@@ -418,7 +418,6 @@ func (u *ConsumerController) FindPwdByPhone() {
 // @Param	newPwd			form	string	true	新密码
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	huid			header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /pwd/:uid [put]
@@ -432,6 +431,7 @@ func (u *ConsumerController) ModifyPwdByUid() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	oldPwd := u.Ctx.Request.FormValue("oldPwd")
 	newPwd := u.Ctx.Request.FormValue("newPwd")
 	//check sign
@@ -491,7 +491,6 @@ func (u *ConsumerController) CheckUserExists() {
 // @Param	uid	path	string	true	用户ID
 // @Param	sign			header	string	true	签名
 // @Param	pkg			header	string	true	包名
-// @Param	huid		header	string	true	用户ID
 // @Success	200 {object} models.MUserInfoResp
 // @Failure 401 无权访问
 // @router /:uid [get]
@@ -505,6 +504,7 @@ func (u *ConsumerController) GetUserInfo() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	//检查参数
@@ -561,7 +561,6 @@ func (u *ConsumerController) GetUserInfo() {
 // @Param	avatarId			form	int		false	系统头像ID(选择系统头像,参数avatarType为2)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /:uid [put]
@@ -575,6 +574,7 @@ func (u *ConsumerController) ModifyUserInfo() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	avatarType := helper.StrToInt(u.Ctx.Request.FormValue("avatarType"))
 	//check sign
 	datas["responseNo"] = u.checkSign()
@@ -604,7 +604,7 @@ func (u *ConsumerController) ModifyUserInfo() {
 		if datas["responseNo"] == 0{
 			datas["responseNo"] = -1
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.PostForm {
+			for k,v := range u.Ctx.Request.Form {
 				if k != "avatarType" && k != "avatar" && k != "avatarId"{
 					parames[k] = v[0]
 				}
@@ -631,7 +631,6 @@ func (u *ConsumerController) ModifyUserInfo() {
 // @Param	uid	path	string	true	用户ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /logout/:uid [delete]
@@ -645,6 +644,7 @@ func (u *ConsumerController) UserLogout() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
 	datas["responseNo"] = u.checkSign()
@@ -667,7 +667,6 @@ func (u *ConsumerController) UserLogout() {
 // @Param	classId				query	int		true	班级ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /class/:uid [put]
@@ -681,6 +680,7 @@ func (u *ConsumerController) ModifyUserClass() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	classId := u.Ctx.Request.FormValue("classId")
 	//check sign
 	datas["responseNo"] = u.checkSign()
@@ -698,7 +698,6 @@ func (u *ConsumerController) ModifyUserClass() {
 // @Param	uid	path	string	true	用户ID
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	用户ID
 // @Success	200 {object} models.MResp
 // @Failure 401 无权访问
 // @router /avatar/:uid [put]
@@ -711,6 +710,7 @@ func (u *ConsumerController) UploadAvatar() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	if datas["responseNo"] == 0 {
@@ -808,7 +808,6 @@ func (u *ConsumerController) GetSystemAvatarList() {
 // @Param	num					form	string	true	验证码(经过验证成功后的)
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	uid
 // @Success	200 {object} models.MModifyPhoneResp
 // @Failure 401 无权访问
 // @router /phone/:mobilePhoneNumber [put]
@@ -824,6 +823,7 @@ func (u *ConsumerController) ModifyPhone() {
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	uid := u.Ctx.Request.FormValue("uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
@@ -856,7 +856,6 @@ func (u *ConsumerController) ModifyPhone() {
 // @Param	uid				form	string	true	uid
 // @Param	sign			header	string	true	签名
 // @Param	pkg				header	string	true	包名
-// @Param	huid			header	string	true	uid
 // @Success	200 {object} models.MModifyEmailResp
 // @Failure 401 无权访问
 // @router /email/:email [put]
@@ -872,6 +871,7 @@ func (u *ConsumerController) ModifyEmail() {
 	u.Ctx.Request.ParseForm()
 	email := u.Ctx.Input.Param(":email")
 	uid := u.Ctx.Request.FormValue("uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	num := u.Ctx.Request.FormValue("num")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//check sign
@@ -903,7 +903,6 @@ func (u *ConsumerController) ModifyEmail() {
 // @Param	coin				form	int		true	金币
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	uid
 // @Success	200 {object} models.MModifyCoinResp
 // @router /coin [post]
 func (u *ConsumerController) AddCoin() {
@@ -916,6 +915,7 @@ func (u *ConsumerController) AddCoin() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Request.FormValue("uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	coin := u.Ctx.Request.FormValue("coin")
 	coin2 := helper.StrToInt(coin)
 	pkg := u.Ctx.Request.Header.Get("pkg")
@@ -940,7 +940,6 @@ func (u *ConsumerController) AddCoin() {
 // @Param	uid					query	string	true	uid
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	uid
 // @Success	200 {object} models.MGetCoinResp
 // @router /coin [get]
 func (u *ConsumerController) GetCoin() {
@@ -953,6 +952,7 @@ func (u *ConsumerController) GetCoin() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Request.FormValue("uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	//检查参数
@@ -971,7 +971,6 @@ func (u *ConsumerController) GetCoin() {
 // @Param	coin				form	int		true	金币
 // @Param	sign				header	string	true	签名
 // @Param	pkg					header	string	true	包名
-// @Param	huid				header	string	true	uid
 // @Success	200 {object} models.MModifyCoinResp
 // @router /coin [put]
 func (u *ConsumerController) ReduceCoin() {
@@ -984,6 +983,7 @@ func (u *ConsumerController) ReduceCoin() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	uid := u.Ctx.Request.FormValue("uid")
+	u.Ctx.Request.Header.Set("huid",uid)
 	coin := u.Ctx.Request.FormValue("coin")
 	coin2 := helper.StrToInt(coin)
 	pkg := u.Ctx.Request.Header.Get("pkg")
@@ -1025,6 +1025,46 @@ func (u *ConsumerController) GetUserAvatar() {
 		url := userObj.GetUserAvatar(uid)
 		datas["responseNo"] = 0
 		datas["F_avatar_url"] = url
+	}else if datas["responseNo"] == 0{
+		datas["responseNo"] = -1
+	}
+	//return
+	u.jsonEcho(datas)
+}
+
+// @Title 获取其它用户信息
+// @Description 获取其它用户信息(token: md5(pkg))
+// @Param	uid			path	string	true	用户ID
+// @Param	sign		header	string	true	签名
+// @Param	pkg			header	string	true	包名
+// @Success	200 {object} models.MOtherUserInfoResp
+// @Failure 401 无权访问
+// @router /other/:uid [get]
+func (u *ConsumerController) GetOtherUserInfo() {
+	//log
+	u.logRequest()
+	//ini return
+	datas := map[string]interface{}{"responseNo": -1}
+	//model ini
+	var userObj *models.MConsumer
+	//parse request parames
+	u.Ctx.Request.ParseForm()
+	uid := u.Ctx.Input.Param(":uid")
+	u.Ctx.Request.Header.Set("huid",uid)
+	//check sign
+	datas["responseNo"] = u.checkSign2()
+	//检查参数
+	if datas["responseNo"] == 0 {
+		datas["responseNo"] = -1
+		info := userObj.GetOtherUserInfoByUid(uid)
+		if len(info.F_uid) > 0{
+			datas["responseNo"] = 0
+			datas["F_uid"] = info.F_uid
+			datas["F_user_realname"] = info.F_user_realname
+			datas["F_user_nickname"] = info.F_user_nickname
+			datas["F_avatar_url"] = info.F_avatar_url
+		}
+		
 	}else if datas["responseNo"] == 0{
 		datas["responseNo"] = -1
 	}

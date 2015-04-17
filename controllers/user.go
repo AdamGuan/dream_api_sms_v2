@@ -122,7 +122,7 @@ func (u *UserController) Register() {
 		datas["responseNo"] = -1
 		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.PostForm{
+			for k,v := range u.Ctx.Request.Form{
 				parames[k] = v[0]
 			}
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
@@ -493,7 +493,7 @@ func (u *UserController) ModifyUserInfo() {
 		if datas["responseNo"] == 0{
 			datas["responseNo"] = -1
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.PostForm {
+			for k,v := range u.Ctx.Request.Form {
 				if k != "avatarType" && k != "avatar" && k != "avatarId"{
 					parames[k] = v[0]
 				}

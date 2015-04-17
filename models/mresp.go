@@ -83,6 +83,15 @@ type MUserInfoResp struct {
 	F_coin int
 }
 
+type MOtherUserInfoResp struct {
+	responseNo  int
+	responseMsg string
+	F_uid string
+	F_user_realname string
+	F_user_nickname string
+	F_avatar_url string
+}
+
 type MAreaResp struct {
 	responseNo  int
 	responseMsg string

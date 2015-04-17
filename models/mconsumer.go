@@ -44,6 +44,13 @@ type userInfoa struct {
 	F_coin int
 }
 
+type userInfob struct {
+	F_uid string
+	F_user_realname string
+	F_user_nickname string
+	F_avatar_url string
+}
+
 type avatarSysInfoLista []struct{
 	F_avatar_url string
 	F_avatar_id int
@@ -606,6 +613,37 @@ func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
 			}
 			//金币
 			info.F_coin = u.GetCoin(userId)
+		}
+	}
+	return info
+}
+
+//获取其它用户的信息
+func (u *MConsumer) GetOtherUserInfoByUid(userId string)userInfob{
+	info := userInfob{}
+	if len(userId) > 0 {
+		o := orm.NewOrm()
+		var maps []orm.Params
+		num, err := o.Raw("SELECT * FROM t_user WHERE F_user_name=? LIMIT 1", userId).Values(&maps)
+		if err == nil && num > 0 {
+			info.F_uid = userId
+			//真实名
+			info.F_user_realname = ""
+			if maps[0]["F_user_realname"] != nil{
+				info.F_user_realname = maps[0]["F_user_realname"].(string)
+			}
+			//昵称
+			info.F_user_nickname = ""
+			if maps[0]["F_user_nickname"] != nil{
+				info.F_user_nickname = maps[0]["F_user_nickname"].(string)
+			}
+			//头像
+			avatartmp := maps[0]["F_avatarname"].(string)
+			if len(avatartmp) > 0{
+				info.F_avatar_url = u.getUserAvatarUrl(avatartmp,helper.StrToInt(avatartmp[0:1]))
+			}else{
+				info.F_avatar_url = ""
+			}
 		}
 	}
 	return info
