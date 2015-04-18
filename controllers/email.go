@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //Email(每个用户email发送限制为1分钟的一次)
@@ -38,13 +38,13 @@ func (u *EmailController) Emailvalid() {
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) && len(num) > 0 {
 		datas["responseNo"] = -1
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
-		if len(pkgConfig) > 0{
-			res := emailObj.ValidEmail(pkg,num,email)
-			if res{
+		if len(pkgConfig) > 0 {
+			res := emailObj.ValidEmail(pkg, num, email)
+			if res {
 				datas["responseNo"] = 0
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
@@ -80,22 +80,22 @@ func (u *EmailController) RegisterGetEmail() {
 		res2 := userObj.CheckEmailValid(email)
 		if res2 {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
-			if len(pkgConfig) > 0 && emailObj.CheckEmailRateValid(email,pkg){
-				emailObj.AddEmailRate(email,pkg)
+			if len(pkgConfig) > 0 && emailObj.CheckEmailRateValid(email, pkg) {
+				emailObj.AddEmailRate(email, pkg)
 				res := emailObj.GetEmailCode(email)
-				if len(res) == 6{
-					emailObj.AddEmailRate(email,pkg)
-					if emailObj.AddEmailActionvalid(email,pkg,res){
+				if len(res) == 6 {
+					emailObj.AddEmailRate(email, pkg)
+					if emailObj.AddEmailActionvalid(email, pkg, res) {
 						datas["responseNo"] = 0
 					}
-				}else{
-					emailObj.DeleteEmailRate(email,pkg)
+				} else {
+					emailObj.DeleteEmailRate(email, pkg)
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -2
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 
@@ -132,22 +132,22 @@ func (u *EmailController) ResetPwdGetEmail() {
 		res := userObj.CheckEmailExists(email)
 		if res {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
-			if len(pkgConfig) > 0 && emailObj.CheckEmailRateValid(email,pkg) {
-				emailObj.AddEmailRate(email,pkg)
+			if len(pkgConfig) > 0 && emailObj.CheckEmailRateValid(email, pkg) {
+				emailObj.AddEmailRate(email, pkg)
 				res := emailObj.GetEmailCode(email)
 				if len(res) == 6 {
-					emailObj.AddEmailRate(email,pkg)
-					if emailObj.AddEmailActionvalid(email,pkg,res){
+					emailObj.AddEmailRate(email, pkg)
+					if emailObj.AddEmailActionvalid(email, pkg, res) {
 						datas["responseNo"] = 0
 					}
-				}else{
-					emailObj.DeleteEmailRate(email,pkg)
+				} else {
+					emailObj.DeleteEmailRate(email, pkg)
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -4
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -4
 	}
 
@@ -180,8 +180,8 @@ func (u *EmailController) ChangeEmailCode() {
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	//检查新email是否已被使用
-	if datas["responseNo"] == 0{
-		if userObj.CheckEmailExists(email){
+	if datas["responseNo"] == 0 {
+		if userObj.CheckEmailExists(email) {
 			datas["responseNo"] = -26
 		}
 	}
@@ -189,19 +189,19 @@ func (u *EmailController) ChangeEmailCode() {
 	if datas["responseNo"] == 0 && helper.CheckEmailValid(email) {
 		datas["responseNo"] = -1
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
-		if len(pkgConfig) > 0 && emailObj.CheckEmailRateValid(email,pkg) {
-			emailObj.AddEmailRate(email,pkg)
+		if len(pkgConfig) > 0 && emailObj.CheckEmailRateValid(email, pkg) {
+			emailObj.AddEmailRate(email, pkg)
 			res := emailObj.GetEmailCode(email)
-			if len(res) == 6{
-				emailObj.AddEmailRate(email,pkg)
-				if emailObj.AddEmailActionvalid(email,pkg,res){
+			if len(res) == 6 {
+				emailObj.AddEmailRate(email, pkg)
+				if emailObj.AddEmailActionvalid(email, pkg, res) {
 					datas["responseNo"] = 0
 				}
-			}else{
-				emailObj.DeleteEmailRate(email,pkg)
+			} else {
+				emailObj.DeleteEmailRate(email, pkg)
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -10
 	}
 

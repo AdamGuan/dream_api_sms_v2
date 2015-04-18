@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //学校
@@ -31,29 +31,29 @@ func (u *SchoolController) QuerySchools() {
 	areaName := u.Ctx.Request.FormValue("areaName")
 	needDefault := u.Ctx.Request.FormValue("needDefault")
 	needDefault2 := false
-	if needDefault == "true"{
+	if needDefault == "true" {
 		needDefault2 = true
 	}
-	if len(name) > 0 || len(stype) > 0 || len(areaId) > 0 || len(areaName) > 0{
+	if len(name) > 0 || len(stype) > 0 || len(areaId) > 0 || len(areaName) > 0 {
 		//model ini
 		stype2 := 0
-		for k,v := range models.SchoolType{
-			if stype == v{
+		for k, v := range models.SchoolType {
+			if stype == v {
 				stype2 = k
 			}
 		}
 		areaId2 := 0
-		if len(areaId) > 0{
+		if len(areaId) > 0 {
 			areaId2 = helper.StrToInt(areaId)
 		}
 		var schoolObj *models.MSchool
-		schools := schoolObj.QuerySchools(name,stype2,areaId2,areaName,needDefault2)
-		if len(schools) > 0{
+		schools := schoolObj.QuerySchools(name, stype2, areaId2, areaName, needDefault2)
+		if len(schools) > 0 {
 			datas["schoolList"] = schools
-		}else{
+		} else {
 			datas["responseNo"] = -17
 		}
-	}else{
+	} else {
 		datas["responseNo"] = -10
 	}
 	//return
@@ -92,22 +92,22 @@ func (u *SchoolController) GetSchoolArea() {
 	schoolIds := u.Ctx.Input.Param(":schoolIds")
 
 	//check sign
-	if datas["responseNo"] == 0 && len(schoolIds) > 0{
-		schoolIdList := helper.Split(schoolIds,",")
-		if len(schoolIdList) <= 20{
-			tmp := make(models.MSchoolAreaInfoItemResp,len(schoolIdList))
-			for _,schoolId := range schoolIdList{
+	if datas["responseNo"] == 0 && len(schoolIds) > 0 {
+		schoolIdList := helper.Split(schoolIds, ",")
+		if len(schoolIdList) <= 20 {
+			tmp := make(models.MSchoolAreaInfoItemResp, len(schoolIdList))
+			for _, schoolId := range schoolIdList {
 				tmp2 := schoolObj.GetSchoolArea(helper.StrToInt(schoolId))
-				if tmp2.F_school_id == helper.StrToInt(schoolId){
+				if tmp2.F_school_id == helper.StrToInt(schoolId) {
 					tmp[schoolId] = schoolObj.GetSchoolArea(helper.StrToInt(schoolId))
 				}
 			}
-			if len(tmp) > 0{
+			if len(tmp) > 0 {
 				datas["areaInfoList"] = tmp
-			}else{
+			} else {
 				datas["responseNo"] = -17
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -15
 		}
 	}
@@ -131,16 +131,16 @@ func (u *SchoolController) GetSchoolName() {
 	schoolIds := u.Ctx.Input.Param(":schoolIds")
 
 	//check sign
-	if datas["responseNo"] == 0 && len(schoolIds) > 0{
-		schoolIdList := helper.Split(schoolIds,",")
-		if len(schoolIdList) <= 20{
+	if datas["responseNo"] == 0 && len(schoolIds) > 0 {
+		schoolIdList := helper.Split(schoolIds, ",")
+		if len(schoolIdList) <= 20 {
 			tmp := schoolObj.GetSchoolNameById(schoolIdList)
-			if len(tmp) > 0{
+			if len(tmp) > 0 {
 				datas["schoolList"] = tmp
-			}else{
+			} else {
 				datas["responseNo"] = -17
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -15
 		}
 	}

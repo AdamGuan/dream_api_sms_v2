@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	"dream_api_sms_v2/helper"
 	"dream_api_sms_v2/models"
 	"github.com/astaxie/beego"
-	"net/http"
-	"dream_api_sms_v2/helper"
 	"github.com/astaxie/beego/config"
+	"net/http"
 )
 
 //公共controller
@@ -17,15 +17,15 @@ type BaseController struct {
 func (u *BaseController) jsonEcho(datas map[string]interface{}) {
 	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
 		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-//		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-//		u.Ctx.ResponseWriter.WriteHeader(http.StatusForbidden)
+		//		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
+		//		u.Ctx.ResponseWriter.WriteHeader(http.StatusForbidden)
 		u.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
-	} 
-	
+	}
+
 	datas["responseMsg"] = ""
 	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
+	debug, _ := appConf.Bool(beego.RunMode + "::debug")
+	if debug {
 		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
 	}
 
@@ -37,17 +37,17 @@ func (u *BaseController) jsonEcho(datas map[string]interface{}) {
 }
 
 //sign check
-func (u *BaseController) checkSign()int {
+func (u *BaseController) checkSign() int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	uid := u.Ctx.Request.Header.Get("huid")
 	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
+	if !pkgObj.CheckPkgExists(pkg) {
 		result = -7
-	}else{
+	} else {
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
+		if re := signObj.CheckSign(sign, uid, pkg, ""); re == true {
 			result = 0
 		}
 	}
@@ -55,16 +55,16 @@ func (u *BaseController) checkSign()int {
 }
 
 //sign check, , token为包名的md5值
-func (u *BaseController) checkSign2()int {
+func (u *BaseController) checkSign2() int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
+	if !pkgObj.CheckPkgExists(pkg) {
 		result = -7
-	}else{
+	} else {
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
+		if re := signObj.CheckSign(sign, "", pkg, helper.Md5(pkg)); re == true {
 			result = 0
 		}
 	}
@@ -72,22 +72,22 @@ func (u *BaseController) checkSign2()int {
 }
 
 //sign check3 pnum可以是手机号码或uid
-func (u *BaseController) checkSign3()int {
+func (u *BaseController) checkSign3() int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	uid := u.Ctx.Request.Header.Get("pnum")
 	//判断是否为手机号码
-	if helper.CheckMPhoneValid(uid){
+	if helper.CheckMPhoneValid(uid) {
 		var userObj *models.MConsumer
 		uid = userObj.GetUidByPhone(uid)
 	}
 	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
+	if !pkgObj.CheckPkgExists(pkg) {
 		result = -7
-	}else{
+	} else {
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
+		if re := signObj.CheckSign(sign, uid, pkg, ""); re == true {
 			result = 0
 		}
 	}

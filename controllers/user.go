@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	"dream_api_sms_v2/helper"
 	"dream_api_sms_v2/models"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/config"
 	"net/http"
-	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
-	"strings"
 	"os"
+	"strings"
 )
 
 //用户(注意：请使用下面的api consumer, 留user这个api仅仅为了兼容以前的使用)
@@ -21,16 +21,16 @@ type Sizer interface {
 }
 
 //json echo
-func (u0 *UserController) jsonEcho(datas map[string]interface{},u *UserController) {
+func (u0 *UserController) jsonEcho(datas map[string]interface{}, u *UserController) {
 	if datas["responseNo"] == -6 || datas["responseNo"] == -7 {
 		u.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 		u.Ctx.ResponseWriter.WriteHeader(http.StatusUnauthorized)
-	} 
-	
+	}
+
 	datas["responseMsg"] = ""
 	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	if debug{
+	debug, _ := appConf.Bool(beego.RunMode + "::debug")
+	if debug {
 		datas["responseMsg"] = models.ConfigMyResponse[helper.IntToString(datas["responseNo"].(int))]
 	}
 
@@ -42,18 +42,18 @@ func (u0 *UserController) jsonEcho(datas map[string]interface{},u *UserControlle
 }
 
 //sign check
-func (u0 *UserController) checkSign(u *UserController)int {
+func (u0 *UserController) checkSign(u *UserController) int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	pnum := u.Ctx.Request.Header.Get("pnum")
 	uid := u.getUidByPhone(pnum)
 	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
+	if !pkgObj.CheckPkgExists(pkg) {
 		result = -7
-	}else{
+	} else {
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, uid, pkg,""); re == true {
+		if re := signObj.CheckSign(sign, uid, pkg, ""); re == true {
 			result = 0
 		}
 	}
@@ -61,16 +61,16 @@ func (u0 *UserController) checkSign(u *UserController)int {
 }
 
 //sign check, , token为包名的md5值
-func (u0 *UserController) checkSign2(u *UserController)int {
+func (u0 *UserController) checkSign2(u *UserController) int {
 	result := -6
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	sign := u.Ctx.Request.Header.Get("sign")
 	var pkgObj *models.MPkg
-	if !pkgObj.CheckPkgExists(pkg){
+	if !pkgObj.CheckPkgExists(pkg) {
 		result = -7
-	}else{
+	} else {
 		var signObj *models.MSign
-		if re := signObj.CheckSign(sign, "", pkg,helper.Md5(pkg)); re == true {
+		if re := signObj.CheckSign(sign, "", pkg, helper.Md5(pkg)); re == true {
 			result = 0
 		}
 	}
@@ -78,7 +78,7 @@ func (u0 *UserController) checkSign2(u *UserController)int {
 }
 
 //根据电话号码获取uid
-func (u0 *UserController) getUidByPhone(pnum string)string {
+func (u0 *UserController) getUidByPhone(pnum string) string {
 	var userObj *models.MConsumer
 	return userObj.GetUidByPhone(pnum)
 }
@@ -120,25 +120,25 @@ func (u *UserController) Register() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
-		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
+		if smsObj.CheckMsmActionvalid(mobilePhoneNumber, pkg, num) == true {
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.Form{
+			for k, v := range u.Ctx.Request.Form {
 				parames[k] = v[0]
 			}
 			parames["mobilePhoneNumber"] = mobilePhoneNumber
 			parames["pwd"] = pwd
 
-			res2,uid := userObj.AddUserByPhone(parames,pkg)
+			res2, uid := userObj.AddUserByPhone(parames, pkg)
 			datas["responseNo"] = res2
-			if len(uid) > 0{
+			if len(uid) > 0 {
 				datas["F_uid"] = uid
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 重置密码
@@ -170,15 +170,15 @@ func (u *UserController) ResetPwd() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
-		if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
-			res2 := userObj.ModifyUserPwdByPhone(mobilePhoneNumber,pwd)
+		if smsObj.CheckMsmActionvalid(mobilePhoneNumber, pkg, num) == true {
+			res2 := userObj.ModifyUserPwdByPhone(mobilePhoneNumber, pwd)
 			datas["responseNo"] = res2
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 登录
@@ -207,19 +207,19 @@ func (u *UserController) CheckUserAndPwd() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(pwd) {
 		datas["responseNo"] = -1
-		if !userObj.CheckPhoneExists(mobilePhoneNumber){
+		if !userObj.CheckPhoneExists(mobilePhoneNumber) {
 			datas["responseNo"] = -4
-		}else{
-			res := userObj.CheckPhoneAndPwd(mobilePhoneNumber,pwd)
-			if res{
-				token,tokenExpireDatetime := userObj.GetTokenByPhone(mobilePhoneNumber,pkg)
-				if len(token) > 0{
+		} else {
+			res := userObj.CheckPhoneAndPwd(mobilePhoneNumber, pwd)
+			if res {
+				token, tokenExpireDatetime := userObj.GetTokenByPhone(mobilePhoneNumber, pkg)
+				if len(token) > 0 {
 					datas["responseNo"] = 0
 					datas["token"] = token
 					datas["tokenExpireDatetime"] = tokenExpireDatetime
 					//获取用户信息
 					info := userObj.GetUserInfoByPhone(mobilePhoneNumber)
-					if len(info.F_phone_number) > 0{
+					if len(info.F_phone_number) > 0 {
 						datas["F_uid"] = info.F_uid
 						datas["F_phone_number"] = info.F_phone_number
 						datas["F_gender"] = info.F_gender
@@ -244,15 +244,15 @@ func (u *UserController) CheckUserAndPwd() {
 						datas["F_avatar_url"] = info.F_avatar_url
 					}
 				}
-			}else{
+			} else {
 				datas["responseNo"] = -9
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -5
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 找回密码
@@ -282,23 +282,23 @@ func (u *UserController) FindPwd() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
-		if userObj.CheckPhoneExists(mobilePhoneNumber){
-			if smsObj.CheckMsmActionvalid(mobilePhoneNumber,pkg,num) == true{
+		if userObj.CheckPhoneExists(mobilePhoneNumber) {
+			if smsObj.CheckMsmActionvalid(mobilePhoneNumber, pkg, num) == true {
 				res := userObj.GetUserPwdByPhone(mobilePhoneNumber)
-				if len(res) > 0{
+				if len(res) > 0 {
 					datas["responseNo"] = 0
 					datas["password"] = res
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -4
 		}
-		
-	}else if datas["responseNo"] == 0{
+
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 修改密码
@@ -329,17 +329,17 @@ func (u *UserController) ModifyPwd() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckPwdValid(oldPwd) && helper.CheckPwdValid(newPwd) {
 		datas["responseNo"] = -1
-		if userObj.CheckPhoneAndPwd(mobilePhoneNumber,oldPwd){
-			res2 := userObj.ModifyUserPwdByPhone(mobilePhoneNumber,newPwd)
+		if userObj.CheckPhoneAndPwd(mobilePhoneNumber, oldPwd) {
+			res2 := userObj.ModifyUserPwdByPhone(mobilePhoneNumber, newPwd)
 			datas["responseNo"] = res2
-		}else{
+		} else {
 			datas["responseNo"] = -8
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 验证手机号码是否已注册
@@ -364,16 +364,16 @@ func (u *UserController) CheckUserExists() {
 	datas["responseNo"] = u.checkSign2(u)
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
-		if userObj.CheckPhoneExists(mobilePhoneNumber){
+		if userObj.CheckPhoneExists(mobilePhoneNumber) {
 			datas["responseNo"] = -2
-		}else{
+		} else {
 			datas["responseNo"] = -4
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 获取用户信息
@@ -401,7 +401,7 @@ func (u *UserController) GetUserInfo() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
 		info := userObj.GetUserInfoByPhone(mobilePhoneNumber)
-		if len(info.F_phone_number) > 0{
+		if len(info.F_phone_number) > 0 {
 			datas["responseNo"] = 0
 			datas["F_uid"] = info.F_uid
 			datas["F_phone_number"] = info.F_phone_number
@@ -426,11 +426,11 @@ func (u *UserController) GetUserInfo() {
 			datas["F_class_name"] = info.F_class_name
 			datas["F_avatar_url"] = info.F_avatar_url
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 修改用户信息
@@ -472,17 +472,17 @@ func (u *UserController) ModifyUserInfo() {
 		//头像修改
 		avatarSysName := ""
 		avatarExists := 0
-		if avatarType == 1 || avatarType == 2{
-			if avatarType == 1{	//上传
-				datas["responseNo"] = u.uploadAvatar(u,mobilePhoneNumber)
-			}else if avatarType == 2{	//系统选择
+		if avatarType == 1 || avatarType == 2 {
+			if avatarType == 1 { //上传
+				datas["responseNo"] = u.uploadAvatar(u, mobilePhoneNumber)
+			} else if avatarType == 2 { //系统选择
 				avatarId := helper.StrToInt(u.Ctx.Request.FormValue("avatarId"))
-				if avatarId <= 0{
+				if avatarId <= 0 {
 					datas["responseNo"] = -10
-				}else{
+				} else {
 					//根据系统头像ID获取头像名称
 					avatarSysName = userObj.GetAvatarNameFromId(avatarId)
-					if len(avatarSysName) <= 0{
+					if len(avatarSysName) <= 0 {
 						datas["responseNo"] = -10
 					}
 				}
@@ -490,30 +490,30 @@ func (u *UserController) ModifyUserInfo() {
 			avatarExists = 1
 		}
 		//其它信息的修改
-		if datas["responseNo"] == 0{
+		if datas["responseNo"] == 0 {
 			datas["responseNo"] = -1
 			parames := make(map[string]string)
-			for k,v := range u.Ctx.Request.Form {
-				if k != "avatarType" && k != "avatar" && k != "avatarId"{
+			for k, v := range u.Ctx.Request.Form {
+				if k != "avatarType" && k != "avatar" && k != "avatarId" {
 					parames[k] = v[0]
 				}
 			}
-			if len(avatarSysName) > 0{
+			if len(avatarSysName) > 0 {
 				parames["avatarSysName"] = avatarSysName
 			}
-			if (avatarExists == 1 && len(parames) > 0) || (avatarExists != 1){
-//				parames["mobilePhoneNumber"] = mobilePhoneNumber
+			if (avatarExists == 1 && len(parames) > 0) || (avatarExists != 1) {
+				//				parames["mobilePhoneNumber"] = mobilePhoneNumber
 				parames["uid"] = u.getUidByPhone(mobilePhoneNumber)
 				datas["responseNo"] = userObj.ModifyUserInfo(parames)
-			}else{
+			} else {
 				datas["responseNo"] = 0
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 用户登出
@@ -541,14 +541,14 @@ func (u *UserController) UserLogout() {
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
-		if userObj.UserLoginout(u.getUidByPhone(mobilePhoneNumber),pkg) == true{
+		if userObj.UserLoginout(u.getUidByPhone(mobilePhoneNumber), pkg) == true {
 			datas["responseNo"] = 0
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 修改用户的班级
@@ -576,12 +576,11 @@ func (u *UserController) ModifyUserClass() {
 	datas["responseNo"] = u.checkSign(u)
 	//检查参数
 	if datas["responseNo"] == 0 {
-		datas["responseNo"] = userObj.UserChangeClass(u.getUidByPhone(mobilePhoneNumber),helper.StrToInt(classId))
+		datas["responseNo"] = userObj.UserChangeClass(u.getUidByPhone(mobilePhoneNumber), helper.StrToInt(classId))
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
-
 
 // @Title 上传用户头像
 // @Description 上传用户头像(token: 登录时获取) (上传的头像name为"avatar")
@@ -597,22 +596,22 @@ func (u *UserController) UploadAvatar() {
 	u.logRequest()
 	//ini return
 	datas := map[string]interface{}{"responseNo": -1}
-	
+
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	mobilePhoneNumber := u.Ctx.Input.Param(":mobilePhoneNumber")
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	if datas["responseNo"] == 0 {
-		datas["responseNo"] = u.uploadAvatar(u,mobilePhoneNumber)
+		datas["responseNo"] = u.uploadAvatar(u, mobilePhoneNumber)
 	}
-	
+
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // 上传用户头像
-func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber string) int{
+func (u0 *UserController) uploadAvatar(u *UserController, mobilePhoneNumber string) int {
 	result := -1
 
 	otherconf, _ := config.NewConfig("ini", "conf/other.conf")
@@ -620,50 +619,50 @@ func (u0 *UserController) uploadAvatar(u *UserController,mobilePhoneNumber strin
 	allowType := otherconf.String("uploadAvatarType")
 	savePath := otherconf.String("uploadAvatarSavePath")
 
-	file,header,err := u.GetFile(filename)
+	file, header, err := u.GetFile(filename)
 	if err == nil {
 		//文件类型
 		contentType := header.Header.Get("Content-Type")
-		typeList := strings.Split(allowType,",")
-		valid := helper.StringInArray(contentType,typeList)
+		typeList := strings.Split(allowType, ",")
+		valid := helper.StringInArray(contentType, typeList)
 		if valid {
-			contentType = strings.Replace(contentType,"image/","",-1)
+			contentType = strings.Replace(contentType, "image/", "", -1)
 			//文件大小
 			if fileSizer, ok := file.(Sizer); ok {
 				fileSize := fileSizer.Size()
-				if fileSize <= 2*1024*1024{
+				if fileSize <= 2*1024*1024 {
 					valid = true
-				}else{
+				} else {
 					valid = false
 					result = -21
 				}
 			}
-		}else{
+		} else {
 			valid = false
 			result = -22
 		}
 
 		//存储头像
-		if valid{
+		if valid {
 			//文件存储
-			saveFileName := "1_"+mobilePhoneNumber+"_"+helper.GetGuid()+"."+contentType
-			saveFilePath := savePath+helper.Md5(saveFileName)[0:2]
-			if !helper.Exist(saveFilePath){
-				os.Mkdir(saveFilePath,0764)
-				os.Create(saveFilePath+"/index.html")
+			saveFileName := "1_" + mobilePhoneNumber + "_" + helper.GetGuid() + "." + contentType
+			saveFilePath := savePath + helper.Md5(saveFileName)[0:2]
+			if !helper.Exist(saveFilePath) {
+				os.Mkdir(saveFilePath, 0764)
+				os.Create(saveFilePath + "/index.html")
 			}
-			err := u.SaveToFile(filename,saveFilePath+"/"+saveFileName)
-			if err == nil{
+			err := u.SaveToFile(filename, saveFilePath+"/"+saveFileName)
+			if err == nil {
 				//数据库记录
 				//model ini
 				var userObj *models.MConsumer
-				if userObj.UserAvatarNameModify(u.getUidByPhone(mobilePhoneNumber),saveFileName){
+				if userObj.UserAvatarNameModify(u.getUidByPhone(mobilePhoneNumber), saveFileName) {
 					result = 0
 				}
 			}
 		}
 	}
-	
+
 	return result
 }
 
@@ -681,14 +680,14 @@ func (u *UserController) GetSystemAvatarList() {
 	var userObj *models.MConsumer
 
 	tmp := userObj.GetAvatarUrlList()
-	if len(tmp) <= 0{
+	if len(tmp) <= 0 {
 		datas["responseNo"] = -17
-	}else{
+	} else {
 		datas["avatarList"] = tmp
 	}
-	
+
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 // @Title 修改用户手机号码
@@ -720,28 +719,28 @@ func (u *UserController) ModifyPhone() {
 	//check sign
 	datas["responseNo"] = u.checkSign(u)
 	//确定旧的手机号码是否是自己的
-	if pnum != mobilePhoneNumber{
+	if pnum != mobilePhoneNumber {
 		datas["responseNo"] = -1
 	}
 	//检查参数
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && helper.CheckMPhoneValid(newPhone) {
 		datas["responseNo"] = -1
-		if smsObj.CheckMsmActionvalid(newPhone,pkg,num) == true{
-			datas["responseNo"] = userObj.ModifyUserPhoneByPhone(mobilePhoneNumber,newPhone)
-			if datas["responseNo"] == 0{
+		if smsObj.CheckMsmActionvalid(newPhone, pkg, num) == true {
+			datas["responseNo"] = userObj.ModifyUserPhoneByPhone(mobilePhoneNumber, newPhone)
+			if datas["responseNo"] == 0 {
 				//删除旧的手机号码的token
 				var signObj *models.MSign
 				signObj.DeleteAllPkgToken(mobilePhoneNumber)
-				token,tokenExpireDatetime := userObj.GetTokenByPhone(newPhone,pkg)
+				token, tokenExpireDatetime := userObj.GetTokenByPhone(newPhone, pkg)
 				datas["token"] = token
 				datas["tokenExpireDatetime"] = tokenExpireDatetime
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -10
 	}
 	//return
-	u.jsonEcho(datas,u)
+	u.jsonEcho(datas, u)
 }
 
 //记录请求

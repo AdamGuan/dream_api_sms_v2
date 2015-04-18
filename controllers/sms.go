@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //短信(每个用户短信发送限制为1分钟的一次)
@@ -38,13 +38,13 @@ func (u *SmsController) Smsvalid() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) && len(num) > 0 {
 		datas["responseNo"] = -1
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
-		if len(pkgConfig) > 0{
-			res := smsObj.ValidMsm(pkg,num,mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"])
-			if len(res) == 0{
+		if len(pkgConfig) > 0 {
+			res := smsObj.ValidMsm(pkg, num, mobilePhoneNumber, pkgConfig["F_app_id"], pkgConfig["F_app_key"])
+			if len(res) == 0 {
 				datas["responseNo"] = 0
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 	//return
@@ -78,25 +78,25 @@ func (u *SmsController) RegisterGetSms() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
 		res2 := userObj.CheckPhoneValid(mobilePhoneNumber)
-		if res2 == 0{
+		if res2 == 0 {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
-			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg){
-				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
-				if len(res) == 0{
+			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber, pkg) {
+				smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				res := smsObj.GetMsm(mobilePhoneNumber, pkgConfig["F_app_id"], pkgConfig["F_app_key"], pkgConfig["F_app_name"], pkgConfig["F_app_msm_template"], pkg)
+				if len(res) == 0 {
 					datas["responseNo"] = 0
-					smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				}else{
-					smsObj.DeleteMsmRate(mobilePhoneNumber,pkg)
+					smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				} else {
+					smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 				}
 			}
-		}else{
-			if res2 == -23{
+		} else {
+			if res2 == -23 {
 				res2 = -2
 			}
 			datas["responseNo"] = res2
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -1
 	}
 
@@ -133,20 +133,20 @@ func (u *SmsController) ResetPwdGetSms() {
 		res := userObj.CheckPhoneExists(mobilePhoneNumber)
 		if res {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
-			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
-				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
-				if len(res) == 0{
+			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber, pkg) {
+				smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				res := smsObj.GetMsm(mobilePhoneNumber, pkgConfig["F_app_id"], pkgConfig["F_app_key"], pkgConfig["F_app_name"], pkgConfig["F_app_msm_template"], pkg)
+				if len(res) == 0 {
 					datas["responseNo"] = 0
-					smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				}else{
-					smsObj.DeleteMsmRate(mobilePhoneNumber,pkg)
+					smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				} else {
+					smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -4
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -4
 	}
 
@@ -183,20 +183,20 @@ func (u *SmsController) FindPwdGetSms() {
 		res := userObj.CheckPhoneExists(mobilePhoneNumber)
 		if res {
 			pkgConfig := pkgObj.GetPkgConfig(pkg)
-			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
-				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
-				if len(res) == 0{
+			if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber, pkg) {
+				smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				res := smsObj.GetMsm(mobilePhoneNumber, pkgConfig["F_app_id"], pkgConfig["F_app_key"], pkgConfig["F_app_name"], pkgConfig["F_app_msm_template"], pkg)
+				if len(res) == 0 {
 					datas["responseNo"] = 0
-					smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-				}else{
-					smsObj.DeleteMsmRate(mobilePhoneNumber,pkg)
+					smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				} else {
+					smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -4
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -4
 	}
 
@@ -231,13 +231,13 @@ func (u *SmsController) ChangePhoneSms() {
 	//check sign
 	datas["responseNo"] = u.checkSign3()
 	//确定旧的手机号码是否是自己的
-	if pnum != mobilePhoneNumber{
+	if pnum != mobilePhoneNumber {
 		datas["responseNo"] = -1
 	}
 	//检查新手机号码是否已被使用
-	if datas["responseNo"] == 0{
+	if datas["responseNo"] == 0 {
 		var userObj *models.MConsumer
-		if userObj.CheckPhoneExists(newPhone){
+		if userObj.CheckPhoneExists(newPhone) {
 			datas["responseNo"] = -23
 		}
 	}
@@ -245,17 +245,17 @@ func (u *SmsController) ChangePhoneSms() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(newPhone) {
 		datas["responseNo"] = -1
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
-		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone,pkg) {
-			smsObj.AddMsmRate(newPhone,pkg)
-			res := smsObj.GetMsm(newPhone,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
-			if len(res) == 0{
+		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(newPhone, pkg) {
+			smsObj.AddMsmRate(newPhone, pkg)
+			res := smsObj.GetMsm(newPhone, pkgConfig["F_app_id"], pkgConfig["F_app_key"], pkgConfig["F_app_name"], pkgConfig["F_app_msm_template"], pkg)
+			if len(res) == 0 {
 				datas["responseNo"] = 0
-				smsObj.AddMsmRate(newPhone,pkg)
-			}else{
-				smsObj.DeleteMsmRate(newPhone,pkg)
+				smsObj.AddMsmRate(newPhone, pkg)
+			} else {
+				smsObj.DeleteMsmRate(newPhone, pkg)
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -10
 	}
 
@@ -287,9 +287,9 @@ func (u *SmsController) ChangePhoneSms2() {
 	//check sign
 	datas["responseNo"] = u.checkSign()
 	//检查新手机号码是否已被使用
-	if datas["responseNo"] == 0{
+	if datas["responseNo"] == 0 {
 		var userObj *models.MConsumer
-		if userObj.CheckPhoneExists(mobilePhoneNumber){
+		if userObj.CheckPhoneExists(mobilePhoneNumber) {
 			datas["responseNo"] = -23
 		}
 	}
@@ -297,17 +297,17 @@ func (u *SmsController) ChangePhoneSms2() {
 	if datas["responseNo"] == 0 && helper.CheckMPhoneValid(mobilePhoneNumber) {
 		datas["responseNo"] = -1
 		pkgConfig := pkgObj.GetPkgConfig(pkg)
-		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber,pkg) {
-			smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-			res := smsObj.GetMsm(mobilePhoneNumber,pkgConfig["F_app_id"],pkgConfig["F_app_key"],pkgConfig["F_app_name"],pkgConfig["F_app_msm_template"],pkg)
-			if len(res) == 0{
+		if len(pkgConfig) > 0 && smsObj.CheckMsmRateValid(mobilePhoneNumber, pkg) {
+			smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+			res := smsObj.GetMsm(mobilePhoneNumber, pkgConfig["F_app_id"], pkgConfig["F_app_key"], pkgConfig["F_app_name"], pkgConfig["F_app_msm_template"], pkg)
+			if len(res) == 0 {
 				datas["responseNo"] = 0
-				smsObj.AddMsmRate(mobilePhoneNumber,pkg)
-			}else{
-				smsObj.DeleteMsmRate(mobilePhoneNumber,pkg)
+				smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+			} else {
+				smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 			}
 		}
-	}else if datas["responseNo"] == 0{
+	} else if datas["responseNo"] == 0 {
 		datas["responseNo"] = -10
 	}
 

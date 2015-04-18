@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //微信(第三方)
@@ -42,14 +42,14 @@ func (u *WeixinController) LoginWeixin() {
 		datas["responseNo"] = -1
 		//检查微信信息的有效性
 		if len(access_token) > 0 && len(openid) > 0 {
-			res,_ := helper.CurlQq("https://api.weixin.qq.com/sns/auth?access_token="+access_token+"&openid="+openid,"GET")
-			resErrcode,ok := res["errcode"]
-			if ok{
+			res, _ := helper.CurlQq("https://api.weixin.qq.com/sns/auth?access_token="+access_token+"&openid="+openid, "GET")
+			resErrcode, ok := res["errcode"]
+			if ok {
 				resErrcode2 := resErrcode.(float64)
 				if int(resErrcode2) == 0 {
 					//检查微信号码是否已存在
 					uid := userObj.GetUidByWeixin(openid)
-					if len(uid) <= 0{
+					if len(uid) <= 0 {
 						datas["responseNo"] = 0
 						//写入一条微信数据
 						paramesData := make(map[string]string)
@@ -57,11 +57,11 @@ func (u *WeixinController) LoginWeixin() {
 						if len(gender) > 0 {
 							if gender != "男" && gender != "女" {
 								datas["responseNo"] = -10
-							}else{
+							} else {
 								gender2 := "1"
 								if gender == "男" {
 									gender2 = "1"
-								}else{
+								} else {
 									gender2 = "2"
 								}
 								paramesData["gender"] = gender2
@@ -71,22 +71,22 @@ func (u *WeixinController) LoginWeixin() {
 							paramesData["nickname"] = nickname
 						}
 						if datas["responseNo"] == 0 {
-							uid = userObj.InsertWeixin(paramesData,pkg)
+							uid = userObj.InsertWeixin(paramesData, pkg)
 						}
 					}
-					if len(uid) > 0{
+					if len(uid) > 0 {
 						//返回登录信息
-						info := u.login(uid,pkg)
-						if len(info) > 0{
+						info := u.login(uid, pkg)
+						if len(info) > 0 {
 							datas["responseNo"] = 0
-							for key,value := range info{
+							for key, value := range info {
 								datas[key] = value
 							}
 						}
 					}
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -10
 		}
 	}
@@ -95,20 +95,20 @@ func (u *WeixinController) LoginWeixin() {
 }
 
 //登录
-func (u *WeixinController) login(uid string,pkg string)map[string]interface{} {
+func (u *WeixinController) login(uid string, pkg string) map[string]interface{} {
 	userInfo := map[string]interface{}{}
 	//model ini
 	var userObj *models.MConsumer
 	//检查uid是否存在
-	if userObj.CheckUserIdExists(uid){
+	if userObj.CheckUserIdExists(uid) {
 		//获取token
-		token,tokenExpireDatetime := userObj.GetTokenByUid(uid,pkg)
+		token, tokenExpireDatetime := userObj.GetTokenByUid(uid, pkg)
 		//获取其它信息
-		if len(token) > 0{
+		if len(token) > 0 {
 			userInfo["token"] = token
 			userInfo["tokenExpireDatetime"] = tokenExpireDatetime
 			info := userObj.GetUserInfoByUid(uid)
-			if len(info.F_uid) > 0{
+			if len(info.F_uid) > 0 {
 				userInfo["F_uid"] = info.F_uid
 				userInfo["F_phone_number"] = info.F_phone_number
 				userInfo["F_gender"] = info.F_gender

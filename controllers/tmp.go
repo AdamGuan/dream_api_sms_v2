@@ -1,18 +1,17 @@
 package controllers
 
 import (
+	"dream_api_sms_v2/helper"
 	"dream_api_sms_v2/models"
 	"github.com/astaxie/beego"
-	"dream_api_sms_v2/helper"
-	"github.com/astaxie/beego/config" 
-//	"fmt"
+	"github.com/astaxie/beego/config"
+	//	"fmt"
 )
 
 //临时工具
 type TmpController struct {
 	BaseController
 }
-
 
 /*
 // @Title 清空全部用户数据(临时用)
@@ -62,9 +61,9 @@ func (u *TmpController) DeleteUser() {
 	wakaka := helper.StrToInt(u.Ctx.Request.FormValue("wakaka"))
 
 	appConf, err := config.NewConfig("ini", "conf/app.conf")
-	if err == nil{
-		cwakaka,err := appConf.Int(beego.RunMode+"::wakaka")
-		if err == nil && cwakaka == wakaka{
+	if err == nil {
+		cwakaka, err := appConf.Int(beego.RunMode + "::wakaka")
+		if err == nil && cwakaka == wakaka {
 			//
 			mobilePhoneNumber := u.Ctx.Request.FormValue("mobilePhoneNumber")
 			//model ini
@@ -75,7 +74,7 @@ func (u *TmpController) DeleteUser() {
 			tmpObj.DeleteUser(uid)
 		}
 	}
-	
+
 	//return
 	u.jsonEcho(datas)
 }
@@ -89,13 +88,13 @@ func (u *TmpController) DeleteUser() {
 // @Failure 401 无权访问
 // @router /ttt [get]
 	func (u *TmpController) Test() {
-	
+
 	//ini return
 //	datas := map[string]interface{}{"responseNo": 0}
 
 	u.Ctx.Request.ParseForm()
 	phone := u.Ctx.Request.FormValue("phone")
-	
+
 
 	if phone == "abc"{
 		c := 10
@@ -104,10 +103,10 @@ func (u *TmpController) DeleteUser() {
 		a := 10/d
 		fmt.Println("a:",a)
 	}
-	
+
 //	fmt.Println(u.Ctx.Output.IsServerError())
 	//return
 //	u.jsonEcho(datas)
-	
+
 }
 */

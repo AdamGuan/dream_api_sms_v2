@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //地域
@@ -10,14 +10,14 @@ type AreaController struct {
 	BaseController
 }
 
-type areaInfoList map[string]struct{
-		F_area_id int
-		F_area_name string
+type areaInfoList map[string]struct {
+	F_area_id   int
+	F_area_name string
 }
 
-type areaInfoItem struct{
-		F_area_id int
-		F_area_name string
+type areaInfoItem struct {
+	F_area_id   int
+	F_area_name string
 }
 
 // @Title 获取所有省份
@@ -88,18 +88,18 @@ func (u *AreaController) GetProvinceName() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	ids := u.Ctx.Input.Param(":ids")
-	if len(ids) > 0{
-		idList := helper.Split(ids,",")
-		tmp := make(areaInfoList,len(idList))
-		for _,id := range idList{
-			name,ok := models.Province[id]
-			if ok{
-				tmp[id] = areaInfoItem{F_area_id:helper.StrToInt(id),F_area_name:name}
+	if len(ids) > 0 {
+		idList := helper.Split(ids, ",")
+		tmp := make(areaInfoList, len(idList))
+		for _, id := range idList {
+			name, ok := models.Province[id]
+			if ok {
+				tmp[id] = areaInfoItem{F_area_id: helper.StrToInt(id), F_area_name: name}
 			}
 		}
-		if len(tmp) > 0{
+		if len(tmp) > 0 {
 			datas["areaInfoList"] = tmp
-		}else{
+		} else {
 			datas["responseNo"] = -17
 		}
 	}
@@ -119,18 +119,18 @@ func (u *AreaController) GetCityName() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	ids := u.Ctx.Input.Param(":ids")
-	if len(ids) > 0{
-		idList := helper.Split(ids,",")
-		tmp := make(areaInfoList,len(idList))
-		for _,id := range idList{
-			name,ok := models.City[id]
-			if ok{
-				tmp[id] = areaInfoItem{F_area_id:helper.StrToInt(id),F_area_name:name}
+	if len(ids) > 0 {
+		idList := helper.Split(ids, ",")
+		tmp := make(areaInfoList, len(idList))
+		for _, id := range idList {
+			name, ok := models.City[id]
+			if ok {
+				tmp[id] = areaInfoItem{F_area_id: helper.StrToInt(id), F_area_name: name}
 			}
 		}
-		if len(tmp) > 0{
+		if len(tmp) > 0 {
 			datas["areaInfoList"] = tmp
-		}else{
+		} else {
 			datas["responseNo"] = -17
 		}
 	}
@@ -150,18 +150,18 @@ func (u *AreaController) GetCountyName() {
 	//parse request parames
 	u.Ctx.Request.ParseForm()
 	ids := u.Ctx.Input.Param(":ids")
-	if len(ids) > 0{
-		idList := helper.Split(ids,",")
-		tmp := make(areaInfoList,len(idList))
-		for _,id := range idList{
-			name,ok := models.County[id]
-			if ok{
-				tmp[id] = areaInfoItem{F_area_id:helper.StrToInt(id),F_area_name:name}
+	if len(ids) > 0 {
+		idList := helper.Split(ids, ",")
+		tmp := make(areaInfoList, len(idList))
+		for _, id := range idList {
+			name, ok := models.County[id]
+			if ok {
+				tmp[id] = areaInfoItem{F_area_id: helper.StrToInt(id), F_area_name: name}
 			}
 		}
-		if len(tmp) > 0{
+		if len(tmp) > 0 {
 			datas["areaInfoList"] = tmp
-		}else{
+		} else {
 			datas["responseNo"] = -17
 		}
 	}

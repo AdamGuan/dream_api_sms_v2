@@ -32,8 +32,8 @@ func (u *TokenController) CheckToken() {
 	//检查参数
 	var userObj *models.MConsumer
 	uid := userObj.GetUidByPhone(mobilePhoneNumber)
-	result := signObj.CheckToken(uid,pkg,token)
-	if !result{
+	result := signObj.CheckToken(uid, pkg, token)
+	if !result {
 		datas["responseNo"] = -18
 	}
 	//return
@@ -61,8 +61,8 @@ func (u *TokenController) CheckTokenByUid() {
 	uid := u.Ctx.Request.FormValue("uid")
 	pkg := u.Ctx.Request.Header.Get("pkg")
 	//检查参数
-	result := signObj.CheckToken(uid,pkg,token)
-	if !result{
+	result := signObj.CheckToken(uid, pkg, token)
+	if !result {
 		datas["responseNo"] = -18
 	}
 	//return

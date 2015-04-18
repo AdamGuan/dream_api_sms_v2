@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //班级
@@ -41,7 +41,7 @@ func (u *ClassController) AddAClass() {
 		var userObj *models.MConsumer
 		uid := userObj.GetUidByPhone(mobilePhoneNumber)
 
-		datas["responseNo"],datas["F_class_id"] = classObj.CreateAClass(uid,className,helper.StrToInt(schoolId),helper.StrToInt(gradeId))
+		datas["responseNo"], datas["F_class_id"] = classObj.CreateAClass(uid, className, helper.StrToInt(schoolId), helper.StrToInt(gradeId))
 	}
 	//return
 	u.jsonEcho(datas)
@@ -73,10 +73,10 @@ func (u *ClassController) GetAllClasses() {
 	//check sign
 	datas["responseNo"] = u.checkSign3()
 	if datas["responseNo"] == 0 {
-		tmp := classObj.GetSchoolClassInfo(helper.StrToInt(schoolId),helper.StrToInt(gradeId))
-		if len(tmp) > 0{
+		tmp := classObj.GetSchoolClassInfo(helper.StrToInt(schoolId), helper.StrToInt(gradeId))
+		if len(tmp) > 0 {
 			datas["classList"] = tmp
-		}else{
+		} else {
 			datas["responseNo"] = -17
 		}
 	}

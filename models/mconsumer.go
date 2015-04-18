@@ -1,14 +1,14 @@
 package models
 
 import (
-	"github.com/astaxie/beego/orm"
-	_ "github.com/go-sql-driver/mysql"
+	"crypto/md5"
 	"dream_api_sms_v2/helper"
 	"fmt"
-	"crypto/md5"
-	"strings"
-	"github.com/astaxie/beego/config" 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/config"
+	"github.com/astaxie/beego/orm"
+	_ "github.com/go-sql-driver/mysql"
+	"strings"
 )
 
 func init() {
@@ -18,46 +18,46 @@ type MConsumer struct {
 }
 
 type userInfoa struct {
-	F_uid string
-	F_phone_number string
-	F_gender string
-	F_gender_id int
-	F_grade string
-	F_grade_id int
-	F_birthday string
-	F_school string
-	F_school_id int
-	F_province string
-	F_province_id int
-	F_city string
-	F_city_id int
-	F_county string
-	F_county_id int
-	F_user_realname string
-	F_user_nickname string
-	F_crate_datetime string
+	F_uid             string
+	F_phone_number    string
+	F_gender          string
+	F_gender_id       int
+	F_grade           string
+	F_grade_id        int
+	F_birthday        string
+	F_school          string
+	F_school_id       int
+	F_province        string
+	F_province_id     int
+	F_city            string
+	F_city_id         int
+	F_county          string
+	F_county_id       int
+	F_user_realname   string
+	F_user_nickname   string
+	F_crate_datetime  string
 	F_modify_datetime string
-	F_class_id int
-	F_class_name string
-	F_avatar_url string
-	F_user_email string
-	F_coin int
+	F_class_id        int
+	F_class_name      string
+	F_avatar_url      string
+	F_user_email      string
+	F_coin            int
 }
 
 type userInfob struct {
-	F_uid string
+	F_uid           string
 	F_user_realname string
 	F_user_nickname string
-	F_avatar_url string
+	F_avatar_url    string
 }
 
-type avatarSysInfoLista []struct{
+type avatarSysInfoLista []struct {
 	F_avatar_url string
-	F_avatar_id int
+	F_avatar_id  int
 }
 
 //根据手机号码获取uid
-func (u *MConsumer) GetUidByPhone(phone string)string{
+func (u *MConsumer) GetUidByPhone(phone string) string {
 	uid := ""
 	o := orm.NewOrm()
 	var maps []orm.Params
@@ -69,7 +69,7 @@ func (u *MConsumer) GetUidByPhone(phone string)string{
 }
 
 //根据email获取uid
-func (u *MConsumer) GetUidByEmail(email string)string{
+func (u *MConsumer) GetUidByEmail(email string) string {
 	uid := ""
 	o := orm.NewOrm()
 	var maps []orm.Params
@@ -81,7 +81,7 @@ func (u *MConsumer) GetUidByEmail(email string)string{
 }
 
 //检查手机号码是否可用
-func (u *MConsumer) CheckPhoneValid(phone string)int{
+func (u *MConsumer) CheckPhoneValid(phone string) int {
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_phone=? LIMIT 1", phone).Values(&maps)
@@ -93,7 +93,7 @@ func (u *MConsumer) CheckPhoneValid(phone string)int{
 }
 
 //检查email是否可做新用户使用
-func (u *MConsumer) CheckEmailValid(email string)bool{
+func (u *MConsumer) CheckEmailValid(email string) bool {
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? LIMIT 1", email).Values(&maps)
@@ -104,7 +104,7 @@ func (u *MConsumer) CheckEmailValid(email string)bool{
 }
 
 //检查用户ID是否可用
-func (u *MConsumer) checkUserIdValid(uid string)bool{
+func (u *MConsumer) checkUserIdValid(uid string) bool {
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? LIMIT 1", uid).Values(&maps)
@@ -115,11 +115,11 @@ func (u *MConsumer) checkUserIdValid(uid string)bool{
 }
 
 //创建一个可用的用户ID
-func (u *MConsumer) CreateUid()string{
+func (u *MConsumer) CreateUid() string {
 	uid := ""
-	for{
+	for {
 		uid = helper.GetGuid()
-		if u.checkUserIdValid(uid){
+		if u.checkUserIdValid(uid) {
 			break
 		}
 	}
@@ -127,15 +127,15 @@ func (u *MConsumer) CreateUid()string{
 }
 
 //检查手机号码是否存在
-func (u *MConsumer) CheckPhoneExists(phone string)bool{
-	if u.CheckPhoneValid(phone) != 0{
+func (u *MConsumer) CheckPhoneExists(phone string) bool {
+	if u.CheckPhoneValid(phone) != 0 {
 		return true
 	}
 	return false
 }
 
 //检查email是否存在
-func (u *MConsumer) CheckEmailExists(email string)bool{
+func (u *MConsumer) CheckEmailExists(email string) bool {
 	if !u.CheckEmailValid(email) {
 		return true
 	}
@@ -143,24 +143,24 @@ func (u *MConsumer) CheckEmailExists(email string)bool{
 }
 
 //检查uid是否存在
-func (u *MConsumer) CheckUserIdExists(uid string)bool{
-	if !u.checkUserIdValid(uid){
+func (u *MConsumer) CheckUserIdExists(uid string) bool {
+	if !u.checkUserIdValid(uid) {
 		return true
 	}
 	return false
 }
 
 //检查手机号码与密码是否正确
-func (u *MConsumer) CheckPhoneAndPwd(phone string,userPwd string)bool{
-	if len(phone) <= 0 || len(userPwd) <= 0{
+func (u *MConsumer) CheckPhoneAndPwd(phone string, userPwd string) bool {
+	if len(phone) <= 0 || len(userPwd) <= 0 {
 		return false
 	}
-	if len(userPwd) != 40{
+	if len(userPwd) != 40 {
 		userPwd = helper.Sha1(userPwd)
 	}
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_phone=? AND F_user_password_sha1 = ? LIMIT 1", phone,userPwd).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_phone=? AND F_user_password_sha1 = ? LIMIT 1", phone, userPwd).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -168,16 +168,16 @@ func (u *MConsumer) CheckPhoneAndPwd(phone string,userPwd string)bool{
 }
 
 //检查email与密码是否正确
-func (u *MConsumer) CheckEmailAndPwd(email string,userPwd string)bool{
-	if len(email) <= 0 || len(userPwd) <= 0{
+func (u *MConsumer) CheckEmailAndPwd(email string, userPwd string) bool {
+	if len(email) <= 0 || len(userPwd) <= 0 {
 		return false
 	}
-	if len(userPwd) != 40{
+	if len(userPwd) != 40 {
 		userPwd = helper.Sha1(userPwd)
 	}
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? AND F_user_password_sha1 = ? LIMIT 1", email,userPwd).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_email=? AND F_user_password_sha1 = ? LIMIT 1", email, userPwd).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -185,16 +185,16 @@ func (u *MConsumer) CheckEmailAndPwd(email string,userPwd string)bool{
 }
 
 //检查用户ID与密码是否正确
-func (u *MConsumer) CheckUserIdAndPwd(uid string,userPwd string)bool{
-	if len(uid) <= 0 || len(userPwd) <= 0{
+func (u *MConsumer) CheckUserIdAndPwd(uid string, userPwd string) bool {
+	if len(uid) <= 0 || len(userPwd) <= 0 {
 		return false
 	}
-	if len(userPwd) != 40{
+	if len(userPwd) != 40 {
 		userPwd = helper.Sha1(userPwd)
 	}
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_password_sha1 = ? LIMIT 1", uid,userPwd).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_password_sha1 = ? LIMIT 1", uid, userPwd).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -202,10 +202,10 @@ func (u *MConsumer) CheckUserIdAndPwd(uid string,userPwd string)bool{
 }
 
 //检查uid与email是否匹配
-func (u *MConsumer) CheckUidAndEmail(uid string,email string)bool{
+func (u *MConsumer) CheckUidAndEmail(uid string, email string) bool {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_email = ? LIMIT 1", uid,email).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_user WHERE F_user_name=? AND F_user_email = ? LIMIT 1", uid, email).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -213,176 +213,176 @@ func (u *MConsumer) CheckUidAndEmail(uid string,email string)bool{
 }
 
 //检查用户密码
-func (u *MConsumer) CheckUserPwdValid(userPwd string)int{
-	if helper.CheckPwdValid(userPwd){
+func (u *MConsumer) CheckUserPwdValid(userPwd string) int {
+	if helper.CheckPwdValid(userPwd) {
 		return 0
 	}
 	return -3
 }
 
 //添加用户(根据手机号码)
-func (u *MConsumer) AddUserByPhone(parames map[string]string,pkg string)(int,string){
+func (u *MConsumer) AddUserByPhone(parames map[string]string, pkg string) (int, string) {
 	result := -16
-	phone,ok := parames["mobilePhoneNumber"]
-	if ok{
+	phone, ok := parames["mobilePhoneNumber"]
+	if ok {
 		result = 0
-		if u.CheckPhoneValid(phone) != 0{
+		if u.CheckPhoneValid(phone) != 0 {
 			result = -2
 		}
 	}
-	if result == 0{
-		return u.addUser(parames,pkg)
+	if result == 0 {
+		return u.addUser(parames, pkg)
 	}
-	return result,""
+	return result, ""
 }
 
 //添加用户(根据email)
-func (u *MConsumer) AddUserByEmail(parames map[string]string,pkg string)(int,string){
+func (u *MConsumer) AddUserByEmail(parames map[string]string, pkg string) (int, string) {
 	result := -16
-	email,ok := parames["email"]
-	if ok{
+	email, ok := parames["email"]
+	if ok {
 		result = 0
 		if !u.CheckEmailValid(email) {
 			result = -2
 		}
 	}
-	if result == 0{
-		return u.addUser(parames,pkg)
+	if result == 0 {
+		return u.addUser(parames, pkg)
 	}
-	return result,""
+	return result, ""
 }
 
 //添加用户
-func (u *MConsumer) addUser(parames map[string]string,pkg string)(int,string){
+func (u *MConsumer) addUser(parames map[string]string, pkg string) (int, string) {
 	result := -10
 	uid := ""
 	//检查pwd
-	userPwd,ok := parames["pwd"]
-	if ok{
+	userPwd, ok := parames["pwd"]
+	if ok {
 		result = u.CheckUserPwdValid(userPwd)
-	}else{
+	} else {
 		result = -9
 	}
 	//foreach
-	if result == 0{
+	if result == 0 {
 		/**/
 		breakd := 0
 		now := helper.GetNowDateTime()
-		if len(userPwd) != 40{
+		if len(userPwd) != 40 {
 			userPwd = helper.Sha1(userPwd)
 		}
-		set := "F_user_password_sha1 = '"+userPwd+"',F_crate_datetime='"+now+"',F_modify_datetime='"+now+"',"
-		for filed,value := range parames{
+		set := "F_user_password_sha1 = '" + userPwd + "',F_crate_datetime='" + now + "',F_modify_datetime='" + now + "',"
+		for filed, value := range parames {
 			switch filed {
-				case "gender":
-					if value == "男" || value == "女"{
-						g := "2"
-						if value == "男" {
-							g = "1"
-						}
-						set += "F_gender="+g+","
-					}else{
-						breakd = 1
-						result = -10
+			case "gender":
+				if value == "男" || value == "女" {
+					g := "2"
+					if value == "男" {
+						g = "1"
 					}
-				case "grade":
-					tmp := 0
-					for id,v := range Grade{
-						if value == v{
-							set += "F_grade_id="+id+","
-							tmp = 1
-						}
-					}
-					if tmp == 0 {
-						breakd = 1
-						result = -10
-					}
-				case "birthday":
-					if len(value) > 0{
-						set += "F_birthday='"+value+"',"
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "school":
-					_,ok := School[value]
-					if ok{
-						set += "F_school_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "province":
-					_,ok := Province[value]
-					if ok{
-						set += "F_province_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "city":
-					_,ok := City[value]
-					if ok{
-						set += "F_city_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "county":
-					_,ok := County[value]
-					if ok{
-						set += "F_county_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "realname":
-					if helper.CheckRealNameValid(value){
-						set += "F_user_realname='"+value+"',"
-					}else{
-						breakd = 1
-						result = -24
-					}
-				case "nickname":
-					if helper.CheckNickNameValid(value){
-						set += "F_user_nickname='"+value+"',"
-					}else{
-						breakd = 1
-						result = -25
-					}
-				case "mobilePhoneNumber":
+					set += "F_gender=" + g + ","
+				} else {
+					breakd = 1
 					result = -10
-					phone,ok := parames["mobilePhoneNumber"]
-					if ok{
-						if u.CheckPhoneValid(phone) != 0{
-							result = -2
-						}else{
-							result = 0
-						}
+				}
+			case "grade":
+				tmp := 0
+				for id, v := range Grade {
+					if value == v {
+						set += "F_grade_id=" + id + ","
+						tmp = 1
 					}
-					if result == 0{
-						set += "F_user_phone='"+phone+"',"
-					}else{
-						breakd = 1
-					}
-				case "email":
+				}
+				if tmp == 0 {
+					breakd = 1
 					result = -10
-					email,ok := parames["email"]
-					if ok{
-						if !u.CheckEmailValid(email) {
-							result = -2
-						}else{
-							result = 0
-						}
+				}
+			case "birthday":
+				if len(value) > 0 {
+					set += "F_birthday='" + value + "',"
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "school":
+				_, ok := School[value]
+				if ok {
+					set += "F_school_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "province":
+				_, ok := Province[value]
+				if ok {
+					set += "F_province_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "city":
+				_, ok := City[value]
+				if ok {
+					set += "F_city_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "county":
+				_, ok := County[value]
+				if ok {
+					set += "F_county_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "realname":
+				if helper.CheckRealNameValid(value) {
+					set += "F_user_realname='" + value + "',"
+				} else {
+					breakd = 1
+					result = -24
+				}
+			case "nickname":
+				if helper.CheckNickNameValid(value) {
+					set += "F_user_nickname='" + value + "',"
+				} else {
+					breakd = 1
+					result = -25
+				}
+			case "mobilePhoneNumber":
+				result = -10
+				phone, ok := parames["mobilePhoneNumber"]
+				if ok {
+					if u.CheckPhoneValid(phone) != 0 {
+						result = -2
+					} else {
+						result = 0
 					}
-					if result == 0{
-						set += "F_user_email='"+email+"',"
-					}else{
-						breakd = 1
+				}
+				if result == 0 {
+					set += "F_user_phone='" + phone + "',"
+				} else {
+					breakd = 1
+				}
+			case "email":
+				result = -10
+				email, ok := parames["email"]
+				if ok {
+					if !u.CheckEmailValid(email) {
+						result = -2
+					} else {
+						result = 0
 					}
-				default:
+				}
+				if result == 0 {
+					set += "F_user_email='" + email + "',"
+				} else {
+					breakd = 1
+				}
+			default:
 			}
-			if breakd == 1{
+			if breakd == 1 {
 				break
 			}
 		}
@@ -391,55 +391,55 @@ func (u *MConsumer) addUser(parames map[string]string,pkg string)(int,string){
 		if result == 0 {
 			result = -1
 			set = strings.Trim(set, ",")
-			if len(set) > 0{
+			if len(set) > 0 {
 				uid = u.CreateUid()
-				set = "F_user_name='"+uid+"',"+set
+				set = "F_user_name='" + uid + "'," + set
 				o := orm.NewOrm()
-				res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+				res, err := o.Raw("INSERT INTO t_user SET " + set).Exec()
 				if err == nil {
 					num, _ := res.RowsAffected()
-					if num >0{
+					if num > 0 {
 						//写入金币数量
-						set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
-						res, err := o.Raw("INSERT INTO t_coin SET "+set).Exec()
-						if err == nil{
+						set := "F_user_name='" + uid + "',F_coin=" + helper.IntToString(u.GetRegisterCoin())
+						res, err := o.Raw("INSERT INTO t_coin SET " + set).Exec()
+						if err == nil {
 							num, _ := res.RowsAffected()
-							if num > 0{
+							if num > 0 {
 								result = 0
 							}
 						}
 						//注册用户记录
-						u.addRegiestLog(uid,pkg)
+						u.addRegiestLog(uid, pkg)
 					}
 				}
-				if result != 0{
-					o.Raw("DELETE FROM t_user WHERE F_user_name = '"+uid+"'").Exec()
-					o.Raw("DELETE FROM t_coin WHERE F_user_name = '"+uid+"'").Exec()
+				if result != 0 {
+					o.Raw("DELETE FROM t_user WHERE F_user_name = '" + uid + "'").Exec()
+					o.Raw("DELETE FROM t_coin WHERE F_user_name = '" + uid + "'").Exec()
 				}
 			}
 		}
 	}
-	if result != 0{
+	if result != 0 {
 		uid = ""
 	}
-	return result,uid
+	return result, uid
 }
 
 //修改用户密码
-func (u *MConsumer) ModifyUserPwdByUid(userId string,userPwd string)int{
+func (u *MConsumer) ModifyUserPwdByUid(userId string, userPwd string) int {
 	result := -1
 	res := u.CheckUserIdExists(userId)
 	if res {
 		result = u.CheckUserPwdValid(userPwd)
 	}
-	if result == 0{
+	if result == 0 {
 		result = -1
 		//写入数据库
-		if len(userPwd) != 40{
+		if len(userPwd) != 40 {
 			userPwd = helper.Sha1(userPwd)
 		}
 		o := orm.NewOrm()
-		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_name=?",userPwd,helper.GetNowDateTime(),userId).Exec()
+		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_name=?", userPwd, helper.GetNowDateTime(), userId).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -448,20 +448,20 @@ func (u *MConsumer) ModifyUserPwdByUid(userId string,userPwd string)int{
 }
 
 //修改用户密码(根据手机)
-func (u *MConsumer) ModifyUserPwdByPhone(phone string,userPwd string)int{
+func (u *MConsumer) ModifyUserPwdByPhone(phone string, userPwd string) int {
 	result := -1
 	res := u.CheckPhoneExists(phone)
 	if res {
 		result = u.CheckUserPwdValid(userPwd)
 	}
-	if result == 0{
+	if result == 0 {
 		result = -1
 		//写入数据库
-		if len(userPwd) != 40{
+		if len(userPwd) != 40 {
 			userPwd = helper.Sha1(userPwd)
 		}
 		o := orm.NewOrm()
-		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_phone=?",userPwd,helper.GetNowDateTime(),phone).Exec()
+		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_phone=?", userPwd, helper.GetNowDateTime(), phone).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -470,20 +470,20 @@ func (u *MConsumer) ModifyUserPwdByPhone(phone string,userPwd string)int{
 }
 
 //修改用户密码(根据email)
-func (u *MConsumer) ModifyUserPwdByEmail(email string,userPwd string)int{
+func (u *MConsumer) ModifyUserPwdByEmail(email string, userPwd string) int {
 	result := -1
 	res := u.CheckEmailExists(email)
 	if res {
 		result = u.CheckUserPwdValid(userPwd)
 	}
-	if result == 0{
+	if result == 0 {
 		result = -1
 		//写入数据库
-		if len(userPwd) != 40{
+		if len(userPwd) != 40 {
 			userPwd = helper.Sha1(userPwd)
 		}
 		o := orm.NewOrm()
-		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_email=?",userPwd,helper.GetNowDateTime(),email).Exec()
+		_, err := o.Raw("UPDATE t_user SET F_user_password_sha1=?,F_modify_datetime=? WHERE F_user_email=?", userPwd, helper.GetNowDateTime(), email).Exec()
 		if err == nil {
 			result = 0
 		}
@@ -492,47 +492,47 @@ func (u *MConsumer) ModifyUserPwdByEmail(email string,userPwd string)int{
 }
 
 //获取用户的密码
-func (u *MConsumer) GetUserPwdByUid(userId string)string{
+func (u *MConsumer) GetUserPwdByUid(userId string) string {
 	pwd := ""
 	return pwd
 }
 
 //获取用户的密码(根据手机号码)
-func (u *MConsumer) GetUserPwdByPhone(phone string)string{
+func (u *MConsumer) GetUserPwdByPhone(phone string) string {
 	pwd := ""
 	return pwd
 }
 
 //获取用户token,并写入数据库
-func (u *MConsumer) GetTokenByUid(userId string,pkg string)(token string,tokenExpireDatetime string){
-	if len(userId) > 0 && len(pkg) > 0{
+func (u *MConsumer) GetTokenByUid(userId string, pkg string) (token string, tokenExpireDatetime string) {
+	if len(userId) > 0 && len(pkg) > 0 {
 		//创建token
 		token := fmt.Sprintf("%x", md5.Sum([]byte(helper.CreatePwd(4))))
-		tokenExpireDatetime := helper.GetDateTimeAfterMinute(60*24*30)
+		tokenExpireDatetime := helper.GetDateTimeAfterMinute(60 * 24 * 30)
 		//写入数据库
 		o := orm.NewOrm()
-		res, err := o.Raw("REPLACE INTO t_token SET F_user_name = ?,F_pkg=?,F_token=?,F_expire_datetime=?", userId,pkg,token,tokenExpireDatetime).Exec()
+		res, err := o.Raw("REPLACE INTO t_token SET F_user_name = ?,F_pkg=?,F_token=?,F_expire_datetime=?", userId, pkg, token, tokenExpireDatetime).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
-			if num >0{
-				return token,tokenExpireDatetime
+			if num > 0 {
+				return token, tokenExpireDatetime
 			}
 		}
 	}
-	return "",""
+	return "", ""
 }
 
 //获取用户token,并写入数据库(根据手机号码)
-func (u *MConsumer) GetTokenByPhone(phone string,pkg string)(token string,tokenExpireDatetime string){
+func (u *MConsumer) GetTokenByPhone(phone string, pkg string) (token string, tokenExpireDatetime string) {
 	uid := u.GetUidByPhone(phone)
-	if len(uid) > 0{
-		return u.GetTokenByUid(uid,pkg)
+	if len(uid) > 0 {
+		return u.GetTokenByUid(uid, pkg)
 	}
-	return "",""
+	return "", ""
 }
 
 //获取用户的信息
-func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
+func (u *MConsumer) GetUserInfoByUid(userId string) userInfoa {
 	info := userInfoa{}
 	if len(userId) > 0 {
 		o := orm.NewOrm()
@@ -546,69 +546,69 @@ func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
 			gender := maps[0]["F_gender"].(string)
 			genderint := helper.StrToInt(gender)
 			info.F_gender = "男"
-			if genderint != 1{
+			if genderint != 1 {
 				info.F_gender = "女"
 			}
 			info.F_gender_id = genderint
 			//年级
 			info.F_grade = ""
-			if maps[0]["F_grade_id"] != nil{
-				tmp,ok := Grade[maps[0]["F_grade_id"].(string)]
-				if ok{
+			if maps[0]["F_grade_id"] != nil {
+				tmp, ok := Grade[maps[0]["F_grade_id"].(string)]
+				if ok {
 					info.F_grade = tmp
 					info.F_grade_id = helper.StrToInt(maps[0]["F_grade_id"].(string))
 				}
 			}
 			//生日
 			info.F_birthday = ""
-			if maps[0]["F_birthday"] != nil{
+			if maps[0]["F_birthday"] != nil {
 				info.F_birthday = maps[0]["F_birthday"].(string)
 			}
 			//学校
-			info.F_school,_ = School[maps[0]["F_school_id"].(string)]
+			info.F_school, _ = School[maps[0]["F_school_id"].(string)]
 			info.F_school_id = helper.StrToInt(maps[0]["F_school_id"].(string))
 			//省份
-			info.F_province,_ = Province[maps[0]["F_province_id"].(string)]
+			info.F_province, _ = Province[maps[0]["F_province_id"].(string)]
 			info.F_province_id = helper.StrToInt(maps[0]["F_province_id"].(string))
 			//城市
-			info.F_city,_ = City[maps[0]["F_city_id"].(string)]
+			info.F_city, _ = City[maps[0]["F_city_id"].(string)]
 			info.F_city_id = helper.StrToInt(maps[0]["F_city_id"].(string))
 			//县
-			info.F_county,_ = County[maps[0]["F_county_id"].(string)]
+			info.F_county, _ = County[maps[0]["F_county_id"].(string)]
 			info.F_county_id = helper.StrToInt(maps[0]["F_county_id"].(string))
 			//真实名
 			info.F_user_realname = ""
-			if maps[0]["F_user_realname"] != nil{
+			if maps[0]["F_user_realname"] != nil {
 				info.F_user_realname = maps[0]["F_user_realname"].(string)
 			}
 			//昵称
 			info.F_user_nickname = ""
-			if maps[0]["F_user_nickname"] != nil{
+			if maps[0]["F_user_nickname"] != nil {
 				info.F_user_nickname = maps[0]["F_user_nickname"].(string)
 			}
 			//创建时间
 			info.F_crate_datetime = ""
-			if maps[0]["F_crate_datetime"] != nil{
+			if maps[0]["F_crate_datetime"] != nil {
 				info.F_crate_datetime = maps[0]["F_crate_datetime"].(string)
 			}
 			//修改时间
 			info.F_modify_datetime = ""
-			if maps[0]["F_modify_datetime"] != nil{
+			if maps[0]["F_modify_datetime"] != nil {
 				info.F_modify_datetime = maps[0]["F_modify_datetime"].(string)
 			}
 			//班级
 			info.F_class_id = helper.StrToInt(maps[0]["F_class_id"].(string))
 			info.F_class_name = ""
 			var maps2 []orm.Params
-			num, err := o.Raw("SELECT F_class_name FROM t_class WHERE F_class_id = ? LIMIT 1",maps[0]["F_class_id"].(string)).Values(&maps2)
+			num, err := o.Raw("SELECT F_class_name FROM t_class WHERE F_class_id = ? LIMIT 1", maps[0]["F_class_id"].(string)).Values(&maps2)
 			if err == nil && num > 0 {
 				info.F_class_name = maps2[0]["F_class_name"].(string)
 			}
 			//头像
 			avatartmp := maps[0]["F_avatarname"].(string)
-			if len(avatartmp) > 0{
-				info.F_avatar_url = u.getUserAvatarUrl(avatartmp,helper.StrToInt(avatartmp[0:1]))
-			}else{
+			if len(avatartmp) > 0 {
+				info.F_avatar_url = u.getUserAvatarUrl(avatartmp, helper.StrToInt(avatartmp[0:1]))
+			} else {
 				info.F_avatar_url = ""
 			}
 			//金币
@@ -619,7 +619,7 @@ func (u *MConsumer) GetUserInfoByUid(userId string)userInfoa{
 }
 
 //获取其它用户的信息
-func (u *MConsumer) GetOtherUserInfoByUid(userId string)userInfob{
+func (u *MConsumer) GetOtherUserInfoByUid(userId string) userInfob {
 	info := userInfob{}
 	if len(userId) > 0 {
 		o := orm.NewOrm()
@@ -629,19 +629,19 @@ func (u *MConsumer) GetOtherUserInfoByUid(userId string)userInfob{
 			info.F_uid = userId
 			//真实名
 			info.F_user_realname = ""
-			if maps[0]["F_user_realname"] != nil{
+			if maps[0]["F_user_realname"] != nil {
 				info.F_user_realname = maps[0]["F_user_realname"].(string)
 			}
 			//昵称
 			info.F_user_nickname = ""
-			if maps[0]["F_user_nickname"] != nil{
+			if maps[0]["F_user_nickname"] != nil {
 				info.F_user_nickname = maps[0]["F_user_nickname"].(string)
 			}
 			//头像
 			avatartmp := maps[0]["F_avatarname"].(string)
-			if len(avatartmp) > 0{
-				info.F_avatar_url = u.getUserAvatarUrl(avatartmp,helper.StrToInt(avatartmp[0:1]))
-			}else{
+			if len(avatartmp) > 0 {
+				info.F_avatar_url = u.getUserAvatarUrl(avatartmp, helper.StrToInt(avatartmp[0:1]))
+			} else {
 				info.F_avatar_url = ""
 			}
 		}
@@ -650,124 +650,124 @@ func (u *MConsumer) GetOtherUserInfoByUid(userId string)userInfob{
 }
 
 //获取用户的信息(根据手机号码)
-func (u *MConsumer) GetUserInfoByPhone(phone string)userInfoa{
+func (u *MConsumer) GetUserInfoByPhone(phone string) userInfoa {
 	uid := u.GetUidByPhone(phone)
-	if len(uid) > 0{
+	if len(uid) > 0 {
 		return u.GetUserInfoByUid(uid)
 	}
 	return userInfoa{}
 }
 
 //修改用户的信息
-func (u *MConsumer) ModifyUserInfo(parames map[string]string)int{
+func (u *MConsumer) ModifyUserInfo(parames map[string]string) int {
 	result := -1
-	uid,ok := parames["uid"]
-	if ok{
+	uid, ok := parames["uid"]
+	if ok {
 		result = 0
 		breakd := 0
 		set := ""
-		for filed,value := range parames{
+		for filed, value := range parames {
 			switch filed {
-				case "gender":
-					if value == "男" || value == "女"{
-						g := "2"
-						if value == "男" {
-							g = "1"
-						}
-						set += "F_gender="+g+","
-					}else{
-						breakd = 1
-						result = -10
+			case "gender":
+				if value == "男" || value == "女" {
+					g := "2"
+					if value == "男" {
+						g = "1"
 					}
-				case "grade":
-					tmp := 0
-					for id,v := range Grade{
-						if value == v{
-							set += "F_grade_id="+id+","
-							tmp = 1
-						}
+					set += "F_gender=" + g + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "grade":
+				tmp := 0
+				for id, v := range Grade {
+					if value == v {
+						set += "F_grade_id=" + id + ","
+						tmp = 1
 					}
-					if tmp == 0 {
-						breakd = 1
-						result = -10
-					}
-				case "birthday":
-					if len(value) > 0{
-						set += "F_birthday='"+value+"',"
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "school":
-					_,ok := School[value]
-					if ok{
-						set += "F_school_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "province":
-					_,ok := Province[value]
-					if ok{
-						set += "F_province_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "city":
-					_,ok := City[value]
-					if ok{
-						set += "F_city_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "county":
-					_,ok := County[value]
-					if ok{
-						set += "F_county_id="+value+","
-					}else{
-						breakd = 1
-						result = -10
-					}
-				case "realname":
-					if helper.CheckRealNameValid(value){
-						set += "F_user_realname='"+value+"',"
-					}else{
-						breakd = 1
-						result = -24
-					}
-				case "nickname":
-					if helper.CheckNickNameValid(value){
-						set += "F_user_nickname='"+value+"',"
-					}else{
-						breakd = 1
-						result = -25
-					}
-				case "avatarSysName":
-					if len(value) > 0{
-						set += "F_avatarname='"+value+"',"
-					}else{
-						breakd = 1
-						result = -10
-					}
-				default:
+				}
+				if tmp == 0 {
+					breakd = 1
+					result = -10
+				}
+			case "birthday":
+				if len(value) > 0 {
+					set += "F_birthday='" + value + "',"
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "school":
+				_, ok := School[value]
+				if ok {
+					set += "F_school_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "province":
+				_, ok := Province[value]
+				if ok {
+					set += "F_province_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "city":
+				_, ok := City[value]
+				if ok {
+					set += "F_city_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "county":
+				_, ok := County[value]
+				if ok {
+					set += "F_county_id=" + value + ","
+				} else {
+					breakd = 1
+					result = -10
+				}
+			case "realname":
+				if helper.CheckRealNameValid(value) {
+					set += "F_user_realname='" + value + "',"
+				} else {
+					breakd = 1
+					result = -24
+				}
+			case "nickname":
+				if helper.CheckNickNameValid(value) {
+					set += "F_user_nickname='" + value + "',"
+				} else {
+					breakd = 1
+					result = -25
+				}
+			case "avatarSysName":
+				if len(value) > 0 {
+					set += "F_avatarname='" + value + "',"
+				} else {
+					breakd = 1
+					result = -10
+				}
+			default:
 			}
-			if breakd == 1{
+			if breakd == 1 {
 				break
 			}
 		}
 		//写入数据库
-		if result == 0{
+		if result == 0 {
 			result = -1
 			set = strings.Trim(set, ",")
-			if len(set) > 0{
-				set += ",F_modify_datetime='"+helper.GetNowDateTime()+"'"
+			if len(set) > 0 {
+				set += ",F_modify_datetime='" + helper.GetNowDateTime() + "'"
 				o := orm.NewOrm()
-				res, err := o.Raw("UPDATE t_user SET "+set+" WHERE F_user_name=?",uid).Exec()
+				res, err := o.Raw("UPDATE t_user SET "+set+" WHERE F_user_name=?", uid).Exec()
 				if err == nil {
 					num, _ := res.RowsAffected()
-					if num >0 {
+					if num > 0 {
 						result = 0
 					}
 				}
@@ -778,14 +778,14 @@ func (u *MConsumer) ModifyUserInfo(parames map[string]string)int{
 }
 
 //用户登出
-func (u *MConsumer) UserLoginout(userId string,pkg string)bool{
+func (u *MConsumer) UserLoginout(userId string, pkg string) bool {
 	result := false
 	//写入数据库
 	o := orm.NewOrm()
-	res, err := o.Raw("DELETE FROM t_token WHERE F_user_name=? AND F_pkg=?",userId,pkg).Exec()
+	res, err := o.Raw("DELETE FROM t_token WHERE F_user_name=? AND F_pkg=?", userId, pkg).Exec()
 	if err == nil {
 		num, _ := res.RowsAffected()
-		if num >0 {
+		if num > 0 {
 			result = true
 		}
 	}
@@ -793,22 +793,22 @@ func (u *MConsumer) UserLoginout(userId string,pkg string)bool{
 }
 
 //用户修改班级
-func (u *MConsumer) UserChangeClass(userId string,classId int)int{
+func (u *MConsumer) UserChangeClass(userId string, classId int) int {
 	result := -14
 	//查询班级是否存在
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT t_class.* FROM t_class,t_user WHERE t_class.F_class_id = ? AND t_class.F_class_id = t_user.F_class_id LIMIT 1",classId).Values(&maps)
+	num, err := o.Raw("SELECT t_class.* FROM t_class,t_user WHERE t_class.F_class_id = ? AND t_class.F_class_id = t_user.F_class_id LIMIT 1", classId).Values(&maps)
 	if err == nil && num > 0 {
 		result = -1
 		//修改用户的班级
 		F_school_id := maps[0]["t_class.F_school_id"]
 		F_grade_id := maps[0]["t_class.F_grade_id"]
 		now := helper.GetNowDateTime()
-		res, err := o.Raw("UPDATE t_user SET F_class_id = ?,F_school_id=?,F_grade_id=?,F_modify_datetime= ? WHERE F_user_name = ?",classId,F_school_id,F_grade_id,now,userId).Exec()
+		res, err := o.Raw("UPDATE t_user SET F_class_id = ?,F_school_id=?,F_grade_id=?,F_modify_datetime= ? WHERE F_user_name = ?", classId, F_school_id, F_grade_id, now, userId).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
-			if num >0 {
+			if num > 0 {
 				result = 0
 			}
 		}
@@ -818,14 +818,14 @@ func (u *MConsumer) UserChangeClass(userId string,classId int)int{
 }
 
 //用户头像修改
-func (u *MConsumer) UserAvatarNameModify(userId string,avatarName string)bool{
+func (u *MConsumer) UserAvatarNameModify(userId string, avatarName string) bool {
 	result := false
 	o := orm.NewOrm()
 	now := helper.GetNowDateTime()
-	res, err := o.Raw("UPDATE t_user SET F_avatarname = ?,F_modify_datetime= ? WHERE F_user_name = ?",avatarName,now,userId).Exec()
+	res, err := o.Raw("UPDATE t_user SET F_avatarname = ?,F_modify_datetime= ? WHERE F_user_name = ?", avatarName, now, userId).Exec()
 	if err == nil {
 		num, _ := res.RowsAffected()
-		if num >0 {
+		if num > 0 {
 			result = true
 		}
 	}
@@ -833,45 +833,45 @@ func (u *MConsumer) UserAvatarNameModify(userId string,avatarName string)bool{
 }
 
 //获取用户头像url
-func (u *MConsumer) getUserAvatarUrl(avatarName string,atype int)string{
+func (u *MConsumer) getUserAvatarUrl(avatarName string, atype int) string {
 	url := ""
 	//domain
 	appconf, _ := config.NewConfig("ini", "conf/app.conf")
-	doamin := appconf.String(beego.RunMode+"::domain")
+	doamin := appconf.String(beego.RunMode + "::domain")
 	//path
 	pre := "avatar/"
-	if atype == 2{
+	if atype == 2 {
 		pre = "avatar2/"
 		//build url
-		url = doamin+"/"+pre+avatarName
-	}else{
+		url = doamin + "/" + pre + avatarName
+	} else {
 		//build url
-		url = doamin+"/"+pre+helper.Md5(avatarName)[0:2]+"/"+avatarName
+		url = doamin + "/" + pre + helper.Md5(avatarName)[0:2] + "/" + avatarName
 	}
 	return url
 }
 
 //获取系统内置用户头像url列表
-func (u *MConsumer) GetAvatarUrlList()avatarSysInfoLista{
+func (u *MConsumer) GetAvatarUrlList() avatarSysInfoLista {
 	o := orm.NewOrm()
 	var maps []orm.Params
 	num, err := o.Raw("SELECT * FROM t_sys_avatar where 1").Values(&maps)
 	if err == nil && num > 0 {
-		urlList := make(avatarSysInfoLista,num)
-		for key,item := range maps{
-			urlList[key].F_avatar_url = u.getUserAvatarUrl(item["F_avatar_name"].(string),2)
+		urlList := make(avatarSysInfoLista, num)
+		for key, item := range maps {
+			urlList[key].F_avatar_url = u.getUserAvatarUrl(item["F_avatar_name"].(string), 2)
 			urlList[key].F_avatar_id = helper.StrToInt(item["F_id"].(string))
 		}
 		return urlList
 	}
-	return make(avatarSysInfoLista,0)
+	return make(avatarSysInfoLista, 0)
 }
 
 //根据系统头像ID获取头像名称
-func (u *MConsumer) GetAvatarNameFromId(id int)string{
+func (u *MConsumer) GetAvatarNameFromId(id int) string {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_avatar_name FROM t_sys_avatar where F_id=?",id).Values(&maps)
+	num, err := o.Raw("SELECT F_avatar_name FROM t_sys_avatar where F_id=?", id).Values(&maps)
 	if err == nil && num > 0 {
 		return maps[0]["F_avatar_name"].(string)
 	}
@@ -879,7 +879,7 @@ func (u *MConsumer) GetAvatarNameFromId(id int)string{
 }
 
 //修改用户手机号码
-func (u *MConsumer) ModifyUserPhoneByPhone(phone string,newPhone string)int{
+func (u *MConsumer) ModifyUserPhoneByPhone(phone string, newPhone string) int {
 	result := -1
 	res := u.CheckPhoneExists(phone)
 	if res {
@@ -887,7 +887,7 @@ func (u *MConsumer) ModifyUserPhoneByPhone(phone string,newPhone string)int{
 		if result == 0 {
 			//更新手机号码
 			o := orm.NewOrm()
-			_, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_phone=?",newPhone,helper.GetNowDateTime(),phone).Exec()
+			_, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_phone=?", newPhone, helper.GetNowDateTime(), phone).Exec()
 			if err == nil {
 				result = 0
 			}
@@ -897,16 +897,16 @@ func (u *MConsumer) ModifyUserPhoneByPhone(phone string,newPhone string)int{
 }
 
 //修改用户手机号码
-func (u *MConsumer) ModifyUserPhone(phone string,uid string)int{
+func (u *MConsumer) ModifyUserPhone(phone string, uid string) int {
 	result := -1
-	
+
 	result = u.CheckPhoneValid(phone)
 	if result == 0 {
 		o := orm.NewOrm()
-		res, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_name=?",phone,helper.GetNowDateTime(),uid).Exec()
+		res, err := o.Raw("UPDATE t_user SET F_user_phone=?,F_modify_datetime=? WHERE F_user_name=?", phone, helper.GetNowDateTime(), uid).Exec()
 		if err == nil {
 			num, err := res.RowsAffected()
-			if err == nil && num > 0{
+			if err == nil && num > 0 {
 				result = 0
 			}
 		}
@@ -915,30 +915,30 @@ func (u *MConsumer) ModifyUserPhone(phone string,uid string)int{
 }
 
 //修改email
-func (u *MConsumer) ModifyUserEmail(email string,uid string)int{
+func (u *MConsumer) ModifyUserEmail(email string, uid string) int {
 	result := -1
-	
+
 	res := u.CheckEmailValid(email)
-	if res{
+	if res {
 		o := orm.NewOrm()
-		res, err := o.Raw("UPDATE t_user SET F_user_email=?,F_modify_datetime=? WHERE F_user_name=?",email,helper.GetNowDateTime(),uid).Exec()
+		res, err := o.Raw("UPDATE t_user SET F_user_email=?,F_modify_datetime=? WHERE F_user_name=?", email, helper.GetNowDateTime(), uid).Exec()
 		if err == nil {
 			num, err := res.RowsAffected()
-			if err == nil && num > 0{
+			if err == nil && num > 0 {
 				result = 0
 			}
 		}
-	}else{
+	} else {
 		result = -26
 	}
 	return result
 }
 
 //根据微信号码返回UID
-func (u *MConsumer) GetUidByWeixin(qq string)string{
+func (u *MConsumer) GetUidByWeixin(qq string) string {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_auth_weixin where F_weixin_openid=? LIMIT 1",qq).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_weixin where F_weixin_openid=? LIMIT 1", qq).Values(&maps)
 	if err == nil && num > 0 {
 		return maps[0]["F_user_name"].(string)
 	}
@@ -946,48 +946,48 @@ func (u *MConsumer) GetUidByWeixin(qq string)string{
 }
 
 //insert 一条微信认证信息
-func (u *MConsumer) InsertWeixin(data map[string]string,pkg string)string{
+func (u *MConsumer) InsertWeixin(data map[string]string, pkg string) string {
 	qq := data["qq"]
-	uid := u.addUserWeixin(data,pkg)
-	if len(uid) > 0{
+	uid := u.addUserWeixin(data, pkg)
+	if len(uid) > 0 {
 		o := orm.NewOrm()
-		res, err := o.Raw("INSERT INTO t_auth_weixin SET F_user_name=?,F_weixin_openid=?",uid,qq).Exec()
+		res, err := o.Raw("INSERT INTO t_auth_weixin SET F_user_name=?,F_weixin_openid=?", uid, qq).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
-			if num >0{
+			if num > 0 {
 				return uid
 			}
-		}else{
-			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1",uid).Exec()
+		} else {
+			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1", uid).Exec()
 		}
 	}
 	return ""
 }
 
 //添加微信到t_user,并返回uid
-func (u *MConsumer) addUserWeixin(data map[string]string,pkg string)string{
+func (u *MConsumer) addUserWeixin(data map[string]string, pkg string) string {
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
-	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
-	set = "F_user_name='"+uid+"',"+set
-	gender,ok := data["gender"]
+	set := "F_crate_datetime='" + now + "',F_modify_datetime='" + now + "'"
+	set = "F_user_name='" + uid + "'," + set
+	gender, ok := data["gender"]
 	if ok {
-		set = "F_gender='"+gender+"',"+set
+		set = "F_gender='" + gender + "'," + set
 	}
-	nickName,ok := data["nickname"]
+	nickName, ok := data["nickname"]
 	if ok {
-		set = "F_user_nickname='"+nickName+"',"+set
+		set = "F_user_nickname='" + nickName + "'," + set
 	}
 	o := orm.NewOrm()
-	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+	res, err := o.Raw("INSERT INTO t_user SET " + set).Exec()
 	if err == nil {
 		num, _ := res.RowsAffected()
-		if num >0{
+		if num > 0 {
 			//写入金币数量
-			set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
-			o.Raw("INSERT INTO t_coin SET "+set).Exec()
+			set := "F_user_name='" + uid + "',F_coin=" + helper.IntToString(u.GetRegisterCoin())
+			o.Raw("INSERT INTO t_coin SET " + set).Exec()
 			//注册记录
-			u.addRegiestLog(uid,pkg)
+			u.addRegiestLog(uid, pkg)
 
 			return uid
 		}
@@ -997,10 +997,10 @@ func (u *MConsumer) addUserWeixin(data map[string]string,pkg string)string{
 }
 
 //根据QQ号码返回UID
-func (u *MConsumer) GetUidByQQ(qq string)string{
+func (u *MConsumer) GetUidByQQ(qq string) string {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_auth_qq where F_qq_openid=? LIMIT 1",qq).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_qq where F_qq_openid=? LIMIT 1", qq).Values(&maps)
 	if err == nil && num > 0 {
 		return maps[0]["F_user_name"].(string)
 	}
@@ -1008,48 +1008,48 @@ func (u *MConsumer) GetUidByQQ(qq string)string{
 }
 
 //insert 一条qq认证信息
-func (u *MConsumer) InsertQQ(data map[string]string,pkg string)string{
+func (u *MConsumer) InsertQQ(data map[string]string, pkg string) string {
 	qq := data["qq"]
-	uid := u.addUserQQ(data,pkg)
-	if len(uid) > 0{
+	uid := u.addUserQQ(data, pkg)
+	if len(uid) > 0 {
 		o := orm.NewOrm()
-		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_openid=?",uid,qq).Exec()
+		res, err := o.Raw("INSERT INTO t_auth_qq SET F_user_name=?,F_qq_openid=?", uid, qq).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
-			if num >0{
+			if num > 0 {
 				return uid
 			}
-		}else{
-			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1",uid).Exec()
+		} else {
+			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1", uid).Exec()
 		}
 	}
 	return ""
 }
 
 //添加qq到t_user,并返回uid
-func (u *MConsumer) addUserQQ(data map[string]string,pkg string)string{
+func (u *MConsumer) addUserQQ(data map[string]string, pkg string) string {
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
-	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
-	set = "F_user_name='"+uid+"',"+set
-	gender,ok := data["gender"]
+	set := "F_crate_datetime='" + now + "',F_modify_datetime='" + now + "'"
+	set = "F_user_name='" + uid + "'," + set
+	gender, ok := data["gender"]
 	if ok {
-		set = "F_gender='"+gender+"',"+set
+		set = "F_gender='" + gender + "'," + set
 	}
-	nickName,ok := data["nickname"]
+	nickName, ok := data["nickname"]
 	if ok {
-		set = "F_user_nickname='"+nickName+"',"+set
+		set = "F_user_nickname='" + nickName + "'," + set
 	}
 	o := orm.NewOrm()
-	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+	res, err := o.Raw("INSERT INTO t_user SET " + set).Exec()
 	if err == nil {
 		num, _ := res.RowsAffected()
-		if num >0{
+		if num > 0 {
 			//写入金币数量
-			set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
-			o.Raw("INSERT INTO t_coin SET "+set).Exec()
+			set := "F_user_name='" + uid + "',F_coin=" + helper.IntToString(u.GetRegisterCoin())
+			o.Raw("INSERT INTO t_coin SET " + set).Exec()
 			//注册记录
-			u.addRegiestLog(uid,pkg)
+			u.addRegiestLog(uid, pkg)
 
 			return uid
 		}
@@ -1059,10 +1059,10 @@ func (u *MConsumer) addUserQQ(data map[string]string,pkg string)string{
 }
 
 //根据新浪微博用户名返回UID
-func (u *MConsumer) GetUidByXinlangweibo(name string)string{
+func (u *MConsumer) GetUidByXinlangweibo(name string) string {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_user_name FROM t_auth_xinlangweibo where F_xinlangweibo_openid=? LIMIT 1",name).Values(&maps)
+	num, err := o.Raw("SELECT F_user_name FROM t_auth_xinlangweibo where F_xinlangweibo_openid=? LIMIT 1", name).Values(&maps)
 	if err == nil && num > 0 {
 		return maps[0]["F_user_name"].(string)
 	}
@@ -1070,48 +1070,48 @@ func (u *MConsumer) GetUidByXinlangweibo(name string)string{
 }
 
 //insert 一条新浪微博认证信息
-func (u *MConsumer) InsertXinlangweibo(data map[string]string,pkg string)string{
+func (u *MConsumer) InsertXinlangweibo(data map[string]string, pkg string) string {
 	name := data["name"]
-	uid := u.addUserXinlangweibo(data,pkg)
-	if len(uid) > 0{
+	uid := u.addUserXinlangweibo(data, pkg)
+	if len(uid) > 0 {
 		o := orm.NewOrm()
-		res, err := o.Raw("INSERT INTO t_auth_xinlangweibo SET F_user_name=?,F_xinlangweibo_openid=?",uid,name).Exec()
+		res, err := o.Raw("INSERT INTO t_auth_xinlangweibo SET F_user_name=?,F_xinlangweibo_openid=?", uid, name).Exec()
 		if err == nil {
 			num, _ := res.RowsAffected()
-			if num >0{
+			if num > 0 {
 				return uid
 			}
-		}else{
-			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1",uid).Exec()
+		} else {
+			o.Raw("DELETE FROM t_user WHERE F_user_name=? LIMIT 1", uid).Exec()
 		}
 	}
 	return ""
 }
 
 //添加新浪微博到t_user,并返回uid
-func (u *MConsumer) addUserXinlangweibo(data map[string]string,pkg string)string{
+func (u *MConsumer) addUserXinlangweibo(data map[string]string, pkg string) string {
 	now := helper.GetNowDateTime()
 	uid := u.CreateUid()
-	set := "F_crate_datetime='"+now+"',F_modify_datetime='"+now+"'"
-	set = "F_user_name='"+uid+"',"+set
-	gender,ok := data["gender"]
+	set := "F_crate_datetime='" + now + "',F_modify_datetime='" + now + "'"
+	set = "F_user_name='" + uid + "'," + set
+	gender, ok := data["gender"]
 	if ok {
-		set = "F_gender='"+gender+"',"+set
+		set = "F_gender='" + gender + "'," + set
 	}
-	nickName,ok := data["nickname"]
+	nickName, ok := data["nickname"]
 	if ok {
-		set = "F_user_nickname='"+nickName+"',"+set
+		set = "F_user_nickname='" + nickName + "'," + set
 	}
 	o := orm.NewOrm()
-	res, err := o.Raw("INSERT INTO t_user SET "+set).Exec()
+	res, err := o.Raw("INSERT INTO t_user SET " + set).Exec()
 	if err == nil {
 		num, _ := res.RowsAffected()
-		if num >0{
+		if num > 0 {
 			//写入金币数量
-			set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
-			o.Raw("INSERT INTO t_coin SET "+set).Exec()
+			set := "F_user_name='" + uid + "',F_coin=" + helper.IntToString(u.GetRegisterCoin())
+			o.Raw("INSERT INTO t_coin SET " + set).Exec()
 			//注册记录
-			u.addRegiestLog(uid,pkg)
+			u.addRegiestLog(uid, pkg)
 
 			return uid
 		}
@@ -1121,31 +1121,31 @@ func (u *MConsumer) addUserXinlangweibo(data map[string]string,pkg string)string
 }
 
 //获取用户金币
-func (u *MConsumer) GetCoin(uid string)int {
+func (u *MConsumer) GetCoin(uid string) int {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? AND F_coin_status = 1 LIMIT 1",uid).Values(&maps)
+	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? AND F_coin_status = 1 LIMIT 1", uid).Values(&maps)
 	if err == nil && num > 0 {
 		return helper.StrToInt(maps[0]["F_coin"].(string))
-	}else{
+	} else {
 		//写入金币数量
-		set := "F_user_name='"+uid+"',F_coin="+helper.IntToString(u.GetRegisterCoin())
-		o.Raw("INSERT INTO t_coin SET "+set).Exec()
+		set := "F_user_name='" + uid + "',F_coin=" + helper.IntToString(u.GetRegisterCoin())
+		o.Raw("INSERT INTO t_coin SET " + set).Exec()
 	}
 	return 0
 }
 
 //增加用户金币,返回用户的新金币数量
-func (u *MConsumer) AddCoin(uid string,coin int,pkg string)int {
+func (u *MConsumer) AddCoin(uid string, coin int, pkg string) int {
 	newCoin := 0
 	o := orm.NewOrm()
 	//添加用户金币
-	o.Raw("UPDATE t_coin SET F_coin = F_coin + ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	o.Raw("UPDATE t_coin SET F_coin = F_coin + ? where F_user_name=? LIMIT 1", coin, uid).Exec()
 	//记录金币历史
-	o.Raw("INSERT INTO t_coin_history SET F_user_name = ?,F_coin = ?,F_pkg = ?,F_create_datetime = ?",uid,coin,pkg,helper.GetNowDateTime()).Exec()
+	o.Raw("INSERT INTO t_coin_history SET F_user_name = ?,F_coin = ?,F_pkg = ?,F_create_datetime = ?", uid, coin, pkg, helper.GetNowDateTime()).Exec()
 	//获取用户金币
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
+	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1", uid).Values(&maps)
 	if err == nil && num > 0 {
 		newCoin = helper.StrToInt(maps[0]["F_coin"].(string))
 	}
@@ -1153,17 +1153,17 @@ func (u *MConsumer) AddCoin(uid string,coin int,pkg string)int {
 }
 
 //减少用户金币,返回用户的新金币数量
-func (u *MConsumer) ReduceCoin(uid string,coin int,pkg string)int {
+func (u *MConsumer) ReduceCoin(uid string, coin int, pkg string) int {
 	newCoin := 0
 	o := orm.NewOrm()
 	//减少用户金币
-	o.Raw("UPDATE t_coin SET F_coin = F_coin - ? where F_user_name=? LIMIT 1",coin,uid).Exec()
+	o.Raw("UPDATE t_coin SET F_coin = F_coin - ? where F_user_name=? LIMIT 1", coin, uid).Exec()
 	//记录金币历史
-	coin = -1*coin
-	o.Raw("INSERT INTO t_coin_history SET F_user_name = ?,F_coin = ?,F_pkg = ?,F_create_datetime = ?",uid,coin,pkg,helper.GetNowDateTime()).Exec()
+	coin = -1 * coin
+	o.Raw("INSERT INTO t_coin_history SET F_user_name = ?,F_coin = ?,F_pkg = ?,F_create_datetime = ?", uid, coin, pkg, helper.GetNowDateTime()).Exec()
 	//获取用户金币
 	var maps []orm.Params
-	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1",uid).Values(&maps)
+	num, err := o.Raw("SELECT F_coin FROM t_coin where F_user_name=? LIMIT 1", uid).Values(&maps)
 	if err == nil && num > 0 {
 		newCoin = helper.StrToInt(maps[0]["F_coin"].(string))
 	}
@@ -1171,10 +1171,10 @@ func (u *MConsumer) ReduceCoin(uid string,coin int,pkg string)int {
 }
 
 //获取update coin white ip
-func (u *MConsumer) CheckUpdateCoinWhiteIp(ip string)bool {
+func (u *MConsumer) CheckUpdateCoinWhiteIp(ip string) bool {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_ip_white_list WHERE F_ip = ? AND F_status = 1 AND F_type = 1",ip).Values(&maps)
+	num, err := o.Raw("SELECT * FROM t_ip_white_list WHERE F_ip = ? AND F_status = 1 AND F_type = 1", ip).Values(&maps)
 	if err == nil && num > 0 {
 		return true
 	}
@@ -1182,28 +1182,28 @@ func (u *MConsumer) CheckUpdateCoinWhiteIp(ip string)bool {
 }
 
 //获取注册所送的金币
-func (u *MConsumer) GetRegisterCoin()int {
+func (u *MConsumer) GetRegisterCoin() int {
 	return 0
 	/*
-	coin := Coin
-	o := orm.NewOrm()
-	var maps []orm.Params
-	num, err := o.Raw("SELECT * FROM t_config_other WHERE F_key = \"coin\" LIMIT 1").Values(&maps)
-	if err == nil && num > 0 {
-		coin = helper.StrToInt(maps[0]["F_value"].(string))
-	}
-	return coin
+		coin := Coin
+		o := orm.NewOrm()
+		var maps []orm.Params
+		num, err := o.Raw("SELECT * FROM t_config_other WHERE F_key = \"coin\" LIMIT 1").Values(&maps)
+		if err == nil && num > 0 {
+			coin = helper.StrToInt(maps[0]["F_value"].(string))
+		}
+		return coin
 	*/
 }
 
 //注册记录
-func (u *MConsumer) addRegiestLog(uid string,pkg string) {
+func (u *MConsumer) addRegiestLog(uid string, pkg string) {
 	o := orm.NewOrm()
-	o.Raw("INSERT INTO t_register_history SET F_user_name = ?,F_pkg = ?,F_create_datetime = ?",uid,pkg,helper.GetNowDateTime()).Exec()
+	o.Raw("INSERT INTO t_register_history SET F_user_name = ?,F_pkg = ?,F_create_datetime = ?", uid, pkg, helper.GetNowDateTime()).Exec()
 }
 
 //获取某个用户的头像
-func (u *MConsumer) GetUserAvatar(uid string) string{
+func (u *MConsumer) GetUserAvatar(uid string) string {
 	F_avatar_url := ""
 	o := orm.NewOrm()
 	var maps []orm.Params
@@ -1211,8 +1211,8 @@ func (u *MConsumer) GetUserAvatar(uid string) string{
 	if err == nil && num > 0 {
 		//头像
 		avatartmp := maps[0]["F_avatarname"].(string)
-		if len(avatartmp) > 0{
-			F_avatar_url = u.getUserAvatarUrl(avatartmp,helper.StrToInt(avatartmp[0:1]))
+		if len(avatartmp) > 0 {
+			F_avatar_url = u.getUserAvatarUrl(avatartmp, helper.StrToInt(avatartmp[0:1]))
 		}
 	}
 	return F_avatar_url

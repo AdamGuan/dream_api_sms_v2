@@ -12,9 +12,9 @@ type MPkg struct {
 }
 
 //获取包对应的app config
-func (u *MPkg) GetPkgConfig(pkg string)map[string]string{
+func (u *MPkg) GetPkgConfig(pkg string) map[string]string {
 	result := map[string]string{}
-	if len(pkg) > 0{
+	if len(pkg) > 0 {
 		o := orm.NewOrm()
 		var maps []orm.Params
 		num, err := o.Raw("SELECT * FROM t_config_pkg WHERE F_pkg=? LIMIT 1", pkg).Values(&maps)
@@ -30,9 +30,9 @@ func (u *MPkg) GetPkgConfig(pkg string)map[string]string{
 }
 
 //检查包是否存在
-func (u *MPkg) CheckPkgExists(pkg string)bool{
+func (u *MPkg) CheckPkgExists(pkg string) bool {
 	result := false
-	if len(pkg) > 0{
+	if len(pkg) > 0 {
 		o := orm.NewOrm()
 		var maps []orm.Params
 		num, err := o.Raw("SELECT * FROM t_config_pkg WHERE F_pkg=? LIMIT 1", pkg).Values(&maps)

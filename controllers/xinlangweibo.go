@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dream_api_sms_v2/models"
 	"dream_api_sms_v2/helper"
+	"dream_api_sms_v2/models"
 )
 
 //新浪微博(第三方)
@@ -42,12 +42,12 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 		datas["responseNo"] = -1
 		//检查新浪微博信息的有效性
 		if len(openid) > 0 && len(access_token) > 0 {
-			res,_ := helper.CurlXinglangweibo("https://api.weibo.com/oauth2/get_token_info?access_token="+access_token,"POST")
-			_,ok := res["uid"]
+			res, _ := helper.CurlXinglangweibo("https://api.weibo.com/oauth2/get_token_info?access_token="+access_token, "POST")
+			_, ok := res["uid"]
 			if ok {
 				//检查新浪微博是否已存在
 				uuid := userObj.GetUidByXinlangweibo(openid)
-				if len(uuid) <= 0{
+				if len(uuid) <= 0 {
 					datas["responseNo"] = 0
 					//写入一条新浪微博数据
 					paramesData := make(map[string]string)
@@ -55,11 +55,11 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 					if len(gender) > 0 {
 						if gender != "男" && gender != "女" {
 							datas["responseNo"] = -10
-						}else{
+						} else {
 							gender2 := "1"
 							if gender == "男" {
 								gender2 = "1"
-							}else{
+							} else {
 								gender2 = "2"
 							}
 							paramesData["gender"] = gender2
@@ -69,21 +69,21 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 						paramesData["nickname"] = nickname
 					}
 					if datas["responseNo"] == 0 {
-						uuid = userObj.InsertXinlangweibo(paramesData,pkg)
+						uuid = userObj.InsertXinlangweibo(paramesData, pkg)
 					}
 				}
-				if len(uuid) > 0{
+				if len(uuid) > 0 {
 					//返回登录信息
-					info := u.login(uuid,pkg)
-					if len(info) > 0{
+					info := u.login(uuid, pkg)
+					if len(info) > 0 {
 						datas["responseNo"] = 0
-						for key,value := range info{
+						for key, value := range info {
 							datas[key] = value
 						}
 					}
 				}
 			}
-		}else{
+		} else {
 			datas["responseNo"] = -10
 		}
 	}
@@ -92,20 +92,20 @@ func (u *XinlangweiboController) LoginXinalngweibo() {
 }
 
 //登录
-func (u *XinlangweiboController) login(uid string,pkg string)map[string]interface{} {
+func (u *XinlangweiboController) login(uid string, pkg string) map[string]interface{} {
 	userInfo := map[string]interface{}{}
 	//model ini
 	var userObj *models.MConsumer
 	//检查uid是否存在
-	if userObj.CheckUserIdExists(uid){
+	if userObj.CheckUserIdExists(uid) {
 		//获取token
-		token,tokenExpireDatetime := userObj.GetTokenByUid(uid,pkg)
+		token, tokenExpireDatetime := userObj.GetTokenByUid(uid, pkg)
 		//获取其它信息
-		if len(token) > 0{
+		if len(token) > 0 {
 			userInfo["token"] = token
 			userInfo["tokenExpireDatetime"] = tokenExpireDatetime
 			info := userObj.GetUserInfoByUid(uid)
-			if len(info.F_uid) > 0{
+			if len(info.F_uid) > 0 {
 				userInfo["F_uid"] = info.F_uid
 				userInfo["F_phone_number"] = info.F_phone_number
 				userInfo["F_gender"] = info.F_gender

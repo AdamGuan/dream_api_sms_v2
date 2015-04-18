@@ -2,14 +2,14 @@ package models
 
 import (
 	//"fmt"
-	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"os"
 	//"dream_api_sms/helper"
-	"time"
-	"github.com/astaxie/beego/config" 
 	"dream_api_sms_v2/helper"
+	"github.com/astaxie/beego/config"
+	"time"
 )
 
 var Debug bool
@@ -29,18 +29,18 @@ var School map[string]string
 var SchoolType map[int]string
 
 //缺省学校列表
-type DefaultSchoolItemType struct{
-	F_school_id			int
-	F_school			string
-	F_school_type		int
-	F_belong_area_id	int
+type DefaultSchoolItemType struct {
+	F_school_id      int
+	F_school         string
+	F_school_type    int
+	F_belong_area_id int
 }
 
-type DefaultSchoolListType map[string]struct{
-	F_school_id			int
-	F_school			string
-	F_school_type		int
-	F_belong_area_id	int
+type DefaultSchoolListType map[string]struct {
+	F_school_id      int
+	F_school         string
+	F_school_type    int
+	F_belong_area_id int
 }
 
 var DefaultSchoolList DefaultSchoolListType
@@ -49,19 +49,19 @@ var DefaultSchoolList DefaultSchoolListType
 var Coin int
 
 func init() {
-	
+
 	dbconf, _ := config.NewConfig("ini", "conf/db.conf")
-	maxIdle,_ := dbconf.Int("maxIdle")
-	maxConn,_ := dbconf.Int("maxConn")
-	userName := dbconf.String(beego.RunMode+"::userName")
-	password := dbconf.String(beego.RunMode+"::password")
-	dbName := dbconf.String(beego.RunMode+"::dbName")
-	orm.RegisterDataBase("default", "mysql", userName+":"+password+"@/"+dbName+"?charset=utf8&loc=Asia%2FShanghai",maxIdle, maxConn)
+	maxIdle, _ := dbconf.Int("maxIdle")
+	maxConn, _ := dbconf.Int("maxConn")
+	userName := dbconf.String(beego.RunMode + "::userName")
+	password := dbconf.String(beego.RunMode + "::password")
+	dbName := dbconf.String(beego.RunMode + "::dbName")
+	orm.RegisterDataBase("default", "mysql", userName+":"+password+"@/"+dbName+"?charset=utf8&loc=Asia%2FShanghai", maxIdle, maxConn)
 	orm.DefaultTimeLoc = time.UTC
 	appConf, _ := config.NewConfig("ini", "conf/app.conf")
-	debug,_ := appConf.Bool(beego.RunMode+"::debug")
-	dblog,_ := appConf.Bool(beego.RunMode+"::dblog")
-	DebugErrlog,_ = appConf.Bool(beego.RunMode+"::errlog")
+	debug, _ := appConf.Bool(beego.RunMode + "::debug")
+	dblog, _ := appConf.Bool(beego.RunMode + "::dblog")
+	DebugErrlog, _ = appConf.Bool(beego.RunMode + "::errlog")
 	Debug = debug
 	if dblog {
 		orm.Debug = true
@@ -79,7 +79,7 @@ func init() {
 	getSchool()
 	getDefaultSchool()
 	getCoinConfig()
-	
+
 	SchoolType = make(map[int]string)
 	SchoolType[1] = "小学"
 	SchoolType[2] = "初中"
@@ -170,9 +170,9 @@ func getDefaultSchool() {
 	var maps []orm.Params
 	num, err := o.Raw("SELECT * FROM t_school WHERE F_school_id < 0").Values(&maps)
 	if err == nil && num > 0 {
-		DefaultSchoolList = make(DefaultSchoolListType,num)
+		DefaultSchoolList = make(DefaultSchoolListType, num)
 		for _, item := range maps {
-			DefaultSchoolList[item["F_school_id"].(string)] = DefaultSchoolItemType{F_school_id:helper.StrToInt(item["F_school_id"].(string)),F_school:item["F_school"].(string),F_school_type:helper.StrToInt(item["F_school_type"].(string)),F_belong_area_id:helper.StrToInt(item["F_belong_area_id"].(string))}
+			DefaultSchoolList[item["F_school_id"].(string)] = DefaultSchoolItemType{F_school_id: helper.StrToInt(item["F_school_id"].(string)), F_school: item["F_school"].(string), F_school_type: helper.StrToInt(item["F_school_type"].(string)), F_belong_area_id: helper.StrToInt(item["F_belong_area_id"].(string))}
 		}
 	}
 }
@@ -185,7 +185,7 @@ func getCoinConfig() {
 	num, err := o.Raw("SELECT * FROM t_config_other").Values(&maps)
 	if err == nil && num > 0 {
 		for _, item := range maps {
-			if item["F_key"] == "coin"{
+			if item["F_key"] == "coin" {
 				Coin = helper.StrToInt(item["F_value"].(string))
 				break
 			}
