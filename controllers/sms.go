@@ -86,6 +86,7 @@ func (u *SmsController) RegisterGetSms() {
 				if len(res) == 0 {
 					datas["responseNo"] = 0
 					smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+					u.logSmsSend(pkg)
 				} else {
 					smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 				}
@@ -139,6 +140,7 @@ func (u *SmsController) ResetPwdGetSms() {
 				if len(res) == 0 {
 					datas["responseNo"] = 0
 					smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+					u.logSmsSend(pkg)
 				} else {
 					smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 				}
@@ -189,6 +191,7 @@ func (u *SmsController) FindPwdGetSms() {
 				if len(res) == 0 {
 					datas["responseNo"] = 0
 					smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+					u.logSmsSend(pkg)
 				} else {
 					smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 				}
@@ -251,6 +254,7 @@ func (u *SmsController) ChangePhoneSms() {
 			if len(res) == 0 {
 				datas["responseNo"] = 0
 				smsObj.AddMsmRate(newPhone, pkg)
+				u.logSmsSend(pkg)
 			} else {
 				smsObj.DeleteMsmRate(newPhone, pkg)
 			}
@@ -303,6 +307,7 @@ func (u *SmsController) ChangePhoneSms2() {
 			if len(res) == 0 {
 				datas["responseNo"] = 0
 				smsObj.AddMsmRate(mobilePhoneNumber, pkg)
+				u.logSmsSend(pkg)
 			} else {
 				smsObj.DeleteMsmRate(mobilePhoneNumber, pkg)
 			}
@@ -313,4 +318,16 @@ func (u *SmsController) ChangePhoneSms2() {
 
 	//return
 	u.jsonEcho(datas)
+}
+
+//记录发送成功的短信
+func (u *SmsController) logSmsSend(pkg string) {
+	method := "POST"
+	debug := "0"
+	if models.Debug {
+		debug = "1"
+	}
+	requestUri := "http://useracc.dream.cn:8286/v1/history/smssend?pkg=" + pkg + "&debug=" + debug
+	requestData := map[string]string{}
+	helper.CurlSmsLog(requestUri, method, requestData)
 }

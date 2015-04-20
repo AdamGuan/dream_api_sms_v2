@@ -140,6 +140,30 @@ func CurlWeixin(requestUri string, method string) (map[string]interface{}, map[s
 	return p, resp.Header
 }
 
+//记录短信发送的 curl
+func CurlSmsLog(requestUri string, method string, requestData map[string]string) (map[string]interface{}, map[string][]string) {
+	fmt.Println(requestUri)
+	fmt.Println(method)
+	fmt.Println(requestData)
+
+	geturl := requestUri
+	req, _ := http.NewRequest(method, geturl, nil)
+	data, _ := json.Marshal(requestData)
+	req.Body = ioutil.NopCloser(strings.NewReader(string(data)))
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+	bodyByte, _ := ioutil.ReadAll(resp.Body)
+	p := map[string]interface{}{}
+	json.Unmarshal(bodyByte, &p)
+	return p, resp.Header
+}
+
 //检查签名
 func CheckSign(sign string, token string) bool {
 	//sign = timestamp+md5(token+timestamp)
