@@ -4,3 +4,4 @@
 dream_api_sms*
 old_dream_api_sms*
 *.tar.gz
+/tests/default_test.go
